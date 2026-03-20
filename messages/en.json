@@ -3,5 +3,15 @@
   "auth": { "title": "Sign in to TenderSarthi", "subtitle": "Win more tenders with AI assistance", "googleSignIn": "Continue with Google", "orDivider": "or", "phonePlaceholder": "Mobile number (e.g. 9876543210)", "sendOtp": "Send OTP", "otpPlaceholder": "Enter 6-digit OTP", "verifyOtp": "Verify OTP", "otpSent": "OTP sent to", "wrongNumber": "Wrong number?", "privacyNote": "By signing in, you agree to our Terms and Privacy Policy." },
   "onboarding": { "stepOf": "Step {current} of {total}", "step1Title": "Welcome to TenderSarthi!", "step1Subtitle": "Let's set up your profile", "namePlaceholder": "Your full name", "businessNamePlaceholder": "Business / firm name", "step2Title": "Which state are you based in?", "step2Subtitle": "We'll filter tenders for your state", "selectState": "Select your state", "step3Title": "Which categories do you bid in?", "step3Subtitle": "Select all that apply", "step4Title": "Get tender alerts instantly", "step4Subtitle": "We'll notify you when matching tenders are posted", "allowNotifications": "Allow Notifications", "notificationsDeclined": "You can enable alerts later in Settings" },
   "nav": { "dashboard": "Dashboard", "find": "Find", "tenders": "Tenders", "bid": "Bid", "more": "More", "documents": "Documents", "alerts": "Alerts", "learn": "Learn", "orders": "Orders", "settings": "Settings" },
-  "planGate": { "aiLimitReached": "You've used {used}/{limit} AI queries this month.", "tenderLimitReached": "Free plan allows {limit} saved tenders.", "bidGeneratorPro": "Bid Document Generator is a Pro feature.", "upgradeMonthly": "Rs.499/month", "upgradeAnnual": "Rs.3,999/year" }
+  "planGate": { "aiLimitReached": "You've used {used}/{limit} AI queries this month.", "tenderLimitReached": "Free plan allows {limit} saved tenders.", "bidGeneratorPro": "Bid Document Generator is a Pro feature.", "upgradeMonthly": "Rs.499/month", "upgradeAnnual": "Rs.3,999/year" },
+  "dashboard": {
+    "greeting": "Hello, {name}!",
+    "activeTenders": "{count} active tender(s)",
+    "nextDeadline": "next deadline in {days} days",
+    "trialBannerTitle": "{days} days of Pro trial left!",
+    "trialBannerSubtitle": "Upgrade now to keep Pro features after trial.",
+    "trialBannerCta": "Upgrade Now",
+    "discoverMore": "Discover more →",
+    "aiUsageTitle": "AI Queries"
+  }
 }
