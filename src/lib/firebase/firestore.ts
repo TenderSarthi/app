@@ -4,7 +4,7 @@ import {
   deleteDoc, increment, QuerySnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument, BidDocument, AlertConfig } from '../types'
+import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument, BidDocument, AlertConfig, Order, OrderStatus, OrderMilestones } from '../types'
 
 export async function getUser(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, 'users', uid))
@@ -256,4 +256,69 @@ export function subscribeAlertConfig(
     snap => onData(snap.exists() ? (snap.data() as AlertConfig) : null),
     onError
   )
+}
+
+// ---------- Orders ----------
+
+/** Add a new work order. Returns the new Firestore document ID. */
+export async function addOrder(
+  uid: string,
+  data: Omit<Order, 'id' | 'userId' | 'createdAt'>
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'orders'), {
+    ...data,
+    userId: uid,
+    createdAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+/** Real-time listener on the current user's orders, newest first. */
+export function subscribeOrders(
+  uid: string,
+  onData: (orders: Order[]) => void,
+  onError: (err: Error) => void
+): () => void {
+  const q = query(
+    collection(db, 'orders'),
+    where('userId', '==', uid),
+    orderBy('createdAt', 'desc')
+  )
+  return onSnapshot(
+    q,
+    (snap: QuerySnapshot<DocumentData>) => {
+      onData(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order)))
+    },
+    onError
+  )
+}
+
+/** Update simple fields on an order (notes, workOrderNumber, value). */
+export async function updateOrder(
+  orderId: string,
+  updates: Partial<Pick<Order, 'workOrderNumber' | 'value' | 'notes'>>
+): Promise<void> {
+  await updateDoc(doc(db, 'orders', orderId), updates)
+}
+
+/**
+ * Advance an order to the next milestone.
+ * Sets milestones.{milestoneKey} = serverTimestamp() and updates status.
+ * Uses Firestore dot-notation to merge into the milestones map without
+ * overwriting the other milestone fields.
+ */
+export async function advanceOrderMilestone(
+  orderId: string,
+  milestoneKey: keyof OrderMilestones,
+  nextStatus: OrderStatus
+): Promise<void> {
+  await updateDoc(doc(db, 'orders', orderId), {
+    [`milestones.${milestoneKey}`]: serverTimestamp(),
+    status: nextStatus,
+  })
+}
+
+/** Delete a work order permanently. */
+export async function deleteOrder(orderId: string): Promise<void> {
+  await deleteDoc(doc(db, 'orders', orderId))
 }
