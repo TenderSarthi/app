@@ -6,6 +6,7 @@ import type { Order } from '@/lib/types'
 export function useOrders(uid: string | null) {
   const [orders, setOrders]   = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState<string | null>(null)
 
   useEffect(() => {
     if (!uid) {
@@ -14,12 +15,13 @@ export function useOrders(uid: string | null) {
       return
     }
     setLoading(true)
+    setError(null)
     return subscribeOrders(
       uid,
-      (data) => { setOrders(data); setLoading(false) },
-      ()     => setLoading(false)
+      (data) => { setOrders(data); setLoading(false); setError(null) },
+      (err)  => { setLoading(false); setError(err.message) }
     )
   }, [uid])
 
-  return { orders, loading }
+  return { orders, loading, error }
 }

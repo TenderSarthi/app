@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Lock, Plus } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
@@ -17,7 +17,7 @@ import type { Order } from '@/lib/types'
 export default function OrdersPage() {
   const { user }    = useFirebase()
   const { profile } = useUserProfile()
-  const { orders, loading } = useOrders(user?.uid ?? null)
+  const { orders, loading, error } = useOrders(user?.uid ?? null)
   const { tenders }         = useUserTenders(user?.uid ?? null)
 
   const [dialogOpen,    setDialogOpen]    = useState(false)
@@ -29,6 +29,17 @@ export default function OrdersPage() {
     () => tenders.filter((t) => t.status === 'active'),
     [tenders]
   )
+
+  // Stable callbacks — defined before early returns so useCallback is unconditional
+  const handleEdit = useCallback((order: Order) => {
+    setEditOrder(order)
+    setDialogOpen(true)
+  }, [])
+
+  const handleDialogClose = useCallback((open: boolean) => {
+    setDialogOpen(open)
+    if (!open) setEditOrder(null)
+  }, [])
 
   // Loading skeleton — shown before profile/auth resolves
   if (!profile || !user) {
@@ -62,6 +73,7 @@ export default function OrdersPage() {
             Upgrade to Pro to log work orders and track Delivery → Inspection → Invoice → Payment milestones.
           </p>
           <button
+            type="button"
             onClick={() => setUpgradeOpen(true)}
             className="mt-1 px-6 py-2.5 rounded-xl bg-orange text-white font-semibold text-sm"
           >
@@ -78,16 +90,6 @@ export default function OrdersPage() {
     )
   }
 
-  const handleEdit = (order: Order) => {
-    setEditOrder(order)
-    setDialogOpen(true)
-  }
-
-  const handleDialogClose = (open: boolean) => {
-    setDialogOpen(open)
-    if (!open) setEditOrder(null)
-  }
-
   return (
     <div className="space-y-4 pb-32 desktop:pb-6">
       {/* Header */}
@@ -97,6 +99,7 @@ export default function OrdersPage() {
           <p className="text-sm text-muted mt-0.5">Track milestones for your won tenders</p>
         </div>
         <button
+          type="button"
           onClick={() => { setEditOrder(null); setDialogOpen(true) }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-navy text-white text-sm font-semibold"
           aria-label="Add work order"
@@ -112,6 +115,13 @@ export default function OrdersPage() {
           {[1, 2].map((i) => (
             <div key={i} className="h-32 bg-navy/5 rounded-xl animate-pulse" />
           ))}
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <p className="font-semibold text-danger">Could not load orders</p>
+          <p className="text-sm text-muted mt-1 max-w-xs">
+            Please check your connection and try again.
+          </p>
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
