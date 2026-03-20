@@ -95,3 +95,25 @@ export interface VaultDocument {
 export function isValidDocumentType(s: unknown): s is DocumentType {
   return ['rc','gst','insurance','itr','msme','pan','udyam','other'].includes(s as string)
 }
+
+export interface ChatMessage {
+  id: string
+  role: 'user' | 'model'
+  content: string
+}
+
+export interface BidDocument {
+  id: string
+  userId: string
+  tenderId: string
+  tenderName: string
+  tenderCategory: string
+  experienceYears: number
+  pastContracts: string
+  capacity: string
+  quotedRate: string
+  winScore: number
+  winLabel: string
+  generatedDocument: string
+  createdAt: Timestamp
+}

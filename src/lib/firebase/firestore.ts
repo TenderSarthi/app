@@ -4,7 +4,7 @@ import {
   deleteDoc, increment, QuerySnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument } from '../types'
+import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument, BidDocument } from '../types'
 
 export async function getUser(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, 'users', uid))
@@ -180,4 +180,45 @@ export function subscribeUserDocuments(
 /** Deletes vault document metadata from Firestore. Caller is responsible for deleting the Storage file. */
 export async function deleteVaultDocument(documentId: string): Promise<void> {
   await deleteDoc(doc(db, 'documents', documentId))
+}
+
+// ---------- Bid History ----------
+
+/** Saves generated bid document to history. Returns new document ID. */
+export async function addBidDocument(
+  uid: string,
+  data: Omit<BidDocument, 'id' | 'userId' | 'createdAt'>
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'bidHistory'), {
+    ...data,
+    userId: uid,
+    createdAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+/** Real-time listener for user's bid history, newest first. */
+export function subscribeBidHistory(
+  uid: string,
+  onData: (docs: BidDocument[]) => void,
+  onError: (err: Error) => void
+): () => void {
+  const q = query(
+    collection(db, 'bidHistory'),
+    where('userId', '==', uid),
+    orderBy('createdAt', 'desc')
+  )
+  return onSnapshot(
+    q,
+    (snap: QuerySnapshot<DocumentData>) => {
+      onData(snap.docs.map(d => ({ id: d.id, ...d.data() } as BidDocument)))
+    },
+    onError
+  )
+}
+
+/** Atomically increments the bidDocs counter for the current month. */
+export async function incrementBidDocCount(uid: string): Promise<void> {
+  const ref = doc(db, 'aiUsage', uid, currentMonthKey(), 'data')
+  await setDoc(ref, { bidDocs: increment(1) }, { merge: true })
 }
