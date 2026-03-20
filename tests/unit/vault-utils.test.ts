@@ -12,7 +12,7 @@ function makeDoc(type: string, expiresAt: Timestamp | null = null): VaultDocumen
   return {
     id: '1', userId: 'u1', type: type as any, fileName: 'test.pdf',
     fileSize: 1000, storagePath: 'docs/u1/test.pdf', storageUrl: 'https://example.com',
-    expiresAt, createdAt: Timestamp.now(), updatedAt: Timestamp.now(),
+    expiresAt, createdAt: Timestamp.now(), updatedAt: Timestamp.now(), expiryAlertSent: false,
   }
 }
 

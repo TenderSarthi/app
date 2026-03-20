@@ -59,6 +59,7 @@ export function UploadDocumentDialog({ open, onClose, uid }: UploadDocumentDialo
         storagePath,
         storageUrl,
         expiresAt: expiryDate ? Timestamp.fromDate(new Date(expiryDate)) : null,
+        expiryAlertSent: false,
       })
       handleClose()
     } catch {

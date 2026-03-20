@@ -90,6 +90,7 @@ export interface VaultDocument {
   expiresAt: Timestamp | null
   createdAt: Timestamp
   updatedAt: Timestamp
+  expiryAlertSent: boolean  // true once 30-day expiry alert has been sent
 }
 
 export function isValidDocumentType(s: unknown): s is DocumentType {
@@ -116,4 +117,18 @@ export interface BidDocument {
   winLabel: string
   generatedDocument: string
   createdAt: Timestamp
+}
+
+export interface AlertConfig {
+  userId: string
+  categories: string[]
+  states: string[]
+  keywords: string[]
+  channels: {
+    push: boolean
+    whatsapp: boolean
+    email: boolean
+  }
+  active: boolean
+  createdAt?: Timestamp
 }

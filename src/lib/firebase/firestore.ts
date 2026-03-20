@@ -4,7 +4,7 @@ import {
   deleteDoc, increment, QuerySnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument, BidDocument } from '../types'
+import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument, BidDocument, AlertConfig } from '../types'
 
 export async function getUser(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, 'users', uid))
@@ -221,4 +221,39 @@ export function subscribeBidHistory(
 export async function incrementBidDocCount(uid: string): Promise<void> {
   const ref = doc(db, 'aiUsage', uid, currentMonthKey(), 'data')
   await setDoc(ref, { bidDocs: increment(1) }, { merge: true })
+}
+
+// ---------- Alert Config ----------
+
+/** Create or overwrite a user's alert config (one config per user). */
+export async function saveAlertConfig(
+  uid: string,
+  config: Omit<AlertConfig, 'userId' | 'createdAt'>
+): Promise<void> {
+  const ref = doc(db, 'alertConfigs', uid)
+  await setDoc(ref, {
+    ...config,
+    userId: uid,
+    createdAt: serverTimestamp(),
+  })
+}
+
+/** Fetch a user's alert config once. Returns null if not configured yet. */
+export async function getAlertConfig(uid: string): Promise<AlertConfig | null> {
+  const snap = await getDoc(doc(db, 'alertConfigs', uid))
+  if (!snap.exists()) return null
+  return { ...(snap.data() as AlertConfig) }
+}
+
+/** Real-time listener for a user's alert config. */
+export function subscribeAlertConfig(
+  uid: string,
+  onData: (config: AlertConfig | null) => void,
+  onError: (err: Error) => void
+): () => void {
+  return onSnapshot(
+    doc(db, 'alertConfigs', uid),
+    snap => onData(snap.exists() ? (snap.data() as AlertConfig) : null),
+    onError
+  )
 }

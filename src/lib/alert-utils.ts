@@ -1,14 +1,7 @@
 import { CATEGORY_KEYWORDS, INDIAN_STATES } from './constants'
+import type { AlertConfig } from './types'
 
-// AlertConfig will be moved to types.ts in a future task; defined here for now
-export interface AlertConfig {
-  userId: string
-  categories: string[]
-  states: string[]
-  keywords: string[]
-  channels: { push: boolean; whatsapp: boolean; email: boolean }
-  active: boolean
-}
+export type { AlertConfig }  // re-export so test imports can use @/lib/alert-utils
 
 export interface ParsedTender {
   title: string
