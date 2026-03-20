@@ -80,3 +80,21 @@ export const CATEGORY_DOCUMENT_REQUIREMENTS: Record<string, string[]> = {
 }
 
 export const BASE_REQUIRED_DOCS = ['gst', 'pan'] as const
+
+// Keywords used to extract categories from RSS feed text
+export const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  'Transport & Vehicles':           ['vehicle', 'transport', 'car', 'bus', 'truck', 'hiring', 'fleet'],
+  'IT & Electronics':               ['computer', 'laptop', 'software', 'it ', 'electronics', 'hardware', 'server'],
+  'Medical & Healthcare':           ['medical', 'health', 'hospital', 'medicine', 'surgical', 'ambulance'],
+  'Construction & Infrastructure':  ['construction', 'civil', 'road', 'building', 'infrastructure', 'bridge'],
+  'Stationery & Office Supplies':   ['stationery', 'paper', 'office supply', 'printing press', 'toner'],
+  'Furniture & Fixtures':           ['furniture', 'chair', 'table', 'cabinet', 'workstation'],
+  'Uniforms & Clothing':            ['uniform', 'clothing', 'garment', 'textile', 'fabric'],
+  'Agriculture & Food':             ['agriculture', 'food', 'grain', 'seed', 'fertilizer', 'ration'],
+  'Security Services':              ['security', 'guard', 'cctv', 'surveillance', 'watchman'],
+  'Printing & Publishing':          ['printing', 'publication', 'book', 'diary', 'calendar'],
+  'Electrical & Lighting':          ['electrical', 'lighting', 'led', 'wiring', 'transformer'],
+  'Plumbing & Sanitation':          ['plumbing', 'sanitation', 'pipe', 'drainage', 'water supply'],
+  'Cleaning & Housekeeping':        ['cleaning', 'housekeeping', 'janitorial', 'sweeping', 'sanitation'],
+  'Other':                          [],
+}
