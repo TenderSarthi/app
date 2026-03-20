@@ -56,7 +56,6 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
       await deleteOrder(order.id)
     } catch {
       setDeleteError(true)
-      setDeleting(false)
       setConfirmDelete(false)
     } finally {
       setDeleting(false)
