@@ -44,3 +44,33 @@ export function isProPlan(plan: unknown): plan is 'pro' {
 export function isValidLanguageCode(code: unknown): code is LanguageCode {
   return typeof code === 'string' && (LOCALE_CODES as readonly string[]).includes(code)
 }
+
+// --- Tender types ---
+
+export type TenderStatus = 'active' | 'won' | 'lost' | 'expired'
+
+export interface Tender {
+  id: string
+  userId: string
+  name: string
+  gemId: string
+  category: string
+  state: string
+  deadline: Timestamp | null
+  status: TenderStatus
+  aiSummary: string | null
+  gemUrl: string | null
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+export interface PlatformStats {
+  vendorCount: number
+  tendersFiled: number
+  tendersWon: number
+  lastUpdatedAt: Timestamp | null
+}
+
+export function isValidTenderStatus(s: unknown): s is TenderStatus {
+  return s === 'active' || s === 'won' || s === 'lost' || s === 'expired'
+}
