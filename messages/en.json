@@ -13,5 +13,22 @@
     "trialBannerCta": "Upgrade Now",
     "discoverMore": "Discover more →",
     "aiUsageTitle": "AI Queries"
+  },
+  "finder": {
+    "title": "Find Tenders",
+    "subtitle": "Search GeM portal and summarize tenders with AI",
+    "filtersTitle": "Filters",
+    "aiTitle": "AI Tender Summarizer",
+    "pastePrompt": "Paste tender text from GeM portal",
+    "pastePlaceholder": "Copy and paste the full tender description here...",
+    "summarize": "Summarize with AI",
+    "summarizing": "Summarizing...",
+    "saveTender": "Save this tender",
+    "saveTenderTitle": "Save Tender",
+    "tenderName": "Tender Name",
+    "category": "Category",
+    "deadline": "Deadline",
+    "queriesLeft": "{left} AI queries left this month",
+    "searchSavedTenders": "Search your saved tenders"
   }
 }
