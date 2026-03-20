@@ -41,6 +41,17 @@
     "allStates": "\u0938\u092d\u0940 States",
     "clearFilters": "Filters \u0939\u091f\u093e\u090f\u0902",
     "limitWarning": "{used}/{limit} tenders use \u0939\u0941\u090f \u2014 unlimited \u0915\u0947 \u0932\u093f\u090f upgrade \u0915\u0930\u0947\u0902",
-    "upgrade": "Upgrade \u0915\u0930\u0947\u0902"
+    "upgrade": "Upgrade \u0915\u0930\u0947\u0902",
+    "markWon": "\u091c\u0940\u0924 \u0917\u090f",
+    "markLost": "\u0939\u093e\u0930 \u0917\u090f",
+    "markExpired": "Expired",
+    "markActive": "Active",
+    "delete": "Delete \u0915\u0930\u0947\u0902",
+    "openOnGem": "GeM \u092a\u0930 \u0926\u0947\u0916\u0947\u0902",
+    "deleteConfirm": "\u0907\u0938 tender \u0915\u094b delete \u0915\u0930\u0947\u0902?",
+    "confirmDelete": "Confirm?",
+    "cancelDelete": "Cancel",
+    "noFilterResults": "\u0906\u092a\u0915\u0947 filters \u0938\u0947 \u0915\u094b\u0908 tender match \u0928\u0939\u0940\u0902 \u0939\u0941\u0906",
+    "noFilterResultsSubtitle": "Filters \u092c\u0926\u0932\u0947\u0902 \u092f\u093e \u0939\u091f\u093e\u090f\u0902\u0964"
   }
 }

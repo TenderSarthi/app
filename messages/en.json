@@ -41,6 +41,17 @@
     "allStates": "All States",
     "clearFilters": "Clear filters",
     "limitWarning": "{used}/{limit} tenders used — upgrade for unlimited",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "markWon": "Won",
+    "markLost": "Lost",
+    "markExpired": "Expired",
+    "markActive": "Active",
+    "delete": "Delete",
+    "openOnGem": "Open on GeM",
+    "deleteConfirm": "Delete this tender?",
+    "confirmDelete": "Confirm?",
+    "cancelDelete": "Cancel",
+    "noFilterResults": "No tenders match your filters",
+    "noFilterResultsSubtitle": "Try changing or clearing your filters."
   }
 }

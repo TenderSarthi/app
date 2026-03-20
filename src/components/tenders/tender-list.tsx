@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { FileText } from 'lucide-react'
+import { FileText, Filter } from 'lucide-react'
 import { TenderCard } from './tender-card'
 import { TenderStatusDialog } from './tender-status-dialog'
 import { UpgradeDialog } from '@/components/dashboard/upgrade-dialog'
@@ -21,9 +21,10 @@ export function TenderList({ tenders, totalCount, isPro }: TenderListProps) {
   const [selectedTender, setSelectedTender] = useState<Tender | null>(null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
 
-  const showWarning = !isPro && totalCount >= FREE_LIMIT - 1
+  const showWarning = !isPro && totalCount >= FREE_LIMIT
 
-  if (tenders.length === 0) {
+  // Truly empty — no tenders saved at all
+  if (tenders.length === 0 && totalCount === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="w-16 h-16 bg-navy/5 rounded-2xl flex items-center justify-center mb-4">
@@ -31,6 +32,19 @@ export function TenderList({ tenders, totalCount, isPro }: TenderListProps) {
         </div>
         <p className="font-semibold text-navy">{t('emptyTitle')}</p>
         <p className="text-sm text-muted mt-1 max-w-xs">{t('emptySubtitle')}</p>
+      </div>
+    )
+  }
+
+  // Filters active but no results
+  if (tenders.length === 0 && totalCount > 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-16 h-16 bg-navy/5 rounded-2xl flex items-center justify-center mb-4">
+          <Filter className="text-navy/30" size={28} />
+        </div>
+        <p className="font-semibold text-navy">{t('noFilterResults')}</p>
+        <p className="text-sm text-muted mt-1 max-w-xs">{t('noFilterResultsSubtitle')}</p>
       </div>
     )
   }
@@ -52,7 +66,11 @@ export function TenderList({ tenders, totalCount, isPro }: TenderListProps) {
       )}
 
       {tenders.map(tender => (
-        <TenderCard key={tender.id} tender={tender} />
+        <TenderCard
+          key={tender.id}
+          tender={tender}
+          onStatusPress={() => setSelectedTender(tender)}
+        />
       ))}
 
       <TenderStatusDialog tender={selectedTender} onClose={() => setSelectedTender(null)} />

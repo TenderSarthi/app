@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { MoreHorizontal, Trophy, XCircle, Archive, ExternalLink } from 'lucide-react'
 import { getDeadlineUrgency, formatDeadlineLabel } from '@/lib/deadline-utils'
 import { updateTenderStatus, deleteTender } from '@/lib/firebase/firestore'
@@ -8,13 +9,14 @@ import type { Tender, TenderStatus } from '@/lib/types'
 
 interface TenderCardProps {
   tender: Tender
+  onStatusPress?: () => void
 }
 
-const STATUS_CONFIG: Record<TenderStatus, { label: string; className: string }> = {
-  active:  { label: 'Active',  className: 'bg-navy/10 text-navy' },
-  won:     { label: 'Won',     className: 'bg-success/10 text-success' },
-  lost:    { label: 'Lost',    className: 'bg-danger/10 text-danger' },
-  expired: { label: 'Expired', className: 'bg-muted/20 text-muted' },
+const STATUS_CONFIG: Record<TenderStatus, { labelKey: string; className: string }> = {
+  active:  { labelKey: 'markActive',  className: 'bg-navy/10 text-navy' },
+  won:     { labelKey: 'markWon',     className: 'bg-success/10 text-success' },
+  lost:    { labelKey: 'markLost',    className: 'bg-danger/10 text-danger' },
+  expired: { labelKey: 'markExpired', className: 'bg-muted/20 text-muted' },
 }
 
 const URGENCY_DOT: Record<string, string> = {
@@ -34,13 +36,15 @@ const URGENCY_TEXT: Record<string, string> = {
 const SWIPE_THRESHOLD = 80
 const SWIPE_REVEAL    = 168
 
-export function TenderCard({ tender }: TenderCardProps) {
-  const [swipeX, setSwipeX]     = useState(0)
-  const [revealed, setRevealed] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [busy, setBusy]         = useState(false)
-  const startXRef               = useRef<number>(0)
-  const dragging                = useRef(false)
+export function TenderCard({ tender, onStatusPress }: TenderCardProps) {
+  const t = useTranslations('tenders')
+  const [swipeX, setSwipeX]             = useState(0)
+  const [revealed, setRevealed]         = useState(false)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [busy, setBusy]                 = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const startXRef                       = useRef<number>(0)
+  const dragging                        = useRef(false)
 
   const urgency       = getDeadlineUrgency(tender.deadline)
   const deadlineLabel = formatDeadlineLabel(tender.deadline)
@@ -60,7 +64,7 @@ export function TenderCard({ tender }: TenderCardProps) {
     if (swipeX >= SWIPE_THRESHOLD) { setSwipeX(SWIPE_REVEAL); setRevealed(true) }
     else { setSwipeX(0); setRevealed(false) }
   }
-  const closeSwipe = () => { setSwipeX(0); setRevealed(false) }
+  const closeSwipe = () => { setSwipeX(0); setRevealed(false); setConfirmDelete(false) }
 
   const doStatus = async (status: TenderStatus) => {
     setBusy(true)
@@ -68,7 +72,6 @@ export function TenderCard({ tender }: TenderCardProps) {
     finally { setBusy(false); closeSwipe(); setMenuOpen(false) }
   }
   const doDelete = async () => {
-    if (!confirm('इस tender को delete करें?')) return
     setBusy(true)
     try { await deleteTender(tender.id) } catch { /* silent */ }
     finally { setBusy(false); closeSwipe(); setMenuOpen(false) }
@@ -79,14 +82,25 @@ export function TenderCard({ tender }: TenderCardProps) {
       {/* Action panel behind card */}
       <div className="absolute right-0 top-0 bottom-0 flex" style={{ width: SWIPE_REVEAL }}>
         <button onClick={() => doStatus('won')}  disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-success text-white text-xs font-medium">
-          <Trophy size={16} /> Won
+          <Trophy size={16} /> {t('markWon')}
         </button>
         <button onClick={() => doStatus('lost')} disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-danger text-white text-xs font-medium">
-          <XCircle size={16} /> Lost
+          <XCircle size={16} /> {t('markLost')}
         </button>
-        <button onClick={doDelete}               disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20 text-navy text-xs font-medium">
-          <Archive size={16} /> Delete
-        </button>
+        {confirmDelete ? (
+          <div className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20">
+            <button onClick={doDelete} disabled={busy} className="w-full flex-1 flex items-center justify-center text-xs font-semibold text-danger">
+              {t('confirmDelete')}
+            </button>
+            <button onClick={() => setConfirmDelete(false)} disabled={busy} className="w-full flex-1 flex items-center justify-center text-xs text-navy border-t border-navy/10">
+              {t('cancelDelete')}
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => setConfirmDelete(true)} disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20 text-navy text-xs font-medium">
+            <Archive size={16} /> {t('delete')}
+          </button>
+        )}
       </div>
 
       {/* Main card */}
@@ -111,9 +125,13 @@ export function TenderCard({ tender }: TenderCardProps) {
           </div>
 
           <div className="flex flex-col items-end gap-1.5 shrink-0">
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusCfg.className}`}>
-              {statusCfg.label}
-            </span>
+            <button
+              type="button"
+              onClick={() => onStatusPress?.()}
+              className={`text-xs font-medium px-2 py-0.5 rounded-full cursor-pointer ${statusCfg.className}`}
+            >
+              {t(statusCfg.labelKey as Parameters<typeof t>[0])}
+            </button>
             {deadlineLabel && (
               <span className={`text-xs font-medium ${URGENCY_TEXT[urgency]}`}>{deadlineLabel}</span>
             )}
@@ -123,20 +141,31 @@ export function TenderCard({ tender }: TenderCardProps) {
                 <MoreHorizontal size={16} />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-6 bg-white border border-navy/10 rounded-xl shadow-lg z-10 w-40 overflow-hidden">
-                  {(['won','lost','expired'] as TenderStatus[]).map(s => (
-                    <button key={s} onClick={() => doStatus(s)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-navy/5 capitalize">
-                      Mark {s}
+                <div className="absolute right-0 top-6 bg-white border border-navy/10 rounded-xl shadow-lg z-10 w-44 overflow-hidden">
+                  {(['won','lost','expired','active'] as TenderStatus[]).map(s => (
+                    <button key={s} onClick={() => doStatus(s)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-navy/5">
+                      {t(STATUS_CONFIG[s].labelKey as Parameters<typeof t>[0])}
                     </button>
                   ))}
                   {tender.gemUrl && (
                     <a href={tender.gemUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-navy/5 border-t border-navy/5 text-navy">
-                      <ExternalLink size={14} /> Open on GeM
+                      <ExternalLink size={14} /> {t('openOnGem')}
                     </a>
                   )}
-                  <button onClick={doDelete} className="w-full text-left px-4 py-2.5 text-sm hover:bg-danger/5 text-danger border-t border-navy/5">
-                    Delete
-                  </button>
+                  {confirmDelete ? (
+                    <div className="border-t border-navy/5">
+                      <button onClick={doDelete} disabled={busy} className="w-full text-left px-4 py-2.5 text-sm text-danger hover:bg-danger/5 font-semibold">
+                        {t('confirmDelete')}
+                      </button>
+                      <button onClick={() => setConfirmDelete(false)} disabled={busy} className="w-full text-left px-4 py-2.5 text-sm hover:bg-navy/5">
+                        {t('cancelDelete')}
+                      </button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmDelete(true)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-danger/5 text-danger border-t border-navy/5">
+                      {t('delete')}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
