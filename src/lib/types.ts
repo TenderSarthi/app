@@ -167,3 +167,24 @@ export function isValidOrderStatus(s: unknown): s is OrderStatus {
     'payment_pending', 'completed',
   ].includes(s as string)
 }
+
+// --- Learning Center types ---
+
+export type ArticleCategory =
+  | 'getting_started'
+  | 'bidding_strategy'
+  | 'finance_compliance'
+  | 'post_win'
+
+export interface Article {
+  id: string
+  category: ArticleCategory
+  readMinutes: number
+  youtubeId: string | null  // YouTube video ID, e.g. 'dQw4w9WgXcQ' — null if no video
+  titleEn: string
+  titleHi: string
+  summaryEn: string
+  summaryHi: string
+  bodyEn: string[]   // paragraphs (plain text)
+  bodyHi: string[]
+}
