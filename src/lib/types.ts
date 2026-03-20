@@ -74,3 +74,24 @@ export interface PlatformStats {
 export function isValidTenderStatus(s: unknown): s is TenderStatus {
   return s === 'active' || s === 'won' || s === 'lost' || s === 'expired'
 }
+
+// --- Document Vault types ---
+
+export type DocumentType = 'rc' | 'gst' | 'insurance' | 'itr' | 'msme' | 'pan' | 'udyam' | 'other'
+
+export interface VaultDocument {
+  id: string
+  userId: string
+  type: DocumentType
+  fileName: string
+  fileSize: number          // bytes
+  storagePath: string       // Firebase Storage path, e.g. documents/{uid}/{timestamp}_{name}
+  storageUrl: string        // Firebase Storage download URL
+  expiresAt: Timestamp | null
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+export function isValidDocumentType(s: unknown): s is DocumentType {
+  return ['rc','gst','insurance','itr','msme','pan','udyam','other'].includes(s as string)
+}

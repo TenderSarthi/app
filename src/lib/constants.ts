@@ -45,3 +45,38 @@ export const SUPPORTED_LANGUAGES = [
 ] as const
 
 export const LOCALE_CODES =['en', 'hi', 'bn', 'mr', 'ta', 'te', 'gu', 'kn', 'pa', 'or', 'ml'] as const
+
+// --- Document Vault constants ---
+
+export const DOCUMENT_TYPES = ['rc', 'gst', 'insurance', 'itr', 'msme', 'pan', 'udyam', 'other'] as const
+
+export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  rc:        'RC (Registration Certificate)',
+  gst:       'GST Certificate',
+  insurance: 'Insurance',
+  itr:       'ITR (Income Tax Return)',
+  msme:      'MSME Certificate',
+  pan:       'PAN Card',
+  udyam:     'Udyam Certificate',
+  other:     'Other',
+}
+
+// Minimum docs required per GeM category. Union of user's categories determines checklist.
+export const CATEGORY_DOCUMENT_REQUIREMENTS: Record<string, string[]> = {
+  'Transport & Vehicles':          ['rc', 'insurance', 'gst', 'pan'],
+  'IT & Electronics':              ['gst', 'pan', 'msme'],
+  'Medical & Healthcare':          ['gst', 'pan', 'msme', 'udyam'],
+  'Construction & Infrastructure': ['gst', 'pan', 'msme', 'itr'],
+  'Stationery & Office Supplies':  ['gst', 'pan'],
+  'Furniture & Fixtures':          ['gst', 'pan', 'msme'],
+  'Uniforms & Clothing':           ['gst', 'pan', 'msme'],
+  'Agriculture & Food':            ['gst', 'pan', 'msme'],
+  'Security Services':             ['gst', 'pan', 'msme', 'itr'],
+  'Printing & Publishing':         ['gst', 'pan', 'msme'],
+  'Electrical & Lighting':         ['gst', 'pan', 'msme'],
+  'Plumbing & Sanitation':         ['gst', 'pan', 'msme'],
+  'Cleaning & Housekeeping':       ['gst', 'pan', 'msme'],
+  'Other':                         ['gst', 'pan'],
+}
+
+export const BASE_REQUIRED_DOCS = ['gst', 'pan'] as const
