@@ -23,9 +23,7 @@ export async function POST(req: NextRequest) {
     // Pro-plan guard — server-side enforcement (client gate alone is insufficient)
     const userDoc = await getFirestore().collection('users').doc(uid).get()
     const userPlan = userDoc.data()?.plan as string | undefined
-    const trialEndsAt = userDoc.data()?.trialEndsAt?.toDate?.() as Date | undefined
-    const isProUser = userPlan === 'pro' || (userPlan === 'pro' && trialEndsAt && trialEndsAt > new Date())
-    if (!isProUser) {
+    if (userPlan !== 'pro') {
       return NextResponse.json({ error: 'Pro plan required for bid document generation' }, { status: 403 })
     }
 
