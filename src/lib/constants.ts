@@ -44,5 +44,4 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം' },
 ] as const
 
-export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code']
-export const LOCALE_CODES = ['en', 'hi', 'bn', 'mr', 'ta', 'te', 'gu', 'kn', 'pa', 'or', 'ml'] as const
+export const LOCALE_CODES =['en', 'hi', 'bn', 'mr', 'ta', 'te', 'gu', 'kn', 'pa', 'or', 'ml'] as const

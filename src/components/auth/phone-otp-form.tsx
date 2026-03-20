@@ -37,8 +37,8 @@ export function PhoneOtpForm({ locale }: { locale: string }) {
       if (!(await userExists(user.uid))) {
         await createUser(user.uid, null, user.phoneNumber)
         track('signup_completed', { method: 'phone' })
-        router.push(`/${locale}/onboarding`)
-      } else { router.push(`/${locale}/dashboard`) }
+        router.replace(`/${locale}/onboarding`)
+      } else { router.replace(`/${locale}/dashboard`) }
     } catch { setError('OTP गलत है। फिर try करें।') }
     finally { setLoading(false) }
   }

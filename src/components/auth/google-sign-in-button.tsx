@@ -19,9 +19,9 @@ export function GoogleSignInButton({ locale }: { locale: string }) {
       if (!(await userExists(user.uid))) {
         await createUser(user.uid, user.email, null)
         track('signup_completed', { method: 'google' })
-        router.push(`/${locale}/onboarding`)
+        router.replace(`/${locale}/onboarding`)
       } else {
-        router.push(`/${locale}/dashboard`)
+        router.replace(`/${locale}/dashboard`)
       }
     } catch { setError('Sign in failed. Please try again.') }
     finally { setLoading(false) }

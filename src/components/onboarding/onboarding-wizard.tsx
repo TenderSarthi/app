@@ -11,6 +11,7 @@ import { saveOnboardingData } from '@/lib/firebase/firestore'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { track } from '@/lib/posthog'
 import type { LanguageCode } from '@/lib/types'
+import { isValidLanguageCode } from '@/lib/types'
 
 const TITLES = ['आपका Profile', 'आपका State', 'आपकी Categories', 'Notifications']
 const SUBTITLES = ['TenderSarthi में आपका स्वागत है!', 'हम आपके state के tenders filter करेंगे', 'जो लागू हों वो सब चुनें', 'Tender alerts तुरंत पाएं']
@@ -31,9 +32,9 @@ export function OnboardingWizard({ locale }: { locale: string }) {
     if (!uid) return
     setSaving(true)
     try {
-      await saveOnboardingData(uid, { name, businessName, state, categories, language: locale as LanguageCode, fcmToken, notificationsDeclined: declined })
+      await saveOnboardingData(uid, { name, businessName, state, categories, language: (isValidLanguageCode(locale) ? locale : 'hi') as LanguageCode, fcmToken, notificationsDeclined: declined })
       track('onboarding_completed', { state, categoriesCount: categories.length, locale })
-      router.push(`/${locale}/dashboard`)
+      router.replace(`/${locale}/dashboard`)
     } finally { setSaving(false) }
   }
 
