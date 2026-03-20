@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Bell, MessageSquare, Mail, X, Plus, CheckCircle } from 'lucide-react'
 import { GEM_CATEGORIES, INDIAN_STATES } from '@/lib/constants'
@@ -22,6 +22,11 @@ export function AlertConfigForm({ initial, saving, onSave }: AlertConfigFormProp
     initial?.channels ?? { push: true, whatsapp: false, email: false }
   )
   const [saved, setSaved]           = useState(false)
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => { if (savedTimerRef.current) clearTimeout(savedTimerRef.current) }
+  }, [])
 
   // Re-initialize form state when `initial` loads from Firestore after mount
   // (useState ignores prop changes; this effect syncs when initial transitions null → real config)
@@ -47,7 +52,7 @@ export function AlertConfigForm({ initial, saving, onSave }: AlertConfigFormProp
   const handleSave = async () => {
     await onSave({ categories, states, keywords, channels, active: true })
     setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    savedTimerRef.current = setTimeout(() => setSaved(false), 3000)
   }
 
   return (
