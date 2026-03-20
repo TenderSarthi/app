@@ -7,7 +7,7 @@ import crypto   from 'node:crypto'
 
 let _rzp: Razorpay | null = null
 
-export function getRazorpayInstance(): Razorpay {
+function getRzpInstance(): Razorpay {
   if (!_rzp) {
     _rzp = new Razorpay({
       key_id:     process.env.RAZORPAY_KEY_ID     ?? '',
@@ -16,6 +16,19 @@ export function getRazorpayInstance(): Razorpay {
   }
   return _rzp
 }
+
+// Export as 'rzp' for spec compliance (lazy proxy for test env)
+export const rzp = {
+  get subscriptions() {
+    return getRzpInstance().subscriptions
+  },
+  get customers() {
+    return getRzpInstance().customers
+  },
+  get payments() {
+    return getRzpInstance().payments
+  },
+} as unknown as Razorpay
 
 /** Plan IDs created in Razorpay dashboard under Subscriptions > Plans */
 export const PLAN_IDS = {
