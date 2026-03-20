@@ -1,7 +1,7 @@
 'use client'
 import { useState, useCallback } from 'react'
 import { ExternalLink, Trash2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { DocumentTypeIcon, getDocTypeLabel } from './document-type-icon'
 import { deleteVaultDocument } from '@/lib/firebase/firestore'
 import { deleteVaultFile } from '@/lib/firebase/storage'
@@ -16,25 +16,23 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function formatExpiry(doc: VaultDocument): string | null {
-  if (!doc.expiresAt) return null
-  return doc.expiresAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-}
-
 export function DocumentCard({ document: doc }: DocumentCardProps) {
   const t = useTranslations('documents')
+  const locale = useLocale()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [busy, setBusy]                   = useState(false)
 
   const expiringSoon = isDocumentExpiringSoon(doc)
   const expired      = isDocumentExpired(doc)
-  const expiryLabel  = formatExpiry(doc)
+  const expiryLabel = doc.expiresAt
+    ? doc.expiresAt.toDate().toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+    : null
 
   const handleDelete = useCallback(async () => {
     setBusy(true)
     try {
-      await deleteVaultDocument(doc.id)
       await deleteVaultFile(doc.storagePath)
+      await deleteVaultDocument(doc.id)
     } catch { /* silent — Firestore onSnapshot will reconcile */ }
     finally { setBusy(false); setConfirmDelete(false) }
   }, [doc.id, doc.storagePath])

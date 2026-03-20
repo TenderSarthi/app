@@ -80,6 +80,7 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "noDocuments": "No documents uploaded yet",
-    "noDocumentsSubtitle": "Upload your compliance documents to track them here."
+    "noDocumentsSubtitle": "Upload your compliance documents to track them here.",
+    "upgradeBtn": "Upgrade to Pro"
   }
 }

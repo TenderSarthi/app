@@ -48,7 +48,7 @@ export default function DocumentsPage() {
             onClick={() => setUpgradeOpen(true)}
             className="mt-1 px-6 py-2.5 rounded-xl bg-orange text-white font-semibold text-sm"
           >
-            Upgrade to Pro
+            {t('upgradeBtn')}
           </button>
         </div>
         <UpgradeDialog open={upgradeOpen} onClose={() => setUpgradeOpen(false)} trigger="feature_gate" />
