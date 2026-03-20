@@ -38,12 +38,19 @@ export function parseRSSItem(item: {
     .filter(([, keywords]) => keywords.some(k => text.includes(k.toLowerCase())))
     .map(([cat]) => cat)
 
+  // If no category keyword matched, classify as 'Other' (catch-all for unrecognised tenders)
+  const finalCategories = categories.length > 0 ? categories : ['Other']
+
   return {
     title,
     link: item.link ?? '',
     description,
-    pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
-    categories,
+    pubDate: (() => {
+      if (!item.pubDate) return new Date()
+      const d = new Date(item.pubDate)
+      return isNaN(d.getTime()) ? new Date() : d
+    })(),
+    categories: finalCategories,
     states,
   }
 }

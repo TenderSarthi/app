@@ -43,6 +43,19 @@ describe('parseRSSItem', () => {
     expect(result.title).toBe('')
     expect(result.description).toBe('')
   })
+
+  it('classifies unrecognised tenders as Other', () => {
+    const result = parseRSSItem({ title: 'Miscellaneous Contract XYZ', link: '', contentSnippet: '', pubDate: undefined })
+    expect(result.categories).toContain('Other')
+  })
+
+  it('falls back to current date for invalid pubDate string', () => {
+    const before = Date.now()
+    const result = parseRSSItem({ title: 'Test', link: '', contentSnippet: '', pubDate: 'not-a-date' })
+    expect(result.pubDate).toBeInstanceOf(Date)
+    expect(isNaN(result.pubDate.getTime())).toBe(false)
+    expect(result.pubDate.getTime()).toBeGreaterThanOrEqual(before)
+  })
 })
 
 describe('matchesAlertConfig', () => {
