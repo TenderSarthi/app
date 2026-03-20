@@ -174,5 +174,33 @@
     "proOnly": "Bid Generator Pro feature है",
     "proOnlySub": "AI से complete bid documents generate करने के लिए Pro में upgrade करें।",
     "upgradeCta": "Pro में Upgrade करें"
+  },
+  "alerts": {
+    "title": "Tender Alerts",
+    "subtitle": "नया matching tender आने पर तुरंत notification मिलेगी",
+    "proOnly": "Tender Alerts Pro feature है",
+    "proOnlySub": "Pro में upgrade करें और अपनी categories के नए tenders पर alerts पाएं।",
+    "upgradeCta": "Pro में Upgrade करें",
+    "categoriesLabel": "कौन सी categories देखें?",
+    "categoriesHint": "Categories चुनें — खाली छोड़ने पर सभी categories के alerts मिलेंगे",
+    "allCategoriesNote": "सभी categories selected हैं",
+    "statesLabel": "कौन से states देखें?",
+    "statesHint": "States चुनें — खाली छोड़ने पर सभी states के alerts मिलेंगे",
+    "allStatesNote": "सभी states selected हैं",
+    "keywordsLabel": "Keywords",
+    "keywordsHint": "Specific keywords add करें जैसे \"vehicle hiring\" या \"laptop\"",
+    "keywordPlaceholder": "Keyword add करें...",
+    "addKeyword": "Keyword add करें",
+    "channelsLabel": "Notification channels",
+    "channelPush": "Push notifications",
+    "channelPushHint": "App और device पर instant alert",
+    "channelWhatsApp": "WhatsApp",
+    "channelWhatsAppHint": "आपके registered mobile number पर alert",
+    "channelEmail": "Email",
+    "channelEmailHint": "आपके registered email पर alert",
+    "saveAlerts": "Alert Settings Save करें",
+    "saving": "Save हो रहा है...",
+    "saved": "Save हो गया ✓",
+    "scheduleNote": "Alerts हर 6 घंटे में check होते हैं। नए tenders की notification 6 घंटे के अंदर आएगी।"
   }
 }

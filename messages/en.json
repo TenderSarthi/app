@@ -174,5 +174,33 @@
     "proOnly": "Bid Generator is a Pro feature",
     "proOnlySub": "Upgrade to Pro to generate complete bid documents with AI.",
     "upgradeCta": "Upgrade to Pro"
+  },
+  "alerts": {
+    "title": "Tender Alerts",
+    "subtitle": "Get notified when new matching tenders are posted",
+    "proOnly": "Tender Alerts is a Pro feature",
+    "proOnlySub": "Upgrade to Pro to receive alerts for new tenders in your categories.",
+    "upgradeCta": "Upgrade to Pro",
+    "categoriesLabel": "Categories to watch",
+    "categoriesHint": "Select categories — leave empty to receive all categories",
+    "allCategoriesNote": "All categories selected",
+    "statesLabel": "States to watch",
+    "statesHint": "Select states — leave empty to receive all states",
+    "allStatesNote": "All states selected",
+    "keywordsLabel": "Keywords",
+    "keywordsHint": "Add specific keywords to filter tenders (e.g. \"vehicle hiring\")",
+    "keywordPlaceholder": "Add keyword...",
+    "addKeyword": "Add keyword",
+    "channelsLabel": "Notification channels",
+    "channelPush": "Push notifications",
+    "channelPushHint": "Instant alerts in-app and on your device",
+    "channelWhatsApp": "WhatsApp",
+    "channelWhatsAppHint": "Alert sent to your registered mobile number",
+    "channelEmail": "Email",
+    "channelEmailHint": "Alert sent to your registered email address",
+    "saveAlerts": "Save Alert Settings",
+    "saving": "Saving...",
+    "saved": "Saved ✓",
+    "scheduleNote": "Alerts are checked every 6 hours. New tenders will be notified within 6 hours of posting."
   }
 }
