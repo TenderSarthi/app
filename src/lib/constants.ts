@@ -2,8 +2,8 @@ export const BRAND_COLORS = {
   navy: '#1A3766',
   orange: '#F97316',
   gold: '#D97706',
-  green: '#16A34A',
-  red: '#DC2626',
+  success: '#16A34A',
+  danger: '#DC2626',
   gray: '#6B7280',
   lightbg: '#F0F4FB',
 } as const
@@ -45,4 +45,4 @@ export const SUPPORTED_LANGUAGES = [
 ] as const
 
 export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code']
-export const LOCALE_CODES = SUPPORTED_LANGUAGES.map((l) => l.code)
+export const LOCALE_CODES = ['en', 'hi', 'bn', 'mr', 'ta', 'te', 'gu', 'kn', 'pa', 'or', 'ml'] as const
