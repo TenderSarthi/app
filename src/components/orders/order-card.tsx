@@ -29,6 +29,7 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
   const [advancing,      setAdvancing]      = useState(false)
   const [confirmDelete,  setConfirmDelete]  = useState(false)
   const [deleting,       setDeleting]       = useState(false)
+  const [deleteError,    setDeleteError]    = useState(false)
 
   const badge       = STATUS_BADGE[order.status]
   const nextStatus  = getNextStatus(order.status)
@@ -50,13 +51,15 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
 
   const handleDelete = async () => {
     setDeleting(true)
+    setDeleteError(false)
     try {
       await deleteOrder(order.id)
     } catch {
-      // silent
-    } finally {
+      setDeleteError(true)
       setDeleting(false)
       setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -103,6 +106,11 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
         )}
       </CardContent>
 
+      {deleteError && (
+        <p role="alert" className="px-4 pb-0 text-xs text-destructive">
+          Delete failed. Please try again.
+        </p>
+      )}
       <CardFooter className="gap-2 flex-wrap">
         {/* Edit */}
         <Button

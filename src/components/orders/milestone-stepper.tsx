@@ -40,13 +40,13 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
           <div key={milestone.key} className="flex-1 flex flex-col items-center">
             {/* Connector row */}
             <div className="flex items-center w-full">
-              {/* Left connector */}
+              {/* Left connector — green only if BOTH this step and previous step are done */}
               <div
                 className={cn(
                   'flex-1 h-0.5',
                   idx === 0
                     ? 'invisible'
-                    : isDone
+                    : isDone && order.milestones[MILESTONES[idx - 1].key] !== null
                     ? 'bg-green-500'
                     : 'bg-gray-200'
                 )}
@@ -103,7 +103,7 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
                 </span>
               )}
 
-              {invoiceDays !== null && (
+              {invoiceDays !== null && invoiceDays >= 0 && (
                 <span className="text-[9px] text-blue-500 leading-none font-medium">
                   {invoiceDays}d ago
                 </span>

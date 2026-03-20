@@ -58,7 +58,10 @@ export function AddOrderDialog({
   const [saving,          setSaving]          = useState(false)
   const [error,           setError]           = useState<string | null>(null)
 
-  // Re-seed form when dialog opens or editOrder changes
+  // Re-seed form when dialog opens or the edited order's identity changes.
+  // Using editOrder?.id (not the full object) avoids resets when the parent
+  // re-renders with a new reference but the same order.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (open) {
       const init = getInitialState(editOrder)
@@ -68,7 +71,7 @@ export function AddOrderDialog({
       setNotes(init.notes)
       setError(null)
     }
-  }, [open, editOrder])
+  }, [open, editOrder?.id])
 
   const reset = () => {
     setTenderId('')
@@ -91,7 +94,7 @@ export function AddOrderDialog({
     }
 
     const parsedValue = value.trim() === '' ? null : Number(value)
-    if (parsedValue !== null && (isNaN(parsedValue) || parsedValue < 0)) {
+    if (parsedValue !== null && (isNaN(parsedValue) || parsedValue <= 0)) {
       setError('Value must be a positive number.')
       return
     }
@@ -129,6 +132,7 @@ export function AddOrderDialog({
       handleOpenChange(false)
     } catch {
       setError('Something went wrong. Please try again.')
+    } finally {
       setSaving(false)
     }
   }
@@ -157,11 +161,17 @@ export function AddOrderDialog({
                 <SelectValue placeholder="Select a tender" />
               </SelectTrigger>
               <SelectContent>
-                {tenders.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.name}
-                  </SelectItem>
-                ))}
+                {tenders.length === 0 ? (
+                  <p className="px-3 py-2 text-sm text-muted-foreground">
+                    No active tenders. Save a tender first.
+                  </p>
+                ) : (
+                  tenders.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -219,7 +229,7 @@ export function AddOrderDialog({
           </div>
 
           {error && (
-            <p className="text-sm text-destructive">{error}</p>
+            <p role="alert" className="text-sm text-destructive">{error}</p>
           )}
         </div>
 
