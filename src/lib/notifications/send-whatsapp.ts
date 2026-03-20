@@ -13,8 +13,13 @@ export async function sendWhatsAppAlert(phone: string, message: string): Promise
     return false
   }
 
-  // MSG91 requires Indian numbers without leading 0 or +91
-  const normalised = phone.replace(/^\+?91/, '').replace(/^0/, '').replace(/\D/g, '')
+  // Accept: +91XXXXXXXXXX, 91XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX (10 digits)
+  const stripped = phone.replace(/\D/g, '') // remove all non-digits first
+  const normalised = stripped.startsWith('91') && stripped.length === 12
+    ? stripped.slice(2)  // remove 91 prefix
+    : stripped.startsWith('0') && stripped.length === 11
+      ? stripped.slice(1)  // remove leading 0
+      : stripped            // bare 10 digits
   if (normalised.length !== 10) {
     console.warn('[WhatsApp] Invalid phone number:', phone)
     return false
