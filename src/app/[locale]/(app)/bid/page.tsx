@@ -23,6 +23,7 @@ interface GeneratedResult {
   document: string
   winScore: number
   winLabel: string
+  winReasoning: string
 }
 
 export default function BidPage() {
@@ -71,7 +72,7 @@ export default function BidPage() {
       })
 
       if (!res.ok) throw new Error((await res.json()).error ?? 'Generation failed')
-      const { winScore, winLabel, generatedDocument } = await res.json()
+      const { winScore, winLabel, winReasoning, generatedDocument } = await res.json()
 
       // Save to bid history
       await addBidDocument(user.uid, {
@@ -88,7 +89,7 @@ export default function BidPage() {
       await incrementBidDocCount(user.uid)
       refreshUsage()
 
-      setResult({ tenderName: data.tender.name, document: generatedDocument, winScore, winLabel })
+      setResult({ tenderName: data.tender.name, document: generatedDocument, winScore, winLabel, winReasoning })
       track('bid_document_generated', { category: data.tender.category, winScore })
     } catch (err) {
       setGenError(err instanceof Error ? err.message : 'Generation failed')
@@ -142,6 +143,7 @@ export default function BidPage() {
             document={result.document}
             winScore={result.winScore}
             winLabel={result.winLabel}
+            winReasoning={result.winReasoning}
             onClose={() => setResult(null)}
           />
         ) : (

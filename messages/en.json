@@ -150,6 +150,7 @@
     "chatPlaceholder": "Ask about GeM tenders...",
     "sendMessage": "Send message",
     "aiDisclaimer": "AI suggestion — verify on GeM portal before acting.",
+    "chatError": "Sorry, something went wrong. Please try again.",
     "confirmYes": "हाँ, समझ गया ✓",
     "confirmMore": "और details चाहिए",
     "selectTender": "Select tender",

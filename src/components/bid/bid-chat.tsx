@@ -77,13 +77,13 @@ export function BidHelperChat({ profile, usage, onUsageUpdate }: BidHelperChatPr
     } catch (err) {
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(), role: 'model',
-        content: 'माफ करें, कुछ error हुई। दोबारा try करें।'
+        content: t('chatError')
       }
       setMessages(prev => [...prev, errorMsg])
     } finally {
       setLoading(false)
     }
-  }, [messages, loading, profile, usage, user, onUsageUpdate])
+  }, [messages, loading, profile, usage, user, onUsageUpdate, t])
 
   return (
     <div className="flex flex-col h-full">

@@ -8,10 +8,11 @@ interface BidDocumentViewerProps {
   document: string
   winScore: number
   winLabel: string
+  winReasoning?: string
   onClose: () => void
 }
 
-export function BidDocumentViewer({ tenderName, document, winScore, winLabel, onClose }: BidDocumentViewerProps) {
+export function BidDocumentViewer({ tenderName, document, winScore, winLabel, winReasoning, onClose }: BidDocumentViewerProps) {
   const t = useTranslations('bid')
   const result = getWinScoreResult(winScore)
 
@@ -46,6 +47,7 @@ export function BidDocumentViewer({ tenderName, document, winScore, winLabel, on
         <div>
           <p className="font-bold text-navy text-sm">{t('bidReady')}</p>
           <p className={`text-xs font-medium ${result.color}`}>{t('winProbability')}: {winScore}% — {winLabel}</p>
+          {winReasoning && <p className="text-xs text-muted mt-1">{winReasoning}</p>}
         </div>
       </div>
 

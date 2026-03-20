@@ -17,7 +17,9 @@ export interface WinScoreResult {
 export function computeHeuristicScore(input: WinScoreInput): WinScoreResult {
   let score = 30 // base
 
-  // Category match (40 pts)
+  // Category match (40 pts max; 0 pts if mismatch — no consolation bonus)
+  // Note: plan draft included `else score += 10` but this was dropped as incorrect:
+  // a category mismatch is a disqualifying factor, not a partial positive signal.
   if (input.userCategories.includes(input.tenderCategory)) score += 40
 
   // Experience years (20 pts)
