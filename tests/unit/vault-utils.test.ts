@@ -39,6 +39,11 @@ describe('getRequiredDocTypes', () => {
     expect(types).toContain('rc')
     expect(types).toContain('msme')
   })
+  it('returns gst and pan for an unrecognized category', () => {
+    const types = getRequiredDocTypes(['Unknown Category'])
+    expect(types).toContain('gst')
+    expect(types).toContain('pan')
+  })
 })
 
 describe('getVaultProgress', () => {
@@ -70,6 +75,9 @@ describe('isDocumentExpiringSoon', () => {
   })
   it('returns false for doc expiring in 31 days', () => {
     expect(isDocumentExpiringSoon(makeDoc('gst', daysFromNow(31)))).toBe(false)
+  })
+  it('returns true for doc expiring today (daysLeft === 0)', () => {
+    expect(isDocumentExpiringSoon(makeDoc('gst', daysFromNow(0)))).toBe(true)
   })
 })
 
