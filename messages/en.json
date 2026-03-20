@@ -246,5 +246,24 @@
     "advancing": "Updating...",
     "orderComplete": "Order Complete ✓",
     "invoicedDaysAgo": "{days} days since invoice submitted"
+  },
+  "learn": {
+    "title": "Learning Center",
+    "subtitle": "GeM tendering guides and tips",
+    "allArticles": "All",
+    "category_getting_started": "Getting Started",
+    "category_bidding_strategy": "Bidding Strategy",
+    "category_finance_compliance": "Finance & Compliance",
+    "category_post_win": "Post Win",
+    "readMinutes": "{minutes} min read",
+    "hasVideo": "Video",
+    "backToLearn": "Back to Learning Center",
+    "articleNotFound": "Article not found",
+    "noArticles": "No articles in this category yet",
+    "offlineAvailable": "Available offline",
+    "watchVideo": "Watch Video",
+    "minRead": "min read",
+    "guidesAndTips": "Guides and tips for GeM vendors",
+    "articles": "articles"
   }
 }

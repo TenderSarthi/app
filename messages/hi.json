@@ -246,5 +246,24 @@
     "advancing": "अपडेट हो रहा है...",
     "orderComplete": "ऑर्डर पूर्ण ✓",
     "invoicedDaysAgo": "इनवॉइस जमा किए {days} दिन हुए"
+  },
+  "learn": {
+    "title": "सीखने का केंद्र",
+    "subtitle": "GeM tendering की guides और tips",
+    "allArticles": "सभी",
+    "category_getting_started": "शुरुआत",
+    "category_bidding_strategy": "Bidding Strategy",
+    "category_finance_compliance": "वित्त और Compliance",
+    "category_post_win": "जीतने के बाद",
+    "readMinutes": "{minutes} मिनट में पढ़ें",
+    "hasVideo": "वीडियो",
+    "backToLearn": "सीखने केंद्र पर वापस",
+    "articleNotFound": "लेख नहीं मिला",
+    "noArticles": "इस category में अभी कोई लेख नहीं",
+    "offlineAvailable": "Offline उपलब्ध",
+    "watchVideo": "वीडियो देखें",
+    "minRead": "मिनट",
+    "guidesAndTips": "GeM vendors के लिए guides और tips",
+    "articles": "लेख"
   }
 }
