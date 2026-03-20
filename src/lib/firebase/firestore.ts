@@ -4,7 +4,7 @@ import {
   deleteDoc, increment, QuerySnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './config'
-import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats } from '../types'
+import type { UserProfile, OnboardingData, LanguageCode, Tender, TenderStatus, PlatformStats, VaultDocument } from '../types'
 
 export async function getUser(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, 'users', uid))
@@ -139,4 +139,45 @@ export async function getAIUsage(uid: string): Promise<AIUsageData> {
 export async function incrementAIQueryCount(uid: string): Promise<void> {
   const ref = doc(db, 'aiUsage', uid, currentMonthKey(), 'data')
   await setDoc(ref, { queries: increment(1) }, { merge: true })
+}
+
+// ---------- Document Vault ----------
+
+/** Saves new vault document metadata. Returns the new Firestore document ID. */
+export async function addVaultDocument(
+  uid: string,
+  data: Omit<VaultDocument, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'documents'), {
+    ...data,
+    userId: uid,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+/** Real-time listener on user's vault documents, ordered by createdAt desc. */
+export function subscribeUserDocuments(
+  uid: string,
+  onData: (docs: VaultDocument[]) => void,
+  onError: (err: Error) => void
+): () => void {
+  const q = query(
+    collection(db, 'documents'),
+    where('userId', '==', uid),
+    orderBy('createdAt', 'desc')
+  )
+  return onSnapshot(
+    q,
+    (snap: QuerySnapshot<DocumentData>) => {
+      onData(snap.docs.map(d => ({ id: d.id, ...d.data() } as VaultDocument)))
+    },
+    onError
+  )
+}
+
+/** Deletes vault document metadata from Firestore. Caller is responsible for deleting the Storage file. */
+export async function deleteVaultDocument(documentId: string): Promise<void> {
+  await deleteDoc(doc(db, 'documents', documentId))
 }
