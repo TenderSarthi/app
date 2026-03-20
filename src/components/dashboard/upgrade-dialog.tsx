@@ -1,10 +1,12 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Zap, CheckCircle } from 'lucide-react'
+import { track } from '@/lib/posthog'
 
 interface UpgradeDialogProps {
   open: boolean
@@ -24,6 +26,10 @@ const PRO_FEATURES = [
 
 export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
   const t = useTranslations('planGate')
+
+  useEffect(() => {
+    if (open) track('upgrade_prompt_seen', { trigger: trigger ?? 'unknown' })
+  }, [open, trigger])
 
   const handleUpgrade = (plan: 'monthly' | 'annual') => {
     window.location.href = '/settings?upgrade=' + plan
