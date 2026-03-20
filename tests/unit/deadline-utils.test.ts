@@ -17,6 +17,8 @@ describe('getDeadlineDaysLeft', () => {
     expect(getDeadlineDaysLeft(null)).toBeNull()
   })
   it('returns 0 for deadline that is today', () => {
+    // daysFromNow(0) inherits the current time, but getDeadlineDaysLeft
+    // strips both sides to midnight, so any time on today's date → 0.
     expect(getDeadlineDaysLeft(daysFromNow(0))).toBe(0)
   })
   it('returns 3 for deadline 3 days away', () => {

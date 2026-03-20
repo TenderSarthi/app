@@ -12,11 +12,11 @@ interface TenderStatusDialogProps {
   onClose: () => void
 }
 
-const OPTIONS: { value: TenderStatus; label: string; Icon: React.ElementType; cls: string }[] = [
-  { value: 'active',  label: 'Mark Active',  Icon: RefreshCw, cls: 'text-navy'    },
-  { value: 'won',     label: 'Mark Won',     Icon: Trophy,    cls: 'text-success'  },
-  { value: 'lost',    label: 'Mark Lost',    Icon: XCircle,   cls: 'text-danger'   },
-  { value: 'expired', label: 'Mark Expired', Icon: Archive,   cls: 'text-muted'    },
+const OPTIONS: { value: TenderStatus; labelKey: string; Icon: React.ElementType; cls: string }[] = [
+  { value: 'active',  labelKey: 'markActive',  Icon: RefreshCw, cls: 'text-navy'    },
+  { value: 'won',     labelKey: 'markWon',     Icon: Trophy,    cls: 'text-success'  },
+  { value: 'lost',    labelKey: 'markLost',    Icon: XCircle,   cls: 'text-danger'   },
+  { value: 'expired', labelKey: 'markExpired', Icon: Archive,   cls: 'text-muted'    },
 ]
 
 export function TenderStatusDialog({ tender, onClose }: TenderStatusDialogProps) {
@@ -38,7 +38,7 @@ export function TenderStatusDialog({ tender, onClose }: TenderStatusDialogProps)
           <p className="text-sm text-muted text-left">{t('updateStatus')}</p>
         </SheetHeader>
         <div className="space-y-2">
-          {OPTIONS.filter(o => o.value !== tender?.status).map(({ value, label, Icon, cls }) => (
+          {OPTIONS.filter(o => o.value !== tender?.status).map(({ value, labelKey, Icon, cls }) => (
             <button
               key={value}
               onClick={() => handleSelect(value)}
@@ -46,7 +46,7 @@ export function TenderStatusDialog({ tender, onClose }: TenderStatusDialogProps)
               className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-navy/10 hover:bg-navy/5 transition-colors ${cls}`}
             >
               <Icon size={18} />
-              <span className="font-medium text-sm">{label}</span>
+              <span className="font-medium text-sm">{t(labelKey as never)}</span>
             </button>
           ))}
         </div>

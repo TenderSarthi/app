@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { MoreHorizontal, Trophy, XCircle, Archive, ExternalLink } from 'lucide-react'
 import { getDeadlineUrgency, formatDeadlineLabel } from '@/lib/deadline-utils'
@@ -46,6 +46,16 @@ export function TenderCard({ tender, onStatusPress }: TenderCardProps) {
   const startXRef                       = useRef<number>(0)
   const dragging                        = useRef(false)
 
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e: MouseEvent) => {
+      // Only close if click is outside this card's menu
+      setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
+
   const urgency       = getDeadlineUrgency(tender.deadline)
   const deadlineLabel = formatDeadlineLabel(tender.deadline)
   const statusCfg     = STATUS_CONFIG[tender.status]
@@ -80,24 +90,24 @@ export function TenderCard({ tender, onStatusPress }: TenderCardProps) {
   return (
     <div className="relative overflow-hidden rounded-xl">
       {/* Action panel behind card */}
-      <div className="absolute right-0 top-0 bottom-0 flex" style={{ width: SWIPE_REVEAL }}>
-        <button onClick={() => doStatus('won')}  disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-success text-white text-xs font-medium">
+      <div className="absolute right-0 top-0 bottom-0 flex" style={{ width: SWIPE_REVEAL }} aria-hidden={!revealed}>
+        <button onClick={() => doStatus('won')}  disabled={busy} tabIndex={revealed ? 0 : -1} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-success text-white text-xs font-medium">
           <Trophy size={16} /> {t('markWon')}
         </button>
-        <button onClick={() => doStatus('lost')} disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-danger text-white text-xs font-medium">
+        <button onClick={() => doStatus('lost')} disabled={busy} tabIndex={revealed ? 0 : -1} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-danger text-white text-xs font-medium">
           <XCircle size={16} /> {t('markLost')}
         </button>
         {confirmDelete ? (
           <div className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20">
-            <button onClick={doDelete} disabled={busy} className="w-full flex-1 flex items-center justify-center text-xs font-semibold text-danger">
+            <button onClick={doDelete} disabled={busy} tabIndex={revealed ? 0 : -1} className="w-full flex-1 flex items-center justify-center text-xs font-semibold text-danger">
               {t('confirmDelete')}
             </button>
-            <button onClick={() => setConfirmDelete(false)} disabled={busy} className="w-full flex-1 flex items-center justify-center text-xs text-navy border-t border-navy/10">
+            <button onClick={() => setConfirmDelete(false)} disabled={busy} tabIndex={revealed ? 0 : -1} className="w-full flex-1 flex items-center justify-center text-xs text-navy border-t border-navy/10">
               {t('cancelDelete')}
             </button>
           </div>
         ) : (
-          <button onClick={() => setConfirmDelete(true)} disabled={busy} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20 text-navy text-xs font-medium">
+          <button onClick={() => setConfirmDelete(true)} disabled={busy} tabIndex={revealed ? 0 : -1} className="flex-1 h-full flex flex-col items-center justify-center gap-1 bg-navy/20 text-navy text-xs font-medium">
             <Archive size={16} /> {t('delete')}
           </button>
         )}

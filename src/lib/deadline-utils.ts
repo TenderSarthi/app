@@ -2,11 +2,16 @@ import type { Timestamp } from 'firebase/firestore'
 
 export type DeadlineUrgency = 'red' | 'amber' | 'green' | 'none'
 
-/** How many whole days until the deadline. Negative = overdue. Null = no deadline. */
+/** How many whole days until the deadline. Negative = overdue. Null = no deadline.
+ *  Both today and the deadline are normalised to midnight so a deadline anywhere
+ *  on today's calendar date always returns 0 (not 1 due to remaining hours). */
 export function getDeadlineDaysLeft(deadline: Timestamp | null): number | null {
   if (!deadline) return null
-  const msLeft = deadline.toMillis() - Date.now()
-  return Math.ceil(msLeft / (1000 * 60 * 60 * 24)) || 0
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const deadlineDay = deadline.toDate()
+  deadlineDay.setHours(0, 0, 0, 0)
+  return Math.round((deadlineDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 }
 
 /**

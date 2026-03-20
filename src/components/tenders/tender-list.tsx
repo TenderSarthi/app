@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { FileText, Filter } from 'lucide-react'
 import { TenderCard } from './tender-card'
@@ -20,6 +20,7 @@ export function TenderList({ tenders, totalCount, isPro }: TenderListProps) {
   const t = useTranslations('tenders')
   const [selectedTender, setSelectedTender] = useState<Tender | null>(null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
+  const handleCloseDialog = useCallback(() => setSelectedTender(null), [])
 
   const showWarning = !isPro && totalCount >= FREE_LIMIT
 
@@ -73,7 +74,7 @@ export function TenderList({ tenders, totalCount, isPro }: TenderListProps) {
         />
       ))}
 
-      <TenderStatusDialog tender={selectedTender} onClose={() => setSelectedTender(null)} />
+      <TenderStatusDialog tender={selectedTender} onClose={handleCloseDialog} />
       <UpgradeDialog open={upgradeOpen} onClose={() => setUpgradeOpen(false)} trigger="tender_limit" />
     </div>
   )

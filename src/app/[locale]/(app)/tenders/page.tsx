@@ -34,7 +34,18 @@ export default function TendersPage() {
     [tenders, filters]
   )
 
-  if (!profile || !user) return null
+  if (!profile || !user) {
+    return (
+      <div className="space-y-4">
+        <div className="h-7 w-40 bg-navy/5 rounded-lg animate-pulse" />
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-20 bg-navy/5 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4 pb-32 desktop:pb-6">
