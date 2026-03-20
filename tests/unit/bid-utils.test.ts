@@ -20,7 +20,12 @@ describe('computeHeuristicScore', () => {
   })
   it('handles null experienceYears as 0', () => {
     const r = computeHeuristicScore({ ...base, experienceYears: null })
-    expect(r.score).toBeGreaterThan(0)
+    expect(r.score).toBe(80)  // 30 base + 40 cat match + 10 state match + 0 experience
+  })
+  it('does not add state bonus when states are empty strings', () => {
+    const r = computeHeuristicScore({ ...base, userState: '', tenderState: '', experienceYears: 0 })
+    expect(r.score).toBe(70)
+    expect(r.tier).toBe('high')  // 70 >= 70 boundary
   })
   it('caps score at 95', () => {
     const r = computeHeuristicScore({ ...base, experienceYears: 10 })
