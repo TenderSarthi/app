@@ -132,3 +132,38 @@ export interface AlertConfig {
   active: boolean
   createdAt?: Timestamp
 }
+
+// --- Orders Tracker types ---
+
+export type OrderStatus =
+  | 'delivery_pending'
+  | 'inspection_pending'
+  | 'invoice_pending'
+  | 'payment_pending'
+  | 'completed'
+
+export interface OrderMilestones {
+  deliveryDate: Timestamp | null
+  inspectionDate: Timestamp | null
+  invoiceDate: Timestamp | null
+  paymentDate: Timestamp | null
+}
+
+export interface Order {
+  id: string
+  userId: string
+  tenderId: string
+  workOrderNumber: string | null
+  value: number | null
+  status: OrderStatus
+  milestones: OrderMilestones
+  notes: string | null
+  createdAt: Timestamp
+}
+
+export function isValidOrderStatus(s: unknown): s is OrderStatus {
+  return [
+    'delivery_pending', 'inspection_pending', 'invoice_pending',
+    'payment_pending', 'completed',
+  ].includes(s as string)
+}
