@@ -6,7 +6,7 @@ export type DeadlineUrgency = 'red' | 'amber' | 'green' | 'none'
 export function getDeadlineDaysLeft(deadline: Timestamp | null): number | null {
   if (!deadline) return null
   const msLeft = deadline.toMillis() - Date.now()
-  return Math.ceil(msLeft / (1000 * 60 * 60 * 24))
+  return Math.ceil(msLeft / (1000 * 60 * 60 * 24)) || 0
 }
 
 /**

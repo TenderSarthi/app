@@ -30,5 +30,17 @@
     "deadline": "Deadline",
     "queriesLeft": "\u0907\u0938 \u092e\u0939\u0940\u0928\u0947 {left} AI queries \u092c\u093e\u0915\u0940 \u0939\u0948\u0902",
     "searchSavedTenders": "Apne saved tenders search \u0915\u0930\u0947\u0902"
+  },
+  "tenders": {
+    "title": "\u092e\u0947\u0930\u0947 Tenders",
+    "subtitle": "Saved tenders \u0914\u0930 deadlines track \u0915\u0930\u0947\u0902",
+    "emptyTitle": "\u0905\u092d\u0940 \u0915\u094b\u0908 tender \u0928\u0939\u0940\u0902 \u0939\u0948",
+    "emptySubtitle": "+ button \u092f\u093e Find Tenders \u0938\u0947 \u092a\u0939\u0932\u093e tender save \u0915\u0930\u0947\u0902\u0964",
+    "updateStatus": "Status update \u0915\u0930\u0947\u0902",
+    "allCategories": "\u0938\u092d\u0940 Categories",
+    "allStates": "\u0938\u092d\u0940 States",
+    "clearFilters": "Filters \u0939\u091f\u093e\u090f\u0902",
+    "limitWarning": "{used}/{limit} tenders use \u0939\u0941\u090f \u2014 unlimited \u0915\u0947 \u0932\u093f\u090f upgrade \u0915\u0930\u0947\u0902",
+    "upgrade": "Upgrade \u0915\u0930\u0947\u0902"
   }
 }

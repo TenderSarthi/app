@@ -30,5 +30,17 @@
     "deadline": "Deadline",
     "queriesLeft": "{left} AI queries left this month",
     "searchSavedTenders": "Search your saved tenders"
+  },
+  "tenders": {
+    "title": "My Tenders",
+    "subtitle": "Track your saved tenders and deadlines",
+    "emptyTitle": "No tenders yet",
+    "emptySubtitle": "Use the + button or Find Tenders to save your first tender.",
+    "updateStatus": "Update status",
+    "allCategories": "All Categories",
+    "allStates": "All States",
+    "clearFilters": "Clear filters",
+    "limitWarning": "{used}/{limit} tenders used — upgrade for unlimited",
+    "upgrade": "Upgrade"
   }
 }
