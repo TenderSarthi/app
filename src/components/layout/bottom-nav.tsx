@@ -23,8 +23,8 @@ export function BottomNav({ locale }: { locale: string }) {
           const full = `/${locale}${href}`
           const active = pathname.startsWith(full)
           return (
-            <Link key={key} href={full} className={cn('flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center', active ? 'text-orange' : 'text-muted')}>
-              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+            <Link key={key} href={full} aria-current={active ? 'page' : undefined} className={cn('flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center', active ? 'text-orange' : 'text-muted')}>
+              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
               <span className="text-[10px] font-medium">{t(key)}</span>
             </Link>
           )

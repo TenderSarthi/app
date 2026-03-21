@@ -27,7 +27,11 @@ export default function DashboardPage() {
   const { usage } = useAIUsage(user?.uid ?? null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
 
-  if (!profile) return null
+  if (!profile) return (
+    <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
+      <p className="text-sm text-muted">Could not load your profile. Please refresh the page.</p>
+    </div>
+  )
 
   const userIsPro = isPro(profile)
 

@@ -33,8 +33,8 @@ export function Sidebar({ locale }: { locale: string }) {
           const full = `/${locale}${href}`
           const active = pathname.startsWith(full)
           return (
-            <Link key={key} href={full} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-colors', active ? 'bg-orange/10 text-orange font-semibold' : 'text-gray-600 hover:bg-gray-100')}>
-              <Icon size={18} />
+            <Link key={key} href={full} aria-current={active ? 'page' : undefined} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-colors', active ? 'bg-orange/10 text-orange font-semibold' : 'text-gray-600 hover:bg-gray-100')}>
+              <Icon size={18} aria-hidden="true" />
               <span>{t(key)}</span>
             </Link>
           )

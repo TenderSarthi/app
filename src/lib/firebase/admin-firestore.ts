@@ -39,6 +39,7 @@ export async function renewProSubscription(uid: string, renewsAt: Date): Promise
 export async function downgradeToFree(uid: string): Promise<void> {
   await db().doc(`users/${uid}`).update({
     plan:                   'free',
+    proSince:               null,
     razorpaySubscriptionId: null,
     scheduledDowngradeAt:   null,
     proRenewsAt:            null,

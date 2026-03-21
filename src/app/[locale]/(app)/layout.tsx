@@ -21,7 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [authLoading, user, locale, router])
 
   useEffect(() => {
-    if (!profileLoading && profile && !profile.name) router.replace(`/${locale}/onboarding`)
+    if (!profileLoading && user && profile && !profile.name) router.replace(`/${locale}/onboarding`)
   }, [profileLoading, profile, locale, router])
 
   if (authLoading || profileLoading) {

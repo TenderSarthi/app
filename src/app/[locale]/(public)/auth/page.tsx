@@ -1,9 +1,10 @@
+import { getTranslations } from 'next-intl/server'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { PhoneOtpForm } from '@/components/auth/phone-otp-form'
 
 function CompassLogo() {
   return (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
       <circle cx="26" cy="26" r="24" fill="#1A3766"/>
       <circle cx="26" cy="26" r="17" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
       <line x1="26" y1="9" x2="26" y2="43" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
@@ -17,6 +18,7 @@ function CompassLogo() {
 
 export default async function AuthPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
+  const t = await getTranslations('auth')
   return (
     <div className="min-h-screen bg-lightbg flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
@@ -34,9 +36,7 @@ export default async function AuthPage({ params }: { params: Promise<{ locale: s
           <PhoneOtpForm locale={locale} />
         </div>
         <p className="text-center text-xs text-muted mt-4">
-          Sign in करके आप हमारी{' '}
-          <a href={`/${locale}/terms`} className="underline">Terms</a> और{' '}
-          <a href={`/${locale}/privacy`} className="underline">Privacy Policy</a> से सहमत हैं।
+          {t('privacyNote')}
         </p>
       </div>
     </div>
