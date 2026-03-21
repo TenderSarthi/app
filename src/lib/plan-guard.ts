@@ -31,3 +31,30 @@ export function getBlockReason(feature: 'ai' | 'tenders' | 'bidGenerator' | 'pro
     case 'pro':          return 'यह Pro feature है। Upgrade करें।'
   }
 }
+
+/**
+ * True when the user is on a 7-day trial (plan=pro, no paid subscription).
+ * Trial users have trialUsed=true and razorpaySubscriptionId=null.
+ */
+export function isOnTrial(user: UserProfile): boolean {
+  return (
+    user.plan === 'pro' &&
+    user.trialUsed &&
+    user.razorpaySubscriptionId === null &&
+    user.trialEndsAt !== null
+  )
+}
+
+/**
+ * True when the trial has ended and the user has not subscribed.
+ * Pass `now` in tests to control the clock.
+ */
+export function isTrialExpired(user: UserProfile, now = new Date()): boolean {
+  if (!isOnTrial(user)) return false
+  return user.trialEndsAt!.toDate() <= now
+}
+
+/** True when the user is a paying Pro subscriber (not just a trial). */
+export function isPaidPro(user: UserProfile): boolean {
+  return user.plan === 'pro' && user.razorpaySubscriptionId !== null
+}
