@@ -158,15 +158,16 @@ export interface ArticleInput {
 
 export async function createAdminArticle(input: ArticleInput): Promise<void> {
   const ref = db().doc(`articles/${input.id}`)
+  const { id: _id, ...fields } = input
   await ref.set({
-    ...input,
+    ...fields,
     bodyEn:    input.bodyEn.split('\n').filter(Boolean),
     bodyHi:    input.bodyHi.split('\n').filter(Boolean),
     createdAt: FieldValue.serverTimestamp(),
   })
 }
 
-export async function updateAdminArticle(id: string, input: Partial<ArticleInput>): Promise<void> {
+export async function updateAdminArticle(id: string, input: Partial<Omit<ArticleInput, 'id'>>): Promise<void> {
   const data: Record<string, unknown> = { ...input }
   if (typeof input.bodyEn === 'string') data.bodyEn = input.bodyEn.split('\n').filter(Boolean)
   if (typeof input.bodyHi === 'string') data.bodyHi = input.bodyHi.split('\n').filter(Boolean)

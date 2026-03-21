@@ -26,8 +26,9 @@ export async function verifyAdminToken(req: Request): Promise<AdminClaims | null
 
   try {
     const decoded = await getAuth().verifyIdToken(token)
-    if (decoded.email !== adminEmail) return null
-    return { uid: decoded.uid, email: decoded.email }
+    const email = decoded.email
+    if (!email || email !== adminEmail) return null
+    return { uid: decoded.uid, email }
   } catch {
     return null
   }
