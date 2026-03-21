@@ -38,7 +38,7 @@ export function getMilestoneKey(status: OrderStatus): keyof OrderMilestones | nu
  * Returns an em-dash for null or zero.
  */
 export function formatOrderValue(value: number | null): string {
-  if (!value) return '\u2014'
+  if (value === null) return '\u2014'
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',

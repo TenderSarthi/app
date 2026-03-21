@@ -51,7 +51,9 @@ export function isOnTrial(user: UserProfile): boolean {
  */
 export function isTrialExpired(user: UserProfile, now = new Date()): boolean {
   if (!isOnTrial(user)) return false
-  return user.trialEndsAt!.toDate() <= now
+  const trialEndsAt = user.trialEndsAt
+  if (!trialEndsAt) return false
+  return trialEndsAt.toDate() <= now
 }
 
 /** True when the user is a paying Pro subscriber (not just a trial). */

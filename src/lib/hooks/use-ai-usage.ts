@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getAIUsage } from '@/lib/firebase/firestore'
 import type { AIUsageData } from '@/lib/firebase/firestore'
 
@@ -13,23 +13,34 @@ export interface UseAIUsageResult {
 export function useAIUsage(uid: string | null): UseAIUsageResult {
   const [usage, setUsage] = useState<AIUsageData>({ queries: 0, bidDocs: 0 })
   const [loading, setLoading] = useState(true)
+  const cancelledRef = useRef(false)
 
   const fetch = useCallback(() => {
+    cancelledRef.current = false
     if (!uid) {
-      setTimeout(() => {
-        setUsage({ queries: 0, bidDocs: 0 })
-        setLoading(false)
+      const timer = setTimeout(() => {
+        if (!cancelledRef.current) {
+          setUsage({ queries: 0, bidDocs: 0 })
+          setLoading(false)
+        }
       }, 0)
-      return
+      return () => { cancelledRef.current = true; clearTimeout(timer) }
     }
     setLoading(true)
     getAIUsage(uid)
-      .then(data => setUsage(data))
-      .catch(() => setUsage({ queries: 0, bidDocs: 0 }))
-      .finally(() => setLoading(false))
+      .then(data => { if (!cancelledRef.current) setUsage(data) })
+      .catch(() => { if (!cancelledRef.current) setUsage({ queries: 0, bidDocs: 0 }) })
+      .finally(() => { if (!cancelledRef.current) setLoading(false) })
   }, [uid])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => {
+    cancelledRef.current = false
+    const cleanup = fetch()
+    return () => {
+      cancelledRef.current = true
+      cleanup?.()
+    }
+  }, [fetch])
 
   return { usage, loading, refresh: fetch }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -26,13 +27,15 @@ const PRO_FEATURES = [
 
 export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
   const t = useTranslations('planGate')
+  const router = useRouter()
+  const params = useParams<{ locale: string }>()
 
   useEffect(() => {
     if (open) track('upgrade_prompt_seen', { trigger: trigger ?? 'unknown' })
   }, [open, trigger])
 
   const handleUpgrade = (plan: 'monthly' | 'annual') => {
-    window.location.href = '/settings?upgrade=' + plan
+    router.push(`/${params.locale}/settings?upgrade=${plan}`)
   }
 
   return (

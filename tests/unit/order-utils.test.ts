@@ -54,8 +54,8 @@ describe('formatOrderValue', () => {
   it('returns em-dash for null value', () => {
     expect(formatOrderValue(null)).toBe('\u2014')
   })
-  it('returns em-dash for zero value', () => {
-    expect(formatOrderValue(0)).toBe('\u2014')
+  it('formats zero as currency (not em-dash)', () => {
+    expect(formatOrderValue(0)).toContain('0')
   })
   it('formats 50000 with Indian currency grouping', () => {
     const result = formatOrderValue(50000)

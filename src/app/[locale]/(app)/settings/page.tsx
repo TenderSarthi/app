@@ -107,8 +107,7 @@ function SettingsContent() {
       handleUpgrade(upgradeParam)
       router.replace(`/${locale}/settings`, { scroll: false })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [upgradeParam, rzpReady])
+  }, [upgradeParam, rzpReady, router, locale, handleUpgrade, profile, user])
 
   // ── Cancel ────────────────────────────────────────────────────────────
   const handleCancel = useCallback(async () => {
@@ -260,28 +259,74 @@ function PlanContent({
   profile, upgrading, cancelling, confirmCancel,
   onUpgrade, onCancelClick, onCancelConfirm, onCancelDismiss, t,
 }: PlanContentProps) {
-  // TODO: implement the three plan state branches here.
-  //
-  // Branch 1 — isPaidPro(profile):
-  //   Show: "Pro · renews {proRenewsAt.toLocaleDateString('en-IN')}"
-  //   CTA: Cancel button (two-step confirm with confirmCancel state)
-  //
-  // Branch 2 — isOnTrial(profile) && !isTrialExpired(profile):
-  //   Show: "Pro Trial · expires {trialEndsAt.toLocaleDateString('en-IN')}"
-  //   CTA: Two upgrade buttons (monthly ₹499, annual ₹3,999)
-  //
-  // Branch 3 — free / expired trial:
-  //   Show: "Free plan"
-  //   CTA: Two upgrade buttons (monthly ₹499, annual ₹3,999)
-  //
-  // Buttons: type="button", disabled when upgrading or cancelling.
-  // Loader2 spinner (animate-spin) on buttons when loading.
-  // Cancel two-step: show warning text + Confirm/Dismiss buttons.
+  const renewDate = profile.proRenewsAt?.toDate().toLocaleDateString('en-IN')
+  const trialEnd  = profile.trialEndsAt?.toDate().toLocaleDateString('en-IN')
+
+  const UpgradeCTAs = (
+    <div className="flex gap-2 flex-wrap">
+      <Button
+        size="sm" type="button"
+        variant="outline"
+        className="border-orange text-orange hover:bg-orange/5"
+        disabled={upgrading}
+        onClick={() => onUpgrade('monthly')}
+      >
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹499/${t('month')}`}
+      </Button>
+      <Button
+        size="sm" type="button"
+        className="bg-gold text-white hover:bg-gold/90"
+        disabled={upgrading}
+        onClick={() => onUpgrade('annual')}
+      >
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹3,999/${t('year')}`}
+      </Button>
+    </div>
+  )
+
+  if (isPaidPro(profile)) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-navy">
+          {t('planPro')} · {t('renewsOn', { date: renewDate ?? '—' })}
+        </p>
+        {confirmCancel ? (
+          <div className="space-y-2">
+            <p className="text-sm text-muted">{t('cancelConfirm')}</p>
+            <div className="flex gap-2">
+              <Button size="sm" variant="destructive" type="button" disabled={cancelling} onClick={onCancelConfirm}>
+                {cancelling ? <Loader2 size={14} className="animate-spin" /> : t('cancelPlan')}
+              </Button>
+              <Button size="sm" variant="ghost" type="button" onClick={onCancelDismiss}>
+                {t('cancel')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button size="sm" variant="ghost" className="text-muted text-xs" type="button" onClick={onCancelClick}>
+            {t('cancelPlan')}
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  if (isOnTrial(profile) && !isTrialExpired(profile)) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-navy flex items-center gap-1.5">
+          <Shield size={14} className="text-orange" />
+          {t('planTrial')} · {t('trialExpiresOn', { date: trialEnd ?? '—' })}
+        </p>
+        {UpgradeCTAs}
+      </div>
+    )
+  }
 
   return (
-    <div className="text-sm text-muted">
-      {/* Implement here */}
-      <p>{profile.plan === 'pro' ? 'Pro' : 'Free'}</p>
+    <div className="space-y-3">
+      <p className="text-sm text-muted">{t('planFree')}</p>
+      {UpgradeCTAs}
     </div>
   )
 }

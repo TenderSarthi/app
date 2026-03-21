@@ -17,12 +17,12 @@ export function useUserTenders(uid: string | null): UseUserTendersResult {
 
   useEffect(() => {
     if (!uid) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setTenders([])
         setLoading(false)
         setError(null)
       }, 0)
-      return
+      return () => clearTimeout(timer)
     }
 
     setLoading(true)
