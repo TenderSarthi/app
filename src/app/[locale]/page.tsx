@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { CheckCircle, Bell, FileText, Zap } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { getPlatformStats } from '@/lib/firebase/firestore'
@@ -41,12 +41,12 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-3 flex items-center justify-between">
         <span className="font-heading font-bold text-navy text-lg">TenderSarthi</span>
         <div className="flex gap-2">
-          <Button size="sm" variant="ghost" asChild>
-            <Link href={`/${locale}/auth`}>{t('nav.login')}</Link>
-          </Button>
-          <Button size="sm" className="bg-orange text-white hover:bg-orange/90" asChild>
-            <Link href={`/${locale}/auth`}>{t('nav.getStarted')}</Link>
-          </Button>
+          <Link href={`/${locale}/auth`} className={buttonVariants({ size: 'sm', variant: 'ghost' })}>
+            {t('nav.login')}
+          </Link>
+          <Link href={`/${locale}/auth`} className={buttonVariants({ size: 'sm', className: 'bg-orange text-white hover:bg-orange/90' })}>
+            {t('nav.getStarted')}
+          </Link>
         </div>
       </nav>
 
@@ -60,12 +60,12 @@ export default function LandingPage() {
           {t('hero.subheadline')}
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <Button size="lg" className="bg-orange text-white hover:bg-orange/90" asChild>
-            <Link href={`/${locale}/auth`}>{t('hero.cta')}</Link>
-          </Button>
-          <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-            <Link href="#pricing">{t('hero.seePricing')}</Link>
-          </Button>
+          <Link href={`/${locale}/auth`} className={buttonVariants({ size: 'lg', className: 'bg-orange text-white hover:bg-orange/90' })}>
+            {t('hero.cta')}
+          </Link>
+          <Link href="#pricing" className={buttonVariants({ size: 'lg', variant: 'outline', className: 'border-white/30 text-white hover:bg-white/10' })}>
+            {t('hero.seePricing')}
+          </Link>
         </div>
       </section>
 
@@ -123,9 +123,9 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" variant="outline" asChild>
-                <Link href={`/${locale}/auth`}>{t('pricing.freeCta')}</Link>
-              </Button>
+              <Link href={`/${locale}/auth`} className={buttonVariants({ variant: 'outline', className: 'w-full' })}>
+                {t('pricing.freeCta')}
+              </Link>
             </div>
             <div className="bg-navy text-white border border-navy rounded-xl p-6 space-y-4">
               <div>
@@ -144,9 +144,9 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full bg-orange hover:bg-orange/90 text-white" asChild>
-                <Link href={`/${locale}/auth`}>{t('pricing.proCta')}</Link>
-              </Button>
+              <Link href={`/${locale}/auth`} className={buttonVariants({ className: 'w-full bg-orange hover:bg-orange/90 text-white' })}>
+                {t('pricing.proCta')}
+              </Link>
             </div>
           </div>
         </div>
