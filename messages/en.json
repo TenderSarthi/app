@@ -290,4 +290,89 @@
     "deleteConfirm": "Yes, delete my account",
     "cancel": "Cancel"
   }
+,
+  "landing": {
+    "nav": {
+      "login": "Log In",
+      "getStarted": "Get Started Free"
+    },
+    "hero": {
+      "badge": "AI-Powered Tender Assistant",
+      "headline": "Win Government Tenders, Easily",
+      "subheadline": "TenderSarthi uses AI to find the right GeM tenders for your business, draft bid documents, and alert you before deadlines.",
+      "cta": "Start Free Trial",
+      "seePricing": "See Pricing"
+    },
+    "trust": {
+      "vendors": "Vendors",
+      "filed": "Tenders Filed",
+      "won": "Tenders Won"
+    },
+    "features": {
+      "title": "Everything you need to win tenders",
+      "alerts": {
+        "title": "Smart Alerts",
+        "desc": "Get notified before tender deadlines so you never miss an opportunity."
+      },
+      "ai": {
+        "title": "AI Analysis",
+        "desc": "Understand tender requirements instantly with AI-powered summaries."
+      },
+      "bid": {
+        "title": "Bid Generator",
+        "desc": "Generate professional bid documents in minutes, not hours."
+      }
+    },
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "free": {
+        "title": "Free",
+        "price": "₹0 / month",
+        "f1": "Up to 10 AI queries/month",
+        "f2": "Save up to 5 tenders",
+        "f3": "Basic alerts"
+      },
+      "freeCta": "Get Started Free",
+      "pro": {
+        "title": "Pro",
+        "price": "₹499 / month",
+        "p1": "Unlimited AI queries",
+        "p2": "Unlimited tender saves",
+        "p3": "Bid Document Generator",
+        "p4": "Priority support"
+      },
+      "proCta": "Start 7-Day Free Trial"
+    },
+    "testimonials": {
+      "title": "Trusted by vendors across India",
+      "t1": {
+        "text": "TenderSarthi helped me win my first government contract in just 3 weeks.",
+        "name": "Ramesh Kumar",
+        "role": "Hardware Supplier, Delhi"
+      },
+      "t2": {
+        "text": "The AI analysis saves me hours every week. I now bid on 3x more tenders.",
+        "name": "Priya Sharma",
+        "role": "IT Services, Bengaluru"
+      },
+      "t3": {
+        "text": "Deadline alerts alone are worth the subscription. Never missed one since.",
+        "name": "Suresh Patel",
+        "role": "Office Supplies, Ahmedabad"
+      }
+    },
+    "footer": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "copyright": "© 2026 TenderSarthi. All rights reserved."
+    }
+  },
+  "offline": {
+    "message": "You are offline. Some features may not be available."
+  },
+  "install": {
+    "title": "Install TenderSarthi",
+    "cta": "Install",
+    "dismiss": "Not now"
+  }
 }
