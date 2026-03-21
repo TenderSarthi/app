@@ -12,9 +12,16 @@ export function useUserProfile() {
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     if (!uid) {
-      const timer = setTimeout(() => { setProfile(null); setLoading(false) }, 0)
-      return () => clearTimeout(timer)
+      // Auth resolved with no user — clear immediately
+      setProfile(null)
+      setLoading(false)
+      return
     }
+    // uid just became available: reset to loading so the app waits for the
+    // first snapshot before making any routing decisions. Without this, the
+    // loading=false state from the previous uid=null path can linger and
+    // cause AppLayout to redirect to onboarding on every page reload.
+    setLoading(true)
     return onSnapshot(
       doc(db, 'users', uid),
       (snap) => {
