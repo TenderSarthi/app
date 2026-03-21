@@ -53,7 +53,19 @@ export async function listUsers(): Promise<AdminUser[]> {
 
 /** Manually override a user's plan (admin support action). */
 export async function setUserPlan(uid: string, plan: 'free' | 'pro'): Promise<void> {
-  await db().doc(`users/${uid}`).update({ plan })
+  const updates: Record<string, unknown> = { plan }
+  if (plan === 'pro') {
+    // Manual Pro grant: set proSince and clear any pending downgrade
+    updates.proSince               = FieldValue.serverTimestamp()
+    updates.scheduledDowngradeAt   = null
+  } else {
+    // Manual downgrade to free: clear paid subscription state
+    updates.proSince               = null
+    updates.proRenewsAt            = null
+    updates.scheduledDowngradeAt   = null
+    updates.razorpaySubscriptionId = null
+  }
+  await db().doc(`users/${uid}`).update(updates)
 }
 
 /** Delete a user's Firestore document and Firebase Auth account. */
@@ -174,7 +186,7 @@ export async function createAdminArticle(input: ArticleInput): Promise<void> {
 }
 
 export async function updateAdminArticle(id: string, input: Partial<Omit<ArticleInput, 'id'>>): Promise<void> {
-  const data: Record<string, unknown> = { ...input }
+  const data: Record<string, unknown> = { ...input, updatedAt: FieldValue.serverTimestamp() }
   if (typeof input.bodyEn === 'string') data.bodyEn = input.bodyEn.split('\n').filter(Boolean)
   if (typeof input.bodyHi === 'string') data.bodyHi = input.bodyHi.split('\n').filter(Boolean)
   await db().doc(`articles/${id}`).update(data)

@@ -81,7 +81,15 @@ Scoring guide:
 Respond ONLY with valid JSON (no markdown, no extra text):
 {"score": <integer 0-100>, "reasoning": "<one concise sentence>"}`
 
-    const scoreResult = await flashModel.generateContent(scorePrompt)
+    const AI_TIMEOUT_MS = 30_000
+    const aiTimeout = <T,>(p: Promise<T>) => Promise.race([
+      p,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), AI_TIMEOUT_MS)
+      ),
+    ])
+
+    const scoreResult = await aiTimeout(flashModel.generateContent(scorePrompt))
     let winScore = 50
     let winReasoning = ''
     try {
@@ -120,7 +128,7 @@ Generate a complete bid response document in ${language === 'hi' ? 'Hinglish (Hi
 Be specific, professional, and tailored to the tender. Format as clean markdown.
 Important: This is for a real tender bid — be accurate and professional.`
 
-    const docResult = await proModel.generateContent(docPrompt)
+    const docResult = await aiTimeout(proModel.generateContent(docPrompt))
     const generatedDocument = docResult.response.text()
 
     return NextResponse.json({ winScore, winLabel, winReasoning, generatedDocument })

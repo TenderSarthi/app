@@ -232,6 +232,7 @@
     "cancelDelete": "रद्द करें",
     "errorSelectTender": "Please select a tender.",
     "errorSave": "Could not save order. Please try again.",
+    "errorRetry": "कनेक्शन जांचें और दोबारा try करें।",
     "status_delivery_pending": "डिलीवरी बाकी",
     "status_inspection_pending": "निरीक्षण बाकी",
     "status_invoice_pending": "इनवॉइस बाकी",

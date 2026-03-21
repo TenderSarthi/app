@@ -120,7 +120,7 @@ export default function OrdersPage() {
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <p className="font-semibold text-danger">{t('errorSave')}</p>
           <p className="text-sm text-muted mt-1 max-w-xs">
-            Please check your connection and try again.
+            {t('errorRetry')}
           </p>
         </div>
       ) : orders.length === 0 ? (

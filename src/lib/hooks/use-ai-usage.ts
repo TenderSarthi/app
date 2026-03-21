@@ -29,7 +29,10 @@ export function useAIUsage(uid: string | null): UseAIUsageResult {
     setLoading(true)
     getAIUsage(uid)
       .then(data => { if (!cancelledRef.current) setUsage(data) })
-      .catch(() => { if (!cancelledRef.current) setUsage({ queries: 0, bidDocs: 0 }) })
+      .catch((err: unknown) => {
+        console.warn('[useAIUsage] Failed to load AI usage:', err)
+        if (!cancelledRef.current) setUsage({ queries: 0, bidDocs: 0 })
+      })
       .finally(() => { if (!cancelledRef.current) setLoading(false) })
   }, [uid])
 

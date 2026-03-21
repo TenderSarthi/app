@@ -108,7 +108,11 @@ export async function GET(req: NextRequest) {
     if (matches.length === 0) continue
 
     // Send for the first match only (avoid notification spam — max 1 per run per user)
-    const tender = matches[0]!
+    const rawTender = matches[0]!
+    // Truncate title to 100 chars to stay within FCM/WhatsApp/email subject limits
+    const tender = rawTender.title.length > 100
+      ? { ...rawTender, title: rawTender.title.slice(0, 97) + '…' }
+      : rawTender
     const message = formatAlertMessage(tender)
 
     const promises: Promise<boolean>[] = []

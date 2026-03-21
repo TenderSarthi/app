@@ -37,7 +37,7 @@ export default function AdminLearnPage() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [user])
 
   const handleSave = async () => {
     if (!form || !user) return
@@ -68,12 +68,21 @@ export default function AdminLearnPage() {
 
   const handleDelete = async (id: string) => {
     if (!user || !confirm('Delete this article?')) return
-    const token = await getToken()
-    await fetch(`/api/admin/articles/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    await load()
+    setError(null)
+    try {
+      const token = await getToken()
+      const res = await fetch(`/api/admin/articles/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        throw new Error(data.error ?? 'Delete failed')
+      }
+      await load()
+    } catch (e) {
+      setError((e as Error).message)
+    }
   }
 
   const openEdit = (a: AdminArticle) => {

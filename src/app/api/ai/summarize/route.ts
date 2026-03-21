@@ -100,7 +100,13 @@ Respond in language: ${language}
 TENDER TEXT:
 ${text}`
 
-    const result = await model.generateContent(prompt)
+    const AI_TIMEOUT_MS = 30_000
+    const result = await Promise.race([
+      model.generateContent(prompt),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), AI_TIMEOUT_MS)
+      ),
+    ])
     const summary = result.response.text()
 
     return NextResponse.json({ summary })

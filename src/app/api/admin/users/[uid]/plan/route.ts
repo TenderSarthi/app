@@ -10,10 +10,13 @@ export async function POST(
   if (!admin) return unauthorized()
 
   const { uid } = await params
-  const body    = await req.json() as { plan?: string }
+  if (!uid || typeof uid !== 'string' || !uid.trim()) {
+    return Response.json({ error: 'Invalid uid' }, { status: 400 })
+  }
+  const body = await req.json() as { plan?: string }
   if (body.plan !== 'free' && body.plan !== 'pro') {
     return Response.json({ error: 'Invalid plan' }, { status: 400 })
   }
-  await setUserPlan(uid, body.plan)
+  await setUserPlan(uid.trim(), body.plan)
   return Response.json({ ok: true })
 }

@@ -97,7 +97,13 @@ export async function POST(req: NextRequest) {
     }))
 
     const chat = model.startChat({ history })
-    const result = await chat.sendMessage(userMessage.content)
+    const AI_TIMEOUT_MS = 30_000
+    const result = await Promise.race([
+      chat.sendMessage(userMessage.content),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), AI_TIMEOUT_MS)
+      ),
+    ])
     const reply = result.response.text()
 
     return NextResponse.json({ reply })

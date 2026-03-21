@@ -10,6 +10,9 @@ export async function POST(
   if (!admin) return unauthorized()
 
   const { uid } = await params
-  await deleteUserData(uid)
+  if (!uid || typeof uid !== 'string' || !uid.trim()) {
+    return Response.json({ error: 'Invalid uid' }, { status: 400 })
+  }
+  await deleteUserData(uid.trim())
   return Response.json({ ok: true })
 }

@@ -31,30 +31,46 @@ export default function AdminUsersPage() {
     }
   }
 
-  useEffect(() => { load() }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [user])
 
   const handleTogglePlan = async (uid: string, currentPlan: string) => {
     if (!user) return
     const newPlan = currentPlan === 'pro' ? 'free' : 'pro'
     if (!confirm(`Change plan to ${newPlan}?`)) return
-    const token = await user.getIdToken()
-    await fetch(`/api/admin/users/${uid}/plan`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ plan: newPlan }),
-    })
-    await load()
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch(`/api/admin/users/${uid}/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan: newPlan }),
+      })
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        throw new Error(data.error ?? 'Plan change failed')
+      }
+      await load()
+    } catch (e) {
+      setError((e as Error).message)
+    }
   }
 
   const handleDelete = async (uid: string, name: string) => {
     if (!user) return
     if (!confirm(`Delete ${name}? This cannot be undone.`)) return
-    const token = await user.getIdToken()
-    await fetch(`/api/admin/users/${uid}/delete`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    await load()
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch(`/api/admin/users/${uid}/delete`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        throw new Error(data.error ?? 'Delete failed')
+      }
+      await load()
+    } catch (e) {
+      setError((e as Error).message)
+    }
   }
 
   const filtered = users.filter((u) => {
@@ -79,6 +95,7 @@ export default function AdminUsersPage() {
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
         <Input
           placeholder="Search name, email, phone…"
+          aria-label="Search users by name, email, or phone"
           className="pl-9"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

@@ -81,9 +81,16 @@ export async function POST(req: NextRequest) {
       contact:       profile?.phone   ?? undefined,
       fail_existing: 0,
     }) as unknown as Promise<{ id: string }>)
-    customerId = customer.id
-    // Persist customer ID so we don't create duplicates on retry
-    await userRef.update({ razorpayCustomerId: customerId })
+    const newCustomerId = customer.id
+    // Conditional write: only store if another concurrent request hasn't already set it.
+    // If it was already set (race), use the existing value and discard ours.
+    customerId = await getFirestore().runTransaction(async (tx) => {
+      const snap    = await tx.get(userRef)
+      const already = snap.data()?.razorpayCustomerId as string | null | undefined
+      if (already) return already
+      tx.update(userRef, { razorpayCustomerId: newCustomerId })
+      return newCustomerId
+    })
   }
 
   const subscription = await rzp.subscriptions.create({

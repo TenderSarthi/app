@@ -232,6 +232,7 @@
     "cancelDelete": "Cancel",
     "errorSelectTender": "Please select a tender.",
     "errorSave": "Could not save order. Please try again.",
+    "errorRetry": "Please check your connection and try again.",
     "status_delivery_pending": "Delivery Pending",
     "status_inspection_pending": "Inspection Pending",
     "status_invoice_pending": "Invoice Pending",
