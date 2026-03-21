@@ -29,6 +29,7 @@ export interface UserProfile {
   deletionRequested: boolean
   deletionRequestedAt: Timestamp | null
   createdAt: Timestamp
+  lastActiveAt: Timestamp | null
 }
 
 export type OnboardingData = Pick<

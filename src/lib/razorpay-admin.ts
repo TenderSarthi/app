@@ -19,18 +19,12 @@ function getRzpInstance(): Razorpay {
   return _rzp
 }
 
-// Export as 'rzp' for spec compliance (lazy proxy for test env)
-export const rzp = {
-  get subscriptions() {
-    return getRzpInstance().subscriptions
-  },
-  get customers() {
-    return getRzpInstance().customers
-  },
-  get payments() {
-    return getRzpInstance().payments
-  },
-} as unknown as Razorpay
+/** Lazy proxy over the Razorpay singleton — defers env-var validation to first use. */
+export const rzp: Pick<Razorpay, 'subscriptions' | 'customers' | 'payments'> = {
+  get subscriptions() { return getRzpInstance().subscriptions },
+  get customers()     { return getRzpInstance().customers },
+  get payments()      { return getRzpInstance().payments },
+}
 
 /** Plan IDs created in Razorpay dashboard under Subscriptions > Plans */
 export const PLAN_IDS = {

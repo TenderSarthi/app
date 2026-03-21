@@ -12,12 +12,12 @@ Answer in a helpful, clear tone. Use simple language. If the user writes in Hind
 Always be accurate about GeM portal procedures. If unsure, say so rather than guessing.`
 
 export async function POST(req: NextRequest) {
+  let uid = ''
   try {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    let uid: string
     try {
       const decoded = await getAuth().verifyIdToken(authHeader.slice(7))
       uid = decoded.uid
@@ -31,16 +31,21 @@ export async function POST(req: NextRequest) {
     const userData = userDoc.data()
     const userPlan = userData?.plan ?? 'free'
 
+    const now = new Date()
+
     // Treat trial-expired users as free even if plan field still says 'pro'
     const isTrialExpired =
       userPlan === 'pro' &&
       !userData?.razorpaySubscriptionId &&
       userData?.trialEndsAt &&
-      userData.trialEndsAt.toDate() <= new Date()
+      userData.trialEndsAt.toDate() <= now
 
-    if (userPlan !== 'pro' || isTrialExpired) {
+    // Treat users whose subscription grace period has ended as free
+    const scheduledDowngradeAt = userData?.scheduledDowngradeAt
+    const isGracePeriodEnded = scheduledDowngradeAt && scheduledDowngradeAt.toDate() <= now
+
+    if (userPlan !== 'pro' || isTrialExpired || isGracePeriodEnded) {
       // Free user: check monthly query count
-      const now = new Date()
       const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
       const usageDoc = await db.doc(`aiUsage/${uid}/${monthKey}/data`).get()
       const queryCount = usageDoc.data()?.queries ?? 0
@@ -97,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reply })
   } catch (err) {
-    console.error('AI chat error:', err)
+    console.error('AI chat error', { uid, err })
     return NextResponse.json(
       { error: 'AI अभी unavailable है। कुछ देर में try करें।' },
       { status: 500 }

@@ -71,7 +71,9 @@ export function BidHelperChat({ profile, usage, onUsageUpdate }: BidHelperChatPr
       setMessages(prev => [...prev, assistantMsg])
       setConfirmId(assistantMsg.id)
 
-      if (user) await incrementAIQueryCount(user.uid)
+      // Server already increments for free users — only increment client-side for Pro
+      // (avoids double-counting the usage display for free users)
+      if (user && profile.plan === 'pro') await incrementAIQueryCount(user.uid)
       onUsageUpdate()
       track('bid_chat_message', { language: profile.language })
     } catch (err) {

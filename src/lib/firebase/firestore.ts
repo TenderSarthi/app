@@ -31,6 +31,7 @@ export async function createUser(uid: string, email: string | null, phone: strin
     notificationsDeclined: false, scheduledDowngradeAt: null,
     deletionRequested: false, deletionRequestedAt: null,
     createdAt: serverTimestamp(),
+    lastActiveAt: serverTimestamp(),
   })
 }
 
@@ -47,6 +48,11 @@ export async function saveOnboardingData(uid: string, data: OnboardingData): Pro
 /** Switches user language. Propagates to all active sessions via Firestore listener. */
 export async function updateLanguage(uid: string, language: LanguageCode): Promise<void> {
   await updateDoc(doc(db, 'users', uid), { language })
+}
+
+/** Updates lastActiveAt to now. Call on dashboard load to track active users. */
+export async function touchLastActive(uid: string): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), { lastActiveAt: serverTimestamp() })
 }
 
 // ---------- Platform Stats ----------

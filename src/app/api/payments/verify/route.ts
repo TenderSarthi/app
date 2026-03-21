@@ -5,11 +5,13 @@ import { rzp, verifyPaymentSignature } from '@/lib/razorpay-admin'
 import { upgradeToPro } from '@/lib/firebase/admin-firestore'
 
 // Minimal shape of subscription returned by rzp.subscriptions.fetch
-// (Razorpay SDK types don't expose current_end/customer_id at compile time)
+// (Razorpay SDK types don't expose these fields at compile time)
 interface FetchedSubscription {
   id:          string
+  status:      string
   customer_id: string
   current_end: number    // Unix timestamp of current billing period end
+  notes?:      { uid?: string }
 }
 
 async function verifyToken(req: NextRequest): Promise<string | null> {
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch subscription to get customer ID and renewal date
   const subscription = await rzp.subscriptions.fetch(razorpay_subscription_id) as unknown as FetchedSubscription
-  const subNoteUid = (subscription as { notes?: { uid?: string } }).notes?.uid
+  const subNoteUid = subscription.notes?.uid
   if (subNoteUid !== uid) {
     console.error('[verify] Subscription uid mismatch:', { subNoteUid, uid })
     return Response.json({ error: 'Subscription does not belong to this user' }, { status: 403 })

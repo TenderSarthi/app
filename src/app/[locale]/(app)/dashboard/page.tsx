@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import { useFirebase } from '@/components/providers/firebase-provider'
@@ -8,6 +8,7 @@ import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { usePlatformStats } from '@/lib/hooks/use-platform-stats'
 import { useUserTenders } from '@/lib/hooks/use-user-tenders'
 import { useAIUsage } from '@/lib/hooks/use-ai-usage'
+import { touchLastActive } from '@/lib/firebase/firestore'
 import { TrustSignalBar } from '@/components/dashboard/trust-signal-bar'
 import { TrialBanner } from '@/components/dashboard/trial-banner'
 import { AIUsageCounter } from '@/components/dashboard/ai-usage-counter'
@@ -22,6 +23,11 @@ export default function DashboardPage() {
 
   const { user } = useFirebase()
   const { profile } = useUserProfile()
+
+  // Track last active time for engagement metrics
+  useEffect(() => {
+    if (user?.uid) touchLastActive(user.uid).catch(() => {})
+  }, [user?.uid])
   const { stats } = usePlatformStats()
   const { tenders } = useUserTenders(user?.uid ?? null)
   const { usage } = useAIUsage(user?.uid ?? null)

@@ -82,6 +82,13 @@ export async function GET(req: NextRequest) {
     .where('active', '==', true)
     .get()
 
+  // CRIT-3: Batch-fetch all user profiles in one round-trip instead of N+1 queries
+  const configUids = configsSnap.docs.map(d => d.id)
+  const userSnapsMap = new Map(
+    (await Promise.all(configUids.map(uid => db.collection('users').doc(uid).get())))
+      .map((snap, i) => [configUids[i], snap] as const)
+  )
+
   let alertsSent = 0
 
   // ── Step 3: Match and notify ─────────────────────────────────────────────
@@ -89,15 +96,9 @@ export async function GET(req: NextRequest) {
     const config = configDoc.data() as AlertConfig
     const uid = configDoc.id
 
-    // Load user profile for notification contact info
-    let userProfile: UserProfile | null = null
-    try {
-      const userSnap = await db.collection('users').doc(uid).get()
-      if (!userSnap.exists) continue  // Admin SDK: .exists is a boolean property, not a method
-      userProfile = userSnap.data() as UserProfile
-    } catch {
-      continue
-    }
+    const userSnap = userSnapsMap.get(uid)
+    if (!userSnap?.exists) continue  // Admin SDK: .exists is a boolean property, not a method
+    const userProfile = userSnap.data() as UserProfile
 
     // Only send alerts to Pro users
     if (userProfile.plan !== 'pro') continue
@@ -153,18 +154,33 @@ export async function GET(req: NextRequest) {
       .where('expiresAt', '<=', Timestamp.fromDate(thirtyDaysFromNow))
       .get()
 
+    // CRIT-3: Batch-fetch distinct user profiles for expiry notifications
+    const expiryUserIds = [...new Set(expiringDocs.docs.map(d => d.data().userId as string))]
+    const expiryUserSnaps = await Promise.all(
+      expiryUserIds.map(id => db.collection('users').doc(id).get())
+    )
+    const expiryUsersMap = new Map(
+      expiryUserIds.map((id, i) => [id, expiryUserSnaps[i]] as const)
+    )
+
     for (const docSnap of expiringDocs.docs) {
       const data = docSnap.data()
       if (data.expiryAlertSent === true) continue
 
-      // Load user profile
-      const userSnap = await db.collection('users').doc(data.userId).get()
-      if (!userSnap.exists) continue  // Admin SDK: boolean property, not method
+      // MED-1: Guard against race condition where expiresAt was removed after query
+      if (!data.expiresAt) continue
+
+      const userSnap = expiryUsersMap.get(data.userId)
+      if (!userSnap?.exists) continue  // Admin SDK: boolean property, not method
       const user = userSnap.data() as UserProfile
       if (user.plan !== 'pro') continue
 
-      const daysLeft = Math.round((data.expiresAt.toDate().getTime() - now.getTime()) / 86_400_000)
-      const expiryMsg = `⚠️ ${data.type?.toUpperCase() ?? 'Document'} ${daysLeft} दिन में expire होगी। Renew करें।`
+      const daysLeft = Math.round(
+        (data.expiresAt.toDate().getTime() - now.getTime()) / 86_400_000
+      )
+      // MED-4: Use direct access for required field (data.type always present on VaultDocument)
+      const docTypeLabel = (data.type as string | undefined)?.toUpperCase() ?? 'Document'
+      const expiryMsg = `⚠️ ${docTypeLabel} ${daysLeft} दिन में expire होगी। Renew करें।`
 
       const expiryPromises: Promise<boolean>[] = []
 
@@ -192,7 +208,7 @@ export async function GET(req: NextRequest) {
           sendAlertEmail({
             to: user.email,
             subject: `Document Expiry: ${daysLeft} दिन बाकी`,
-            tenderTitle: `${data.type?.toUpperCase() ?? 'Document'} expiry`,
+            tenderTitle: `${docTypeLabel} expiry`,
             tenderLink: 'https://tendersarthi.com/en/documents',
             message: expiryMsg,
           })

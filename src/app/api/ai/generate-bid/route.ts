@@ -28,12 +28,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Pro plan required for bid document generation' }, { status: 403 })
     }
 
+    const now = new Date()
+
     // Verify user has an active paid subscription OR an unexpired trial
     const isPaidSubscriber  = !!userData?.razorpaySubscriptionId
     const trialEndsAt       = userData?.trialEndsAt
-    const isActiveTrialUser = trialEndsAt != null && trialEndsAt.toDate() > new Date()
+    const isActiveTrialUser = trialEndsAt != null && trialEndsAt.toDate() > now
 
-    if (!isPaidSubscriber && !isActiveTrialUser) {
+    // Block users whose subscription grace period (post-cancellation) has ended
+    const scheduledDowngradeAt  = userData?.scheduledDowngradeAt
+    const isGracePeriodEnded    = scheduledDowngradeAt && scheduledDowngradeAt.toDate() <= now
+
+    if ((!isPaidSubscriber && !isActiveTrialUser) || isGracePeriodEnded) {
       return NextResponse.json({ error: 'Pro subscription required' }, { status: 403 })
     }
 

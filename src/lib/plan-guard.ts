@@ -6,7 +6,12 @@ const PRO_BID_DOC_SOFT_CAP  = 30
 
 export interface AIUsage { queries: number; bidDocs: number }
 
-export function isPro(user: UserProfile): boolean { return user.plan === 'pro' }
+export function isPro(user: UserProfile, now = new Date()): boolean {
+  if (user.plan !== 'pro') return false
+  // Grace period ended (subscription cancelled, billing period expired)
+  if (user.scheduledDowngradeAt && user.scheduledDowngradeAt.toDate() <= now) return false
+  return true
+}
 
 export function canUseAI(user: UserProfile, usage: AIUsage): boolean {
   if (isPro(user)) return true
