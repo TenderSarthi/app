@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
 import { LayoutDashboard, Users, Bell, BookOpen, FileCheck, LogOut } from 'lucide-react'
@@ -15,22 +15,37 @@ const NAV = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router   = useRouter()
   const params   = useParams<{ locale: string }>()
   const locale   = params.locale
   const pathname = usePathname()
 
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
+  const [isAdmin,      setIsAdmin]      = useState<boolean | null>(null)
+  const [checkLoading, setCheckLoading] = useState(true)
 
   useEffect(() => {
-    if (loading) return
-    if (!user || user.email !== adminEmail) {
+    if (authLoading) return
+    if (!user) {
       router.replace(`/${locale}/dashboard`)
+      return
     }
-  }, [loading, user, adminEmail, locale, router])
 
-  if (loading || !user || user.email !== adminEmail) return null
+    user.getIdToken().then((token) =>
+      fetch('/api/admin/me', { headers: { Authorization: `Bearer ${token}` } })
+    ).then((r) => r.json() as Promise<{ isAdmin: boolean }>)
+    .then(({ isAdmin: admin }) => {
+      setIsAdmin(admin)
+      if (!admin) router.replace(`/${locale}/dashboard`)
+    })
+    .catch(() => {
+      setIsAdmin(false)
+      router.replace(`/${locale}/dashboard`)
+    })
+    .finally(() => setCheckLoading(false))
+  }, [authLoading, user, locale, router])
+
+  if (authLoading || checkLoading || !isAdmin) return null
 
   return (
     <div className="min-h-screen bg-lightbg flex">
@@ -48,13 +63,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={href}
                 href={full}
+                aria-current={active ? 'page' : undefined}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
                   active
                     ? 'bg-orange text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                <Icon size={16} />
+                <Icon size={16} aria-hidden="true" />
                 {label}
               </Link>
             )
@@ -65,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href={`/${locale}/dashboard`}
             className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           >
-            <LogOut size={16} />
+            <LogOut size={16} aria-hidden="true" />
             Exit Admin
           </Link>
         </div>
