@@ -19,7 +19,7 @@ export function useOrders(uid: string | null) {
     return subscribeOrders(
       uid,
       (data) => { setOrders(data); setLoading(false); setError(null) },
-      (err)  => { setLoading(false); setError(err.message) }
+      (err)  => { setLoading(false); setError(err instanceof Error ? err.message : 'Orders load नहीं हुए।') }
     )
   }, [uid])
 

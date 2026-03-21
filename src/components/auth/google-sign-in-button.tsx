@@ -15,7 +15,7 @@ export function GoogleSignInButton({ locale }: { locale: string }) {
     setLoading(true); setError(null)
     try {
       const user = await signInWithGoogle()
-      identifyUser(user.uid, { email: user.email, method: 'google' })
+      identifyUser(user.uid, { method: 'google' })
       if (!(await userExists(user.uid))) {
         await createUser(user.uid, user.email, null)
         track('signup_completed', { method: 'google' })

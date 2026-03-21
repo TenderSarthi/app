@@ -60,18 +60,30 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Reuse existing Razorpay customer or create a new one
-  let customerId = profile?.razorpayCustomerId ?? null
-  if (!customerId) {
-    const customer = await rzp.customers.create({
+  // Reuse existing Razorpay customer or create a new one.
+  // Use a transaction to guard against concurrent requests both reading
+  // razorpayCustomerId = null and creating duplicate customers.
+  let customerId: string
+  const userRef = getFirestore().doc(`users/${uid}`)
+  const txResult = await getFirestore().runTransaction(async (tx) => {
+    const freshSnap = await tx.get(userRef)
+    const existing  = freshSnap.data()?.razorpayCustomerId as string | null | undefined
+    if (existing) return existing
+    return null
+  })
+
+  if (txResult) {
+    customerId = txResult
+  } else {
+    const customer = await (rzp.customers.create({
       name:          profile?.name    || 'TenderSarthi User',
       email:         profile?.email   ?? undefined,
       contact:       profile?.phone   ?? undefined,
-      fail_existing: '0',
-    })
+      fail_existing: 0,
+    }) as unknown as Promise<{ id: string }>)
     customerId = customer.id
     // Persist customer ID so we don't create duplicates on retry
-    await getFirestore().doc(`users/${uid}`).update({ razorpayCustomerId: customerId })
+    await userRef.update({ razorpayCustomerId: customerId })
   }
 
   const subscription = await rzp.subscriptions.create({

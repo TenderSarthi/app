@@ -29,7 +29,7 @@ export default function DashboardPage() {
     if (user?.uid) touchLastActive(user.uid).catch(() => {})
   }, [user?.uid])
   const { stats } = usePlatformStats()
-  const { tenders } = useUserTenders(user?.uid ?? null)
+  const { tenders, error: tendersError } = useUserTenders(user?.uid ?? null)
   const { usage } = useAIUsage(user?.uid ?? null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
 
@@ -85,6 +85,10 @@ export default function DashboardPage() {
         </div>
         <AIUsageCounter usage={usage} isPro={userIsPro} />
       </div>
+
+      {tendersError && (
+        <p className="text-sm text-danger">{tendersError}</p>
+      )}
 
       <FeatureCards isNewUser={isNewUser} locale={locale} />
 

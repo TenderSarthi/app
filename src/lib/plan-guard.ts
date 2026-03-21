@@ -28,13 +28,26 @@ export function canUseBidGenerator(user: UserProfile, usage: AIUsage): boolean {
   return usage.bidDocs < PRO_BID_DOC_SOFT_CAP
 }
 
-export function getBlockReason(feature: 'ai' | 'tenders' | 'bidGenerator' | 'pro'): string {
-  switch (feature) {
-    case 'ai':           return `आपने इस महीने ${FREE_AI_QUERY_LIMIT}/${FREE_AI_QUERY_LIMIT} AI queries use कर लिए। Pro में upgrade करें।`
-    case 'tenders':      return `Free plan में ${FREE_TENDER_SAVE_LIMIT} tenders save कर सकते हैं।`
-    case 'bidGenerator': return 'Bid Document Generator Pro feature है।'
-    case 'pro':          return 'यह Pro feature है। Upgrade करें।'
-  }
+const BLOCK_REASONS: Record<'hi' | 'en', Record<'ai' | 'tenders' | 'bidGenerator' | 'pro', string>> = {
+  hi: {
+    ai:           `आपने इस महीने ${FREE_AI_QUERY_LIMIT}/${FREE_AI_QUERY_LIMIT} AI queries use कर लिए। Pro में upgrade करें।`,
+    tenders:      `Free plan में ${FREE_TENDER_SAVE_LIMIT} tenders save कर सकते हैं।`,
+    bidGenerator: 'Bid Document Generator Pro feature है।',
+    pro:          'यह Pro feature है। Upgrade करें।',
+  },
+  en: {
+    ai:           `You've used all ${FREE_AI_QUERY_LIMIT} AI queries this month. Upgrade to Pro.`,
+    tenders:      `Free plan allows saving up to ${FREE_TENDER_SAVE_LIMIT} tenders.`,
+    bidGenerator: 'Bid Document Generator is a Pro feature.',
+    pro:          'This is a Pro feature. Please upgrade.',
+  },
+}
+
+export function getBlockReason(
+  feature: 'ai' | 'tenders' | 'bidGenerator' | 'pro',
+  locale: 'hi' | 'en' = 'hi',
+): string {
+  return BLOCK_REASONS[locale]?.[feature] ?? BLOCK_REASONS.hi[feature]
 }
 
 /**

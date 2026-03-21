@@ -10,7 +10,11 @@ export async function PUT(
   const admin = await verifyAdminToken(req)
   if (!admin) return unauthorized()
 
-  const { id } = await params
+  const { id: rawId } = await params
+  const id = rawId.trim()
+  if (!id || !/^[a-zA-Z0-9_-]+$/.test(id)) {
+    return Response.json({ error: 'Invalid article id' }, { status: 400 })
+  }
   const body    = await req.json() as Partial<Omit<ArticleInput, 'id'>>
   await updateAdminArticle(id, body)
   return Response.json({ ok: true })
@@ -23,7 +27,11 @@ export async function DELETE(
   const admin = await verifyAdminToken(req)
   if (!admin) return unauthorized()
 
-  const { id } = await params
+  const { id: rawId } = await params
+  const id = rawId.trim()
+  if (!id || !/^[a-zA-Z0-9_-]+$/.test(id)) {
+    return Response.json({ error: 'Invalid article id' }, { status: 400 })
+  }
   await deleteAdminArticle(id)
   return Response.json({ ok: true })
 }

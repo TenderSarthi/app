@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { PhoneOtpForm } from '@/components/auth/phone-otp-form'
+
+export const metadata: Metadata = {
+  title: 'Login — TenderSarthi',
+  description: 'Sign in to TenderSarthi — the AI-powered GeM tender assistant for Indian vendors.',
+}
 
 function CompassLogo() {
   return (

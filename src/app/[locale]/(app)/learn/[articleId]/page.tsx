@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { ARTICLES } from '@/lib/learn-content'
 import { getArticleById } from '@/lib/learn-utils'
 import { ArrowLeft, Clock, PlayCircle } from 'lucide-react'
@@ -28,7 +27,6 @@ export default function ArticleDetailPage() {
   const params     = useParams<{ locale: string; articleId: string }>()
   const locale     = params?.locale ?? 'en'
   const articleId  = params?.articleId ?? ''
-  const { profile } = useUserProfile()
   const router     = useRouter()
 
   const article = getArticleById(ARTICLES, articleId)
@@ -37,21 +35,6 @@ export default function ArticleDetailPage() {
   const handleBack = useCallback(() => {
     router.push(`/${locale}/learn`)
   }, [locale, router])
-
-  // Loading skeleton
-  if (!profile) {
-    return (
-      <div className="space-y-4">
-        <div className="h-5 w-32 bg-navy/5 rounded animate-pulse" />
-        <div className="h-8 w-3/4 bg-navy/5 rounded-lg animate-pulse" />
-        <div className="space-y-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-4 bg-navy/5 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   // Article not found
   if (!article) {

@@ -33,7 +33,7 @@ export function PhoneOtpForm({ locale }: { locale: string }) {
     setLoading(true); setError(null)
     try {
       const user = await verifyOtp(confirmation, otp)
-      identifyUser(user.uid, { phone: user.phoneNumber, method: 'phone' })
+      identifyUser(user.uid, { method: 'phone' })
       if (!(await userExists(user.uid))) {
         await createUser(user.uid, null, user.phoneNumber)
         track('signup_completed', { method: 'phone' })
