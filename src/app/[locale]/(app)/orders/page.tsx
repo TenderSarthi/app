@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Lock, Plus } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
@@ -12,9 +13,8 @@ import { AddOrderDialog } from '@/components/orders/add-order-dialog'
 import { UpgradeDialog } from '@/components/dashboard/upgrade-dialog'
 import type { Order } from '@/lib/types'
 
-// TODO: i18n — replace hardcoded strings once orders namespace is added (Task 6)
-
 export default function OrdersPage() {
+  const t = useTranslations('orders')
   const { user }    = useFirebase()
   const { profile } = useUserProfile()
   const { orders, loading, error } = useOrders(user?.uid ?? null)
@@ -62,22 +62,22 @@ export default function OrdersPage() {
     return (
       <div className="space-y-4 pb-6">
         <div>
-          <h1 className="font-heading font-bold text-xl text-navy">Orders Tracker</h1>
-          <p className="text-sm text-muted mt-0.5">Track work orders and milestone progress</p>
+          <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
+          <p className="text-sm text-muted mt-0.5">{t('subtitle')}</p>
         </div>
 
         <div className="bg-orange/5 border border-orange/20 rounded-xl p-5 text-center space-y-3">
           <Lock className="mx-auto text-orange" size={28} />
-          <p className="font-semibold text-navy text-sm">Orders Tracker is a Pro feature</p>
+          <p className="font-semibold text-navy text-sm">{t('proOnly')}</p>
           <p className="text-sm text-muted">
-            Upgrade to Pro to log work orders and track Delivery → Inspection → Invoice → Payment milestones.
+            {t('proOnlySub')}
           </p>
           <button
             type="button"
             onClick={() => setUpgradeOpen(true)}
             className="mt-1 px-6 py-2.5 rounded-xl bg-orange text-white font-semibold text-sm"
           >
-            Upgrade to Pro
+            {t('upgradeCta')}
           </button>
         </div>
 
@@ -95,8 +95,8 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="font-heading font-bold text-xl text-navy">Orders Tracker</h1>
-          <p className="text-sm text-muted mt-0.5">Track milestones for your won tenders</p>
+          <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
+          <p className="text-sm text-muted mt-0.5">{t('subtitle')}</p>
         </div>
         <button
           type="button"
@@ -105,7 +105,7 @@ export default function OrdersPage() {
           aria-label="Add work order"
         >
           <Plus size={15} />
-          Add Order
+          {t('addOrder')}
         </button>
       </div>
 
@@ -118,16 +118,16 @@ export default function OrdersPage() {
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="font-semibold text-danger">Could not load orders</p>
+          <p className="font-semibold text-danger">{t('errorSave')}</p>
           <p className="text-sm text-muted mt-1 max-w-xs">
             Please check your connection and try again.
           </p>
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="font-semibold text-navy">No work orders yet</p>
+          <p className="font-semibold text-navy">{t('emptyState')}</p>
           <p className="text-sm text-muted mt-1 max-w-xs">
-            Tap &ldquo;Add Order&rdquo; to log a won tender and start tracking milestones.
+            {t('emptyStateSub')}
           </p>
         </div>
       ) : (

@@ -45,13 +45,13 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "find": "خोजें",
+    "find": "खोजें",
     "tenders": "Tenders",
     "bid": "Bid",
     "more": "और",
     "documents": "Documents",
     "alerts": "Alerts",
-    "learn": "सीخें",
+    "learn": "सीखें",
     "orders": "Orders",
     "settings": "Settings"
   },
@@ -73,7 +73,7 @@
     "aiUsageTitle": "AI Queries"
   },
   "finder": {
-    "title": "Tenders خोजें",
+    "title": "Tenders खोजें",
     "subtitle": "GeM portal search करें और AI से tender समझें",
     "filtersTitle": "Filters",
     "aiTitle": "AI Tender Summarizer",
