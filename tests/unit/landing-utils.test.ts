@@ -6,6 +6,10 @@ describe('formatStat', () => {
     expect(formatStat(null)).toBe('—')
   })
 
+  it('returns em-dash for undefined', () => {
+    expect(formatStat(undefined)).toBe('—')
+  })
+
   it('formats 0 as "0+"', () => {
     expect(formatStat(0)).toBe('0+')
   })
