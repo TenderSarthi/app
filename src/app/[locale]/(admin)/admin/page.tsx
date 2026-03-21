@@ -56,14 +56,15 @@ export default function AdminOverviewPage() {
       <div className="grid grid-cols-2 desktop:grid-cols-4 gap-4">
         <StatCard label="Total Users"      value={stats.totalUsers}    icon={Users}      />
         <StatCard label="Pro Users"        value={stats.proUsers}      icon={UserCheck}  sub={`${stats.conversionRate} conversion`} />
+        <StatCard label="Free Users"       value={stats.freeUsers}     icon={Users}      />
         <StatCard label="Est. MRR"         value={stats.mrrFormatted}  icon={TrendingUp} />
-        <StatCard label="Deletion Pending" value={stats.deletionRequests} icon={Trash2}  />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Signups Today"     value={stats.signupsToday}  icon={Calendar} />
-        <StatCard label="Signups This Week" value={stats.signupsWeek}   icon={Calendar} />
-        <StatCard label="Signups 30 days"   value={stats.signupsMonth}  icon={Calendar} />
+      <div className="grid grid-cols-2 desktop:grid-cols-4 gap-4">
+        <StatCard label="Signups Today"     value={stats.signupsToday}    icon={Calendar} />
+        <StatCard label="Signups This Week" value={stats.signupsWeek}     icon={Calendar} />
+        <StatCard label="Signups 30 days"   value={stats.signupsMonth}    icon={Calendar} />
+        <StatCard label="Deletion Pending"  value={stats.deletionRequests} icon={Trash2}  />
       </div>
     </div>
   )
