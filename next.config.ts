@@ -13,4 +13,18 @@ const pwaConfig = withPWA({
   skipWaiting: true,
 })
 
-export default withNextIntl(pwaConfig({} as NextConfig))
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        // Allow Firebase signInWithPopup to detect when the auth popup closes
+        source: '/(.*)',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+        ],
+      },
+    ]
+  },
+}
+
+export default withNextIntl(pwaConfig(nextConfig))
