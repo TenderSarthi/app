@@ -277,7 +277,9 @@ function PlanContent({
         disabled={upgrading}
         onClick={() => onUpgrade('monthly')}
       >
-        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹499/${t('month')}`}
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : (
+          <><span className="line-through text-xs opacity-60 mr-1">₹899</span>₹499/{t('month')}</>
+        )}
       </Button>
       <Button
         size="sm" type="button"
@@ -285,7 +287,9 @@ function PlanContent({
         disabled={upgrading}
         onClick={() => onUpgrade('annual')}
       >
-        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹3,999/${t('year')}`}
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : (
+          <><span className="line-through text-xs opacity-60 mr-1">₹7,999</span>₹3,999/{t('year')}</>
+        )}
       </Button>
     </div>
   )

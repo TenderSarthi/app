@@ -59,8 +59,8 @@
     "aiLimitReached": "You've used {used}/{limit} AI queries this month.",
     "tenderLimitReached": "Free plan allows {limit} saved tenders.",
     "bidGeneratorPro": "Bid Document Generator is a Pro feature.",
-    "upgradeMonthly": "Rs.499/month",
-    "upgradeAnnual": "Rs.3,999/year",
+    "upgradeMonthly": "₹499/month",
+    "upgradeAnnual": "₹3,999/year",
     "upgradeTitle": "Upgrade to Pro",
     "notNow": "Not now"
   },
@@ -349,6 +349,7 @@
       "freeCta": "Get Started Free",
       "pro": {
         "title": "Pro",
+        "mrp": "₹899 / month",
         "price": "₹499 / month",
         "p1": "Unlimited AI queries",
         "p2": "Unlimited tender saves",

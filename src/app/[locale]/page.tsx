@@ -133,7 +133,8 @@ export default function LandingPage() {
                   <h3 className="font-semibold">{t('pricing.pro.title')}</h3>
                   <Badge className="bg-orange text-white text-xs">Popular</Badge>
                 </div>
-                <p className="text-2xl font-bold mt-1">{t('pricing.pro.price')}</p>
+                <p className="text-sm text-white/50 line-through mt-1">{t('pricing.pro.mrp')}</p>
+                <p className="text-2xl font-bold">{t('pricing.pro.price')}</p>
               </div>
               <ul className="space-y-2">
                 {(['p1','p2','p3','p4'] as const).map((k) => (

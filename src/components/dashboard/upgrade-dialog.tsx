@@ -63,6 +63,7 @@ export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
               onClick={() => handleUpgrade('monthly')}
               className="border-2 border-orange rounded-xl p-3 text-center hover:bg-orange/5 transition-colors"
             >
+              <div className="text-xs text-muted line-through">₹899/month</div>
               <div className="font-bold text-navy">{t('upgradeMonthly')}</div>
               <div className="text-xs text-muted mt-0.5">per month</div>
             </button>
@@ -73,6 +74,7 @@ export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
               <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gold text-white text-xs px-2">
                 Best Value
               </Badge>
+              <div className="text-xs text-muted line-through">₹7,999/year</div>
               <div className="font-bold text-navy">{t('upgradeAnnual')}</div>
               <div className="text-xs text-muted mt-0.5">per year</div>
             </button>
