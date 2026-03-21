@@ -73,7 +73,11 @@ export function BidHelperChat({ profile, usage, onUsageUpdate }: BidHelperChatPr
 
       // Server already increments for free users — only increment client-side for Pro
       // (avoids double-counting the usage display for free users)
-      if (user && profile.plan === 'pro') await incrementAIQueryCount(user.uid)
+      if (user && profile.plan === 'pro') {
+        incrementAIQueryCount(user.uid).catch(e =>
+          console.warn('[BidChat] Failed to increment AI query count:', e)
+        )
+      }
       onUsageUpdate()
       track('bid_chat_message', { language: profile.language })
     } catch (err) {

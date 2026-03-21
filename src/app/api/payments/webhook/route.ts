@@ -95,7 +95,8 @@ export async function POST(req: NextRequest) {
         }
       } catch (verifyErr) {
         console.error('[Webhook] Could not verify subscription status with Razorpay:', verifyErr)
-        break // Do not upgrade if we cannot confirm status
+        // Return 503 so Razorpay retries — do NOT return 200 OK which stops retries
+        return NextResponse.json({ error: 'Verification service unavailable' }, { status: 503 })
       }
 
       const renewsAt = new Date(subEntity.current_end * 1000)
