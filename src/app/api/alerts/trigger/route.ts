@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import Parser from 'rss-parser'
 import { getFirestore, Timestamp } from 'firebase-admin/firestore'
@@ -14,10 +15,13 @@ const parser = new Parser({ timeout: 10_000 })
 // --- Helpers ---
 
 function isAuthorized(req: NextRequest): boolean {
+  const auth = req.headers.get('authorization')
+  if (!auth?.startsWith('Bearer ')) return false
+  const token = auth.slice(7)
   const secret = process.env.CRON_SECRET
   if (!secret) return false
-  const auth = req.headers.get('authorization')
-  return auth === `Bearer ${secret}`
+  if (token.length !== secret.length) return false
+  return timingSafeEqual(Buffer.from(token), Buffer.from(secret))
 }
 
 /** Fetch and parse a single RSS feed URL. Returns [] on any error. */

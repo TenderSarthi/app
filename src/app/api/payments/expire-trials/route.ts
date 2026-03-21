@@ -1,11 +1,16 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getFirestore, Timestamp } from 'firebase-admin/firestore'
 import '@/lib/firebase/admin'
 
 function isAuthorized(req: NextRequest): boolean {
+  const auth = req.headers.get('authorization')
+  if (!auth?.startsWith('Bearer ')) return false
+  const token = auth.slice(7)
   const secret = process.env.CRON_SECRET
   if (!secret) return false
-  return req.headers.get('authorization') === `Bearer ${secret}`
+  if (token.length !== secret.length) return false
+  return timingSafeEqual(Buffer.from(token), Buffer.from(secret))
 }
 
 export async function GET(req: NextRequest) {
@@ -27,7 +32,7 @@ export async function GET(req: NextRequest) {
 
   // Filter in JS: only downgrade users without a paid subscription
   const toDowngrade = snapshot.docs.filter(
-    (d) => d.data().razorpaySubscriptionId === null,
+    (d) => !d.data().razorpaySubscriptionId,
   )
 
   const results = await Promise.allSettled(

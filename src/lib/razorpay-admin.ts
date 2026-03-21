@@ -46,7 +46,8 @@ export function verifyWebhookSignature(
   secret:    string,
 ): boolean {
   const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
-  return expected === signature
+  if (expected.length !== signature.length) return false
+  return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'))
 }
 
 /**
