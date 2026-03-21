@@ -9,9 +9,15 @@ service cloud.firestore {
         && !('razorpaySubscriptionId' in request.resource.data.diff(resource.data).affectedKeys())
         && !('trialUsed' in request.resource.data.diff(resource.data).affectedKeys());
       allow create: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.plan == 'free'
-        && request.resource.data.trialUsed == false
-        && request.resource.data.razorpaySubscriptionId == null;
+        && request.resource.data.razorpaySubscriptionId == null
+        && (
+          // New user starting free plan
+          (request.resource.data.plan == 'free' && request.resource.data.trialUsed == false)
+          ||
+          // New user starting 7-day Pro trial (client-initiated, trialEndsAt required)
+          (request.resource.data.plan == 'pro'  && request.resource.data.trialUsed == true
+            && request.resource.data.trialEndsAt != null)
+        );
     }
     match /aiUsage/{uid}/{monthKey}/{doc} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
