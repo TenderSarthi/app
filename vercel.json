@@ -3,6 +3,10 @@
     {
       "path": "/api/alerts/trigger",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/payments/expire-trials",
+      "schedule": "0 2 * * *"
     }
   ]
 }
