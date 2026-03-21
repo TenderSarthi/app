@@ -265,5 +265,29 @@
     "minRead": "मिनिट",
     "guidesAndTips": "GeM vendors साठी guides आणि tips",
     "articles": "लेख"
+  },
+  "settings": {
+    "title": "सेटिंग्ज",
+    "planCard": "तुमची योजना",
+    "planFree": "मोफत योजना",
+    "planTrial": "Pro चाचणी",
+    "planPro": "Pro",
+    "trialExpiresOn": "चाचणी {date} रोजी संपेल",
+    "renewsOn": "{date} रोजी नूतनीकरण होईल",
+    "month": "महिना",
+    "year": "वर्ष",
+    "upgradeSuccess": "Pro सक्रिय झाले!",
+    "verifyFailed": "पेमेंट सत्यापन अयशस्वी.",
+    "checkoutFailed": "चेकआउट सुरू झाले नाही.",
+    "cancelFailed": "रद्द करणे अयशस्वी.",
+    "cancelPlan": "योजना रद्द करा",
+    "cancelConfirm": "तुमचा Pro access लगेच संपेल. खात्री आहे?",
+    "language": "भाषा",
+    "dangerZone": "धोकादायक विभाग",
+    "deleteAccount": "खाते हटवा",
+    "deleteWarning": "सर्व डेटा कायमचा हटवला जाईल.",
+    "deleteRequested": "हटवण्याची विनंती केली.",
+    "deleteConfirm": "होय, खाते हटवा",
+    "cancel": "रद्द करा"
   }
 }

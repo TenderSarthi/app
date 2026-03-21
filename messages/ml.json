@@ -265,5 +265,29 @@
     "minRead": "मिनट",
     "guidesAndTips": "GeM vendors के लिए guides और tips",
     "articles": "लेख"
+  },
+  "settings": {
+    "title": "Settings",
+    "planCard": "आपका Plan",
+    "planFree": "Free plan",
+    "planTrial": "Pro Trial",
+    "planPro": "Pro",
+    "trialExpiresOn": "Trial {date} को खत्म होगा",
+    "renewsOn": "{date} को renew होगा",
+    "month": "महीना",
+    "year": "साल",
+    "upgradeSuccess": "Pro activate हो गया! Unlimited access enjoy करें।",
+    "verifyFailed": "Payment verify नहीं हो सकी। Support से संपर्क करें।",
+    "checkoutFailed": "Checkout शुरू नहीं हो सका। फिर से try करें।",
+    "cancelFailed": "Cancel नहीं हो सका। Support से संपर्क करें।",
+    "cancelPlan": "Plan cancel करें",
+    "cancelConfirm": "आपका Pro access तुरंत बंद हो जाएगा। Sure हैं?",
+    "language": "भाषा",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Account Delete करें",
+    "deleteWarning": "आपका सारा data permanently delete हो जाएगा। यह undo नहीं हो सकता।",
+    "deleteRequested": "Deletion request भेज दी गई। 7 दिनों में process होगा।",
+    "deleteConfirm": "हाँ, account delete करें",
+    "cancel": "Cancel"
   }
 }

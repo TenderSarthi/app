@@ -265,5 +265,29 @@
     "minRead": "min read",
     "guidesAndTips": "Guides and tips for GeM vendors",
     "articles": "articles"
+  },
+  "settings": {
+    "title": "Settings",
+    "planCard": "Your Plan",
+    "planFree": "Free plan",
+    "planTrial": "Pro Trial",
+    "planPro": "Pro",
+    "trialExpiresOn": "Trial expires {date}",
+    "renewsOn": "Renews {date}",
+    "month": "mo",
+    "year": "yr",
+    "upgradeSuccess": "Pro activated! Enjoy unlimited access.",
+    "verifyFailed": "Payment verification failed. Please contact support.",
+    "checkoutFailed": "Failed to start checkout. Please try again.",
+    "cancelFailed": "Cancellation failed. Please contact support.",
+    "cancelPlan": "Cancel plan",
+    "cancelConfirm": "Your Pro access ends immediately. Are you sure?",
+    "language": "Language",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteWarning": "All your data will be permanently deleted. This cannot be undone.",
+    "deleteRequested": "Deletion requested. We'll process it within 7 days.",
+    "deleteConfirm": "Yes, delete my account",
+    "cancel": "Cancel"
   }
 }
