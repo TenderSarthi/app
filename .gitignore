@@ -37,6 +37,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# firebase
+firebase-debug.log
+
+# docs — exclude binary/generated files
+docs/*.pdf
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
