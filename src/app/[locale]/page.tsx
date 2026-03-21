@@ -7,14 +7,14 @@ import { useTranslations } from 'next-intl'
 import { CheckCircle, Bell, FileText, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useFirebase } from '@/components/providers/firebase-provider'
+import { useAuth } from '@/lib/hooks/use-auth'
 import { getPlatformStats } from '@/lib/firebase/firestore'
 import { formatStat } from '@/lib/landing-utils'
 import type { PlatformStats } from '@/lib/types'
 
 export default function LandingPage() {
   const t      = useTranslations('landing')
-  const { user, loading } = useFirebase()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const params = useParams<{ locale: string }>()
   const locale = params.locale

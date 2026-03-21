@@ -7,7 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t('footer.privacy')} — TenderSarthi` }
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   return (
     <main className="min-h-screen bg-white px-4 py-12 max-w-3xl mx-auto space-y-6">
       <h1 className="font-heading font-bold text-2xl text-navy">Privacy Policy</h1>
@@ -22,7 +23,7 @@ export default function PrivacyPage() {
         We use Firebase Authentication and Firestore (Google Cloud) to store your data securely.
         Analytics are powered by PostHog. For questions, contact us at privacy@tendersarthi.in.
       </p>
-      <Link href="/" className="text-sm text-orange hover:underline">Back to Home</Link>
+      <Link href={`/${locale}`} className="text-sm text-orange hover:underline">Back to Home</Link>
     </main>
   )
 }

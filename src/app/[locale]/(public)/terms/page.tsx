@@ -7,7 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t('footer.terms')} — TenderSarthi` }
 }
 
-export default function TermsPage() {
+export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   return (
     <main className="min-h-screen bg-white px-4 py-12 max-w-3xl mx-auto space-y-6">
       <h1 className="font-heading font-bold text-2xl text-navy">Terms of Service</h1>
@@ -22,7 +23,7 @@ export default function TermsPage() {
         Refunds are subject to Razorpay's refund policy. We reserve the right to suspend accounts
         that misuse the platform.
       </p>
-      <Link href="/" className="text-sm text-orange hover:underline">Back to Home</Link>
+      <Link href={`/${locale}`} className="text-sm text-orange hover:underline">Back to Home</Link>
     </main>
   )
 }
