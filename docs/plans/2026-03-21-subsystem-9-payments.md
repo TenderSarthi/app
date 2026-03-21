@@ -44,8 +44,8 @@ RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 
 # Razorpay Plan IDs — create plans in dashboard first, then paste IDs
 # Dashboard > Subscriptions > Plans > Create Plan
-RAZORPAY_PLAN_ID_MONTHLY=plan_xxxxxxxxxxxx    # ₹499/month
-RAZORPAY_PLAN_ID_ANNUAL=plan_xxxxxxxxxxxx     # ₹3,999/year
+RAZORPAY_PLAN_ID_MONTHLY=plan_xxxxxxxxxxxx    # ₹499/month (MRP ₹899 — launch discount)
+RAZORPAY_PLAN_ID_ANNUAL=plan_xxxxxxxxxxxx     # ₹3,999/year (MRP ₹7,999 — launch discount)
 ```
 
 ---
@@ -885,7 +885,7 @@ function SettingsContent() {
         key:             keyId,
         subscription_id: subscriptionId,
         name:            'TenderSarthi',
-        description:     plan === 'monthly' ? '₹499/month' : '₹3,999/year',
+        description:     plan === 'monthly' ? '₹499/month (Launch Offer)' : '₹3,999/year (Launch Offer)',
         prefill: {
           name:    profile.name ?? '',
           email:   profile.email ?? '',
@@ -1087,11 +1087,11 @@ function PlanContent({
   //
   // Branch 2 — isOnTrial(profile) && !isTrialExpired(profile):
   //   Show: "Pro Trial · expires {trialEndsAt.toLocaleDateString('en-IN')}"
-  //   CTA: Two upgrade buttons (monthly ₹499, annual ₹3,999)
+  //   CTA: Two upgrade buttons (monthly ~~₹899~~ ₹499, annual ~~₹7,999~~ ₹3,999 — launch discount)
   //
   // Branch 3 — free / expired trial:
   //   Show: "Free plan"
-  //   CTA: Two upgrade buttons (monthly ₹499, annual ₹3,999)
+  //   CTA: Two upgrade buttons (monthly ~~₹899~~ ₹499, annual ~~₹7,999~~ ₹3,999 — launch discount)
   //
   // Buttons: type="button", disabled when upgrading or cancelling.
   // Loader2 spinner (animate-spin) on buttons when loading.
@@ -1145,7 +1145,9 @@ function PlanContent({ profile, upgrading, cancelling, confirmCancel, onUpgrade,
         disabled={upgrading}
         onClick={() => onUpgrade('monthly')}
       >
-        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹499/${t('month')}`}
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : (
+          <><span className="line-through text-xs opacity-60 mr-1">₹899</span>₹499/{t('month')}</>
+        )}
       </Button>
       <Button
         size="sm" type="button"
@@ -1153,7 +1155,9 @@ function PlanContent({ profile, upgrading, cancelling, confirmCancel, onUpgrade,
         disabled={upgrading}
         onClick={() => onUpgrade('annual')}
       >
-        {upgrading ? <Loader2 size={14} className="animate-spin" /> : `₹3,999/${t('year')}`}
+        {upgrading ? <Loader2 size={14} className="animate-spin" /> : (
+          <><span className="line-through text-xs opacity-60 mr-1">₹7,999</span>₹3,999/{t('year')}</>
+        )}
       </Button>
     </div>
   )

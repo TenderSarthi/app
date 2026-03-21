@@ -27,7 +27,7 @@
 
 | | Free | Pro |
 |---|---|---|
-| **Price** | ₹0 | ₹499/month or ₹3,999/year |
+| **Price** | ₹0 | ~~₹899/month~~ **₹499/month** or ~~₹7,999/year~~ **₹3,999/year** (launch discount) |
 | **Trial** | 7-day Pro trial on signup (no card required) | — |
 
 ### Free Tier Features
@@ -39,7 +39,9 @@
 - Learning Center (full access — drives SEO and trust)
 - Dashboard (basic view)
 
-### Pro Tier Features (₹499/month | ₹3,999/year)
+### Pro Tier Features (~~₹899/month~~ ₹499 | ~~₹7,999/year~~ ₹3,999 — launch discount)
+
+> **Pricing strategy:** MRP is set at ₹899/month and ₹7,999/year. A launch discount brings it to ₹499/month and ₹3,999/year (~44% off). All UI surfaces show the MRP with a strikethrough above the discounted price. The MRP can be raised in Razorpay plans later; the discount framing stays until then.
 - Everything in Free, unlimited
 - Document Vault (upload, store, organize, expiry tracking)
 - AI Bid Document Generator (full bid response drafts)
@@ -618,7 +620,7 @@ Last date: 5 April 2026 | Value: ₹45L
 │  Pro में: Unlimited queries +           │
 │  WhatsApp alerts + Bid Generator        │
 │                                         │
-│  [₹499/month]    [₹3,999/year ✨]      │
+│  [~~₹899~~ ₹499/mo]  [~~₹7,999~~ ₹3,999/yr ✨] │
 └─────────────────────────────────────────┘
 ```
 
@@ -876,7 +878,7 @@ Dashboard → Find Tenders → Filter → GeM deep link (new tab)
 
 ### Flow 4 — Upgrade
 ```
-/upgrade → Monthly ₹499 OR Annual ₹3,999
+/upgrade → Monthly ₹499 (MRP ₹899) OR Annual ₹3,999 (MRP ₹7,999)
 → Razorpay (UPI / card / netbanking)
 → Payment success → Firestore plan: "pro" → Real-time unlock
 → WhatsApp confirmation
@@ -1024,7 +1026,7 @@ No public-facing admin registration — hardcoded email check only
 
 | Stream | Model | Potential |
 |---|---|---|
-| **Current:** Pro subscriptions | ₹499/month per vendor | ₹4.9L MRR at 1,000 users |
+| **Current:** Pro subscriptions | ₹499/month per vendor (MRP ₹899, ~44% launch discount) | ₹4.9L MRR at 1,000 users |
 | **B2B Team Plans** | ₹1,999–4,999/month per firm (5–10 users) | 1 CA firm = 5–10x individual plan |
 | **White-label Licensing** | License platform to MSME helpdesks, industry bodies | ₹50K–2L/month per enterprise client |
 | **Premium Courses** | "GeM Certified Vendor" courses in Hindi | ₹999–2,999 one-time per course |
@@ -1289,7 +1291,7 @@ Software subscriptions attract **18% GST** in India.
 | Rule | Action |
 |---|---|
 | Register on GST portal when turnover > ₹20L | Register proactively at ₹10L to avoid disruption |
-| Collect GST on ₹499/month | Display "₹499 + 18% GST = ₹589/month" clearly at checkout |
+| Collect GST on ₹499/month (discounted) | Display "₹499 + 18% GST = ₹589/month" clearly at checkout |
 | Issue GST invoices | Use Razorpay Invoices API or generate via Cloud Function |
 | File GSTR-1 + GSTR-3B monthly | Assign to accountant from Month 1 |
 
