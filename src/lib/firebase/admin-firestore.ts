@@ -30,6 +30,7 @@ export async function upgradeToPro(
 /** Update renewal date on each successful charge. Called by subscription.charged webhook. */
 export async function renewProSubscription(uid: string, renewsAt: Date): Promise<void> {
   await db().doc(`users/${uid}`).update({
+    plan: 'pro',
     proRenewsAt: Timestamp.fromDate(renewsAt),
   })
 }

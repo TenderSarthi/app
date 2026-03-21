@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getFirestore, Timestamp } from 'firebase-admin/firestore'
 import '@/lib/firebase/admin'
 import { verifyWebhookSignature } from '@/lib/razorpay-admin'
 import { upgradeToPro, renewProSubscription, downgradeToFree } from '@/lib/firebase/admin-firestore'
@@ -55,9 +56,19 @@ export async function POST(req: NextRequest) {
       await renewProSubscription(uid, renewsAt)
       break
     }
-    case 'subscription.cancelled':
-    case 'subscription.completed':
+    case 'subscription.cancelled': {
+      await getFirestore().doc(`users/${uid}`).update({
+        scheduledDowngradeAt: subEntity.current_end
+          ? Timestamp.fromMillis(subEntity.current_end * 1000)
+          : null,
+      })
+      break
+    }
     case 'subscription.halted': {
+      console.warn('subscription halted for uid:', uid)
+      break
+    }
+    case 'subscription.completed': {
       await downgradeToFree(uid)
       break
     }
