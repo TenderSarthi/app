@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { Upload, File as FileIcon } from 'lucide-react'
+import { Upload, File as FileIcon, AlertCircle } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { uploadVaultFile } from '@/lib/firebase/storage'
 import { addVaultDocument } from '@/lib/firebase/firestore'
@@ -142,7 +142,12 @@ export function UploadDocumentDialog({ open, onClose, uid }: UploadDocumentDialo
           )}
 
           {/* Error */}
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && (
+            <div className="flex items-start gap-2 text-sm text-danger">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              {error}
+            </div>
+          )}
 
           {/* Upload button */}
           <button

@@ -66,7 +66,7 @@ export function AISummarizer({ uid, profile, usage, onUsageUpdate, tenderCount, 
       const data = await res.json()
       setSummary(data.summary)
 
-      await incrementAIQueryCount(uid)
+      if (uid) await incrementAIQueryCount(uid)
       onUsageUpdate()
 
       track('ai_summary_generated', { language, textLength: text.length })

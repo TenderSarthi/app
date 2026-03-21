@@ -30,9 +30,10 @@ export function SaveTenderDialog({
   const t = useTranslations('finder')
   const [name, setName] = useState('')
   const [gemId, setGemId] = useState('')
-  const [category, setCategory] = useState(profile.categories[0] ?? GEM_CATEGORIES[0])
+  const [category, setCategory] = useState(profile.categories[0] ?? GEM_CATEGORIES[0] ?? 'Transport & Vehicles')
   const [deadlineStr, setDeadlineStr] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
 
   const canSave = canSaveTenders(profile, currentTenderCount)
@@ -42,6 +43,7 @@ export function SaveTenderDialog({
     if (!name.trim()) return
 
     setSaving(true)
+    setSaveError(null)
     try {
       const deadline = deadlineStr
         ? Timestamp.fromDate(new Date(deadlineStr))
@@ -62,8 +64,8 @@ export function SaveTenderDialog({
 
       track('tender_saved', { category, state: profile.state, plan: profile.plan })
       onClose()
-    } catch {
-      // silent — production would show a toast
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Tender save नहीं हुआ। फिर try करें।')
     } finally {
       setSaving(false)
     }
@@ -130,6 +132,10 @@ export function SaveTenderDialog({
               <p className="text-sm text-danger">
                 Free plan में 5 tenders save कर सकते हैं। Upgrade करें।
               </p>
+            )}
+
+            {saveError && (
+              <p className="text-sm text-danger">{saveError}</p>
             )}
 
             <div className="flex gap-3 pt-1">

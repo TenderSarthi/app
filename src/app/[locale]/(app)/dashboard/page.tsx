@@ -48,10 +48,10 @@ export default function DashboardPage() {
 
   const activeTenders = tenders.filter(tender => tender.status === 'active')
   const nextDeadline = activeTenders
-    .filter(tender => tender.deadline)
-    .sort((a, b) => (a.deadline!.toMillis() - b.deadline!.toMillis()))[0]
+    .filter((t): t is typeof t & { deadline: NonNullable<typeof t['deadline']> } => !!t.deadline)
+    .sort((a, b) => a.deadline.toMillis() - b.deadline.toMillis())[0]
 
-  const daysUntilDeadline = nextDeadline?.deadline
+  const daysUntilDeadline = nextDeadline
     ? Math.ceil((nextDeadline.deadline.toMillis() - Date.now()) / 86_400_000)
     : null
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { Order, OrderStatus } from '@/lib/types'
 import { MilestoneStepper } from './milestone-stepper'
 import { getNextStatus, getMilestoneKey, formatOrderValue } from '@/lib/order-utils'
@@ -10,28 +11,36 @@ import { Button } from '@/components/ui/button'
 import { Pencil, Trash2, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// TODO: i18n — replace hardcoded strings once orders namespace is added (Task 6)
-
 interface OrderCardProps {
   order: Order
   onEdit: (order: Order) => void
 }
 
-const STATUS_BADGE: Record<OrderStatus, { label: string; className: string }> = {
-  delivery_pending:   { label: 'Delivery Pending',   className: 'bg-orange-100 text-orange-700' },
-  inspection_pending: { label: 'Inspection Pending', className: 'bg-orange-100 text-orange-700' },
-  invoice_pending:    { label: 'Invoice Pending',    className: 'bg-blue-100 text-blue-700' },
-  payment_pending:    { label: 'Payment Pending',    className: 'bg-yellow-100 text-yellow-700' },
-  completed:          { label: 'Completed',          className: 'bg-green-100 text-green-700' },
+const STATUS_CLASS: Record<OrderStatus, string> = {
+  delivery_pending:   'bg-orange-100 text-orange-700',
+  inspection_pending: 'bg-orange-100 text-orange-700',
+  invoice_pending:    'bg-blue-100 text-blue-700',
+  payment_pending:    'bg-yellow-100 text-yellow-700',
+  completed:          'bg-green-100 text-green-700',
+}
+
+const STATUS_I18N_KEY: Record<OrderStatus, string> = {
+  delivery_pending:   'status_delivery_pending',
+  inspection_pending: 'status_inspection_pending',
+  invoice_pending:    'status_invoice_pending',
+  payment_pending:    'status_payment_pending',
+  completed:          'status_completed',
 }
 
 export function OrderCard({ order, onEdit }: OrderCardProps) {
+  const t = useTranslations('orders')
   const [advancing,      setAdvancing]      = useState(false)
   const [confirmDelete,  setConfirmDelete]  = useState(false)
   const [deleting,       setDeleting]       = useState(false)
   const [deleteError,    setDeleteError]    = useState(false)
 
-  const badge       = STATUS_BADGE[order.status]
+  const badgeClass  = STATUS_CLASS[order.status] ?? 'bg-gray-100 text-gray-700'
+  const badgeLabel  = STATUS_I18N_KEY[order.status] ? t(STATUS_I18N_KEY[order.status] as never) : order.status
   const nextStatus  = getNextStatus(order.status)
   const isCompleted = order.status === 'completed'
 
@@ -83,10 +92,10 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
             <span
               className={cn(
                 'text-xs font-medium px-2 py-0.5 rounded-full',
-                badge.className
+                badgeClass
               )}
             >
-              {badge.label}
+              {badgeLabel}
             </span>
             <span className="text-sm font-semibold">
               {formatOrderValue(order.value)}

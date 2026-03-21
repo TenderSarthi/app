@@ -21,6 +21,7 @@ export function OnboardingWizard({ locale }: { locale: string }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [state, setState] = useState('')
@@ -31,11 +32,16 @@ export function OnboardingWizard({ locale }: { locale: string }) {
   async function complete(fcmToken: string | null, declined: boolean) {
     if (!uid) return
     setSaving(true)
+    setSaveError(null)
     try {
       await saveOnboardingData(uid, { name, businessName, state, categories, language: (isValidLanguageCode(locale) ? locale : 'hi') as LanguageCode, fcmToken, notificationsDeclined: declined })
       track('onboarding_completed', { state, categoriesCount: categories.length, locale })
       router.replace(`/${locale}/dashboard`)
-    } finally { setSaving(false) }
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Profile save नहीं हुआ। फिर try करें।')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleAllow() {
@@ -70,6 +76,10 @@ export function OnboardingWizard({ locale }: { locale: string }) {
           {step === 3 && <Step3Categories selected={categories} onChange={setCategories} />}
           {step === 4 && <Step4Notifications onAllow={handleAllow} onSkip={() => complete(null, true)} loading={saving} />}
         </div>
+        {saveError && (
+          <p className="text-sm text-danger text-center mt-2">{saveError}</p>
+        )}
+
         {step < 4 && (
           <div className="flex gap-3 mt-8">
             {step > 1 && <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1 h-11">वापस</Button>}

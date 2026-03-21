@@ -27,11 +27,9 @@ export default function FindPage() {
 
   useEffect(() => {
     if (profile && !filtersInitialized) {
-      setTimeout(() => {
-        setSelectedState(profile.state || 'all')
-        setSelectedCategories(profile.categories)
-        setFiltersInitialized(true)
-      }, 0)
+      setSelectedState(profile.state || 'all')
+      setSelectedCategories(profile.categories)
+      setFiltersInitialized(true)
     }
   }, [profile, filtersInitialized])
 
