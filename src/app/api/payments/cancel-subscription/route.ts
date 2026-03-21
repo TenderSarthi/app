@@ -30,8 +30,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Cancel immediately (false = cancel_at_cycle_end=false)
-  await rzp.subscriptions.cancel(subId, false)
+  try {
+    await rzp.subscriptions.cancel(subId, false)
+  } catch (err) {
+    // Log but don't throw — subscription may already be cancelled on Razorpay's side.
+    // We still need to downgrade the user in Firestore.
+    console.warn('[cancel-subscription] Razorpay cancel failed (may already be cancelled):', err)
+  }
   await downgradeToFree(uid)
-
   return NextResponse.json({ success: true })
 }

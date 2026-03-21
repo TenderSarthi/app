@@ -30,8 +30,13 @@ export async function GET(req: NextRequest) {
     (d) => d.data().razorpaySubscriptionId === null,
   )
 
-  await Promise.all(toDowngrade.map((d) => d.ref.update({ plan: 'free' })))
+  const results = await Promise.allSettled(
+    toDowngrade.map((d) => d.ref.update({ plan: 'free' }))
+  )
+  const succeeded = results.filter((r) => r.status === 'fulfilled').length
+  const failed    = results.filter((r) => r.status === 'rejected').length
+  if (failed > 0) console.warn(`[expire-trials] ${failed} updates failed`)
 
-  console.info(`[expire-trials] Downgraded ${toDowngrade.length} users`)
-  return NextResponse.json({ expired: toDowngrade.length })
+  console.info(`[expire-trials] Downgraded ${succeeded}/${toDowngrade.length} users`)
+  return NextResponse.json({ expired: succeeded })
 }
