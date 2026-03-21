@@ -54,7 +54,7 @@
 | User Type | AI Queries/month | Bid Docs/month | Variable Cost |
 |---|---|---|---|
 | Free user | 10 (at their cap) | 0 | ~₹0.43 |
-| Pro user | 80 (estimated avg) | 5 | ~₹21.20 |
+| Pro user | 80 (estimated avg) | 5 | ~₹22.50 |
 
 **Pro user query distribution (for cost planning):**
 ```
@@ -63,7 +63,7 @@ Avg users    (~35%):  60–80 queries/month  → ~₹15–18 AI cost
 Heavy users  (~15%):  150–200 queries/month → ~₹25–35 AI cost
 ```
 
-**Bid Document Generator caveat:** At ₹1.80/doc, a Pro user generating 20 docs/month = ₹36 in AI costs for that feature alone. Recommend a soft-cap of 30 bid docs/month (99% of real users won't hit this — protects against abuse without affecting genuine users).
+**Bid Document Generator caveat:** At ₹2.70/doc, a Pro user generating 20 docs/month = ₹54 in AI costs for that feature alone. Recommend a soft-cap of 30 bid docs/month (99% of real users won't hit this — protects against abuse without affecting genuine users).
 
 ### Revenue Projections
 | Pro Users | Monthly Revenue | Est. Cost | Profit | Margin |
@@ -125,7 +125,7 @@ Auth:        Firebase Auth (Google OAuth + Phone OTP)
 Database:    Firestore
 Search:      Algolia (free tier: 10K searches/month)
 Storage:     Firebase Storage (document vault)
-AI:          Gemini Flash 2.0 via Google AI SDK (@google/generative-ai)
+AI:          Gemini 2.5 Flash via Google AI SDK (@google/generative-ai)
 Alerts:      Firebase Cloud Messaging (push) + MSG91 (WhatsApp + SMS)
              + NIC/CPP portal RSS feeds + GeM web scraper + user-submitted
 Payments:    Razorpay (UPI + cards + netbanking + subscriptions)
@@ -134,13 +134,13 @@ Hosting:     Vercel (frontend) + Firebase (backend services)
 
 ### AI Strategy (Hybrid, Cost-Optimised)
 ```
-Gemini Flash 2.0  → Tender summarizer, Bid Helper chat,
+Gemini 2.5 Flash  → Tender summarizer, Bid Helper chat,
                      Document Q&A, all 11 language responses
-                     (~₹0.04/query — 95% of all AI calls)
+                     (~₹0.06/query — 95% of all AI calls)
 
-Gemini 1.5 Pro    → Bid Document Generator ONLY
+Gemini 2.5 Pro    → Bid Document Generator ONLY
                      (Pro feature, higher quality output,
-                     ~₹1.80/doc — still 3x cheaper than Sonnet 4.6)
+                     ~₹2.70/doc — still 3x cheaper than Sonnet 4.6)
 
 All AI calls      → Server-side only (Next.js API routes)
                      Never client-side — API key stays secure
@@ -442,7 +442,7 @@ Free tier limit: 10,000 search operations/month (sufficient for V1)
   - "Technical bid में क्या डालें?"
   - "L1 rate कैसे decide करें?"
 - Responds in user's chosen language (default Hinglish)
-- Powered by Gemini Flash 2.0
+- Powered by Gemini 2.5 Flash
 
 **AI Confidence Indicator (on every AI response):**
 ```
@@ -479,7 +479,7 @@ Flow:
    └──────────────────────────────────────┘
    Scoring factors: category + user's state + experience years
    + historical win rates from platformStats Firestore doc
-   Powered by Gemini Flash 2.0 (no extra API cost — part of bid flow)
+   Powered by Gemini 2.5 Flash (no extra API cost — part of bid flow)
 4. AI generates complete bid response document
 5. "You're ready to bid! ✅" confirmation screen:
    ┌──────────────────────────────────────┐
@@ -1124,7 +1124,7 @@ These principles were incorporated after external product design review (rated P
 > 70% → "Strong bid position! 🎯"
 ```
 
-**Powered by:** Gemini Flash 2.0 as part of the bid generation call (no separate API call needed — the probability is computed in the same prompt).
+**Powered by:** Gemini 2.5 Flash as part of the bid generation call (no separate API call needed — the probability is computed in the same prompt).
 
 **Caution:** Never present probability as a guarantee. Always include: "यह estimate है — GeM पर जाकर verify करें।"
 

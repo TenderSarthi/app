@@ -49,9 +49,9 @@ firestore.rules               ← +bidHistory rules
 | Framework | Next.js 16.2 App Router |
 | Styling | Tailwind v4 + shadcn/ui (Base UI) |
 | Auth | Firebase Admin (server) + Firebase Client (browser) |
-| AI — Chat | `gemini-2.0-flash` via `@google/generative-ai` |
-| AI — Win Score | `gemini-2.0-flash` (fast JSON response) |
-| AI — Document | `gemini-1.5-pro` (quality output) |
+| AI — Chat | `gemini-2.5-flash` via `@google/generative-ai` |
+| AI — Win Score | `gemini-2.5-flash` (fast JSON response) |
+| AI — Document | `gemini-2.5-pro` (quality output) |
 | i18n | next-intl v4.8.3 |
 | Tests | Vitest |
 | Analytics | PostHog (`track`) |
@@ -372,7 +372,7 @@ export async function POST(req: NextRequest) {
     }
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: `${SYSTEM_PROMPT}\nRespond in language: ${language}`,
     })
 
@@ -456,7 +456,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 1: Win Probability Score via Gemini Flash 2.0 (fast)
-    const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
     const scorePrompt = `You are TenderSarthi's bid advisor. Compute a win probability score (0-100) for this GeM bid.
 
 Tender: ${tenderName} | Category: ${tenderCategory} | State: ${tenderState}
@@ -484,8 +484,8 @@ Respond ONLY with valid JSON (no markdown, no extra text):
 
     const winLabel = winScore >= 65 ? 'High' : winScore >= 40 ? 'Medium' : 'Low'
 
-    // Step 2: Full Bid Document via Gemini 1.5 Pro
-    const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' })
+    // Step 2: Full Bid Document via Gemini 2.5 Pro
+    const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' })
     const docPrompt = `You are an expert tender consultant for Indian GeM portal vendors. Generate a complete, professional bid response document.
 
 TENDER DETAILS:

@@ -1346,7 +1346,7 @@ export async function POST(req: NextRequest) {
     // NOTE: Full Firestore plan gate enforcement uses Admin SDK — for V1, we trust
     // the client-side plan-guard check. Full enforcement added in Subsystem 9.
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     const prompt = `${SYSTEM_PROMPT}
 
