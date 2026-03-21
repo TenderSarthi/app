@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getAuth } from 'firebase-admin/auth'
+import { getFirestore, Timestamp } from 'firebase-admin/firestore'
 import '@/lib/firebase/admin'
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '')
@@ -16,10 +17,37 @@ export async function POST(req: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    let uid: string
     try {
-      await getAuth().verifyIdToken(authHeader.slice(7))
+      const decoded = await getAuth().verifyIdToken(authHeader.slice(7))
+      uid = decoded.uid
     } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    // Server-side usage check
+    const db = getFirestore()
+    const userDoc = await db.doc(`users/${uid}`).get()
+    const userData = userDoc.data()
+    const userPlan = userData?.plan ?? 'free'
+
+    if (userPlan !== 'pro') {
+      // Free user: check monthly query count
+      const now = new Date()
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+      const usageDoc = await db.doc(`aiUsage/${uid}/${monthKey}/data`).get()
+      const queryCount = usageDoc.data()?.queries ?? 0
+      const FREE_AI_QUERY_LIMIT = 10
+
+      if (queryCount >= FREE_AI_QUERY_LIMIT) {
+        return NextResponse.json({ error: 'Monthly AI query limit reached. Upgrade to Pro.' }, { status: 429 })
+      }
+
+      // Increment counter server-side
+      await db.doc(`aiUsage/${uid}/${monthKey}/data`).set(
+        { queries: (queryCount + 1), updatedAt: Timestamp.now() },
+        { merge: true }
+      )
     }
 
     const { messages, language = 'hi' } = await req.json() as {
@@ -29,6 +57,16 @@ export async function POST(req: NextRequest) {
 
     if (!messages?.length) {
       return NextResponse.json({ error: 'Messages required' }, { status: 400 })
+    }
+
+    // Input length validation to prevent token exhaustion
+    if (messages.length > 50) {
+      return NextResponse.json({ error: 'Too many messages. Maximum 50 allowed.' }, { status: 400 })
+    }
+    for (const msg of messages) {
+      if (msg.content && msg.content.length > 4000) {
+        return NextResponse.json({ error: 'Message content too long. Maximum 4000 characters per message.' }, { status: 400 })
+      }
     }
 
     const userMessage = messages[messages.length - 1]

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getAuth } from 'firebase-admin/auth'
+import { getFirestore, Timestamp } from 'firebase-admin/firestore'
 import '@/lib/firebase/admin'  // ensure admin app is initialized
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY ?? '')
@@ -29,10 +30,37 @@ export async function POST(req: NextRequest) {
     }
 
     const idToken = authHeader.slice(7)
+    let uid: string
     try {
-      await getAuth().verifyIdToken(idToken)
+      const decoded = await getAuth().verifyIdToken(idToken)
+      uid = decoded.uid
     } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    // Server-side usage check
+    const db = getFirestore()
+    const userDoc = await db.doc(`users/${uid}`).get()
+    const userData = userDoc.data()
+    const userPlan = userData?.plan ?? 'free'
+
+    if (userPlan !== 'pro') {
+      // Free user: check monthly query count
+      const now = new Date()
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+      const usageDoc = await db.doc(`aiUsage/${uid}/${monthKey}/data`).get()
+      const queryCount = usageDoc.data()?.queries ?? 0
+      const FREE_AI_QUERY_LIMIT = 10
+
+      if (queryCount >= FREE_AI_QUERY_LIMIT) {
+        return NextResponse.json({ error: 'Monthly AI query limit reached. Upgrade to Pro.' }, { status: 429 })
+      }
+
+      // Increment counter server-side
+      await db.doc(`aiUsage/${uid}/${monthKey}/data`).set(
+        { queries: (queryCount + 1), updatedAt: Timestamp.now() },
+        { merge: true }
+      )
     }
 
     const body = await req.json()

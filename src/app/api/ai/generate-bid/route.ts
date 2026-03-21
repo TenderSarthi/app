@@ -22,9 +22,19 @@ export async function POST(req: NextRequest) {
 
     // Pro-plan guard — server-side enforcement (client gate alone is insufficient)
     const userDoc = await getFirestore().collection('users').doc(uid).get()
-    const userPlan = userDoc.data()?.plan as string | undefined
+    const userData = userDoc.data()
+    const userPlan = userData?.plan as string | undefined
     if (userPlan !== 'pro') {
       return NextResponse.json({ error: 'Pro plan required for bid document generation' }, { status: 403 })
+    }
+
+    // Check if user is trial-expired (plan=pro but no subscription and trial has ended)
+    const isPaidSubscriber = !!userData?.razorpaySubscriptionId
+    const isActiveTrialUser = userData?.trialUsed && userData?.trialEndsAt &&
+      userData.trialEndsAt.toDate() > new Date()
+
+    if (!isPaidSubscriber && !isActiveTrialUser) {
+      return NextResponse.json({ error: 'Pro subscription required' }, { status: 403 })
     }
 
     const { tenderName, tenderCategory, tenderState, experienceYears,
@@ -36,6 +46,17 @@ export async function POST(req: NextRequest) {
 
     if (!tenderName || !tenderCategory || !quotedRate) {
       return NextResponse.json({ error: 'Required fields missing' }, { status: 400 })
+    }
+
+    // Input length validation to prevent token exhaustion
+    if (tenderName.length > 200) {
+      return NextResponse.json({ error: 'tenderName too long. Maximum 200 characters.' }, { status: 400 })
+    }
+    if (pastContracts && pastContracts.length > 2000) {
+      return NextResponse.json({ error: 'pastContracts too long. Maximum 2000 characters.' }, { status: 400 })
+    }
+    if (capacity && capacity.length > 2000) {
+      return NextResponse.json({ error: 'capacity too long. Maximum 2000 characters.' }, { status: 400 })
     }
 
     // Step 1: Win Probability Score via Gemini Flash 2.0 (fast)
