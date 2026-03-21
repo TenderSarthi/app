@@ -53,6 +53,11 @@ export async function POST(req: NextRequest) {
 
   // Fetch subscription to get customer ID and renewal date
   const subscription = await rzp.subscriptions.fetch(razorpay_subscription_id) as unknown as FetchedSubscription
+  const subNoteUid = (subscription as { notes?: { uid?: string } }).notes?.uid
+  if (subNoteUid !== uid) {
+    console.error('[verify] Subscription uid mismatch:', { subNoteUid, uid })
+    return Response.json({ error: 'Subscription does not belong to this user' }, { status: 403 })
+  }
   if (!subscription.customer_id || !subscription.current_end) {
     return NextResponse.json({ error: 'Subscription not yet active' }, { status: 422 })
   }

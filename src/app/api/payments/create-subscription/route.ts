@@ -38,6 +38,28 @@ export async function POST(req: NextRequest) {
   const snap    = await getFirestore().doc(`users/${uid}`).get()
   const profile = snap.data() as UserProfile | undefined
 
+  const keyId = process.env.RAZORPAY_KEY_ID
+  if (!keyId) {
+    console.error('[create-subscription] RAZORPAY_KEY_ID not set')
+    return NextResponse.json({ error: 'Payment configuration error' }, { status: 500 })
+  }
+
+  // Check for existing active subscription
+  if (profile?.razorpaySubscriptionId) {
+    try {
+      const existingSub = await rzp.subscriptions.fetch(profile.razorpaySubscriptionId)
+      const activeStates = ['created', 'authenticated', 'active', 'pending']
+      if (activeStates.includes(existingSub.status)) {
+        return NextResponse.json({
+          subscriptionId: existingSub.id,
+          keyId,
+        })
+      }
+    } catch {
+      // Subscription not found in Razorpay — proceed to create a new one
+    }
+  }
+
   // Reuse existing Razorpay customer or create a new one
   let customerId = profile?.razorpayCustomerId ?? null
   if (!customerId) {
@@ -63,6 +85,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     subscriptionId: subscription.id,
-    keyId:          process.env.RAZORPAY_KEY_ID,
+    keyId,
   })
 }
