@@ -9,10 +9,12 @@ let _rzp: Razorpay | null = null
 
 function getRzpInstance(): Razorpay {
   if (!_rzp) {
-    _rzp = new Razorpay({
-      key_id:     process.env.RAZORPAY_KEY_ID     ?? '',
-      key_secret: process.env.RAZORPAY_KEY_SECRET ?? '',
-    })
+    const key_id     = process.env.RAZORPAY_KEY_ID
+    const key_secret = process.env.RAZORPAY_KEY_SECRET
+    if (!key_id || !key_secret) {
+      throw new Error('RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be set')
+    }
+    _rzp = new Razorpay({ key_id, key_secret })
   }
   return _rzp
 }
@@ -62,5 +64,6 @@ export function verifyPaymentSignature(
 ): boolean {
   const body     = `${paymentId}|${subscriptionId}`
   const expected = crypto.createHmac('sha256', keySecret).update(body).digest('hex')
-  return expected === signature
+  if (expected.length !== signature.length) return false
+  return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'))
 }

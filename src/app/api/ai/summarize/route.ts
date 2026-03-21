@@ -44,7 +44,14 @@ export async function POST(req: NextRequest) {
     const userData = userDoc.data()
     const userPlan = userData?.plan ?? 'free'
 
-    if (userPlan !== 'pro') {
+    // Treat trial-expired users as free even if plan field still says 'pro'
+    const isTrialExpired =
+      userPlan === 'pro' &&
+      !userData?.razorpaySubscriptionId &&
+      userData?.trialEndsAt &&
+      userData.trialEndsAt.toDate() <= new Date()
+
+    if (userPlan !== 'pro' || isTrialExpired) {
       // Free user: check monthly query count
       const now = new Date()
       const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`

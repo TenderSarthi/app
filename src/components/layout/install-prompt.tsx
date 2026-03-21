@@ -44,7 +44,7 @@ export function InstallPrompt() {
           {t('cta')}
         </Button>
         <button
-          aria-label="Dismiss"
+          aria-label="Dismiss app install prompt"
           className="text-muted hover:text-navy"
           onClick={() => setDismissed(true)}
         >

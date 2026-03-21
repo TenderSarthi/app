@@ -71,7 +71,7 @@ export function BidHelperChat({ profile, usage, onUsageUpdate }: BidHelperChatPr
       setMessages(prev => [...prev, assistantMsg])
       setConfirmId(assistantMsg.id)
 
-      await incrementAIQueryCount(user!.uid)
+      if (user) await incrementAIQueryCount(user.uid)
       onUsageUpdate()
       track('bid_chat_message', { language: profile.language })
     } catch (err) {

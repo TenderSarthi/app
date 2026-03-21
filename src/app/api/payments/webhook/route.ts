@@ -7,7 +7,8 @@ import { upgradeToPro, renewProSubscription, downgradeToFree } from '@/lib/fireb
 async function crossVerifyUid(uid: string, subscriptionId: string, event: string): Promise<boolean> {
   const snap = await getFirestore().doc(`users/${uid}`).get()
   if (!snap.exists) return false
-  const data = snap.data()!
+  const data = snap.data()
+  if (!data) return false
 
   if (event === 'subscription.activated') {
     // On activation, subscription should not yet be stored (or could be stored from verify)

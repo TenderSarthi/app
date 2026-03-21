@@ -20,6 +20,7 @@ interface AlgoliaSearchProps {
 export function AlgoliaSearch({ uid, onSelectTender }: AlgoliaSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Tender[]>([])
+  const [searchError, setSearchError] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   // Don't render if Algolia not configured
@@ -29,6 +30,7 @@ export function AlgoliaSearch({ uid, onSelectTender }: AlgoliaSearchProps) {
     setQuery(q)
     if (!q.trim()) {
       setResults([])
+      setSearchError(false)
       return
     }
 
@@ -44,8 +46,10 @@ export function AlgoliaSearch({ uid, onSelectTender }: AlgoliaSearchProps) {
           },
         })
         setResults((response.hits as unknown as Tender[]) || [])
+        setSearchError(false)
       } catch {
         setResults([])
+        setSearchError(true)
       }
     })
   }
@@ -72,6 +76,10 @@ export function AlgoliaSearch({ uid, onSelectTender }: AlgoliaSearchProps) {
           </button>
         )}
       </div>
+
+      {searchError && (
+        <p className="text-xs text-danger px-1">Search unavailable. Please try again.</p>
+      )}
 
       {results.length > 0 && (
         <div className="border border-navy/10 rounded-xl overflow-hidden">

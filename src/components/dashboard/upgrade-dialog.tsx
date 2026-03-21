@@ -44,7 +44,7 @@ export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-navy">
             <Zap className="text-orange" size={20} />
-            Pro में Upgrade करें
+            {t('upgradeTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -79,7 +79,7 @@ export function UpgradeDialog({ open, onClose, trigger }: UpgradeDialogProps) {
           </div>
 
           <Button variant="ghost" className="w-full text-muted" onClick={onClose}>
-            अभी नहीं
+            {t('notNow')}
           </Button>
         </div>
       </DialogContent>

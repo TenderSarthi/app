@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Pro plan required for bid document generation' }, { status: 403 })
     }
 
-    // Check if user is trial-expired (plan=pro but no subscription and trial has ended)
-    const isPaidSubscriber = !!userData?.razorpaySubscriptionId
-    const isActiveTrialUser = userData?.trialUsed && userData?.trialEndsAt &&
-      userData.trialEndsAt.toDate() > new Date()
+    // Verify user has an active paid subscription OR an unexpired trial
+    const isPaidSubscriber  = !!userData?.razorpaySubscriptionId
+    const trialEndsAt       = userData?.trialEndsAt
+    const isActiveTrialUser = trialEndsAt != null && trialEndsAt.toDate() > new Date()
 
     if (!isPaidSubscriber && !isActiveTrialUser) {
       return NextResponse.json({ error: 'Pro subscription required' }, { status: 403 })
@@ -121,7 +121,7 @@ Important: This is for a real tender bid — be accurate and professional.`
   } catch (err) {
     console.error('Bid generation error:', err)
     return NextResponse.json(
-      { error: 'Document generation failed। कुछ देर में try करें।' },
+      { error: 'Bid document generate नहीं हो सका। कुछ देर में try करें।' },
       { status: 500 }
     )
   }

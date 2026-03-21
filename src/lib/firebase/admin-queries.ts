@@ -1,6 +1,9 @@
 /**
  * Firestore Admin SDK queries for the admin panel.
  * Server-only — never import in 'use client' components.
+ *
+ * NOTE: Admin SDK DocumentSnapshot uses `.exists` as a boolean PROPERTY (not a method).
+ * Client SDK uses `.exists()` as a METHOD. Do not mix patterns across SDK boundaries.
  */
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore'
 import { getAuth } from 'firebase-admin/auth'
@@ -81,7 +84,7 @@ export async function getAdminStats(): Promise<AdminStats> {
   const weekAgo = new Date(today.getTime() - 7  * 24 * 60 * 60 * 1000)
   const monAgo  = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-  const [allSnap, proSnap, todaySnap, weekSnap, monthSnap, deleteSnap] = await Promise.all([
+  const results = await Promise.allSettled([
     db().collection('users').count().get(),
     db().collection('users').where('plan', '==', 'pro').count().get(),
     db().collection('users').where('createdAt', '>=', Timestamp.fromDate(today)).count().get(),
@@ -90,17 +93,20 @@ export async function getAdminStats(): Promise<AdminStats> {
     db().collection('users').where('deletionRequested', '==', true).count().get(),
   ])
 
-  const total = allSnap.data().count
-  const pro   = proSnap.data().count
+  const count = (i: number) =>
+    results[i].status === 'fulfilled' ? results[i].value.data().count : 0
+
+  const total = count(0)
+  const pro   = count(1)
 
   return {
     totalUsers:      total,
     proUsers:        pro,
     freeUsers:       total - pro,
-    signupsToday:    todaySnap.data().count,
-    signupsWeek:     weekSnap.data().count,
-    signupsMonth:    monthSnap.data().count,
-    deletionRequests: deleteSnap.data().count,
+    signupsToday:    count(2),
+    signupsWeek:     count(3),
+    signupsMonth:    count(4),
+    deletionRequests: count(5),
   }
 }
 

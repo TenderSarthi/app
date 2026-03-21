@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import { CheckCircle2, Circle, AlertTriangle } from 'lucide-react'
 import { DocumentTypeIcon } from './document-type-icon'
 import { getRequiredDocTypes, getVaultProgress, isDocumentExpiringSoon, isDocumentExpired } from '@/lib/vault-utils'
+import { isValidDocumentType } from '@/lib/types'
 import type { VaultDocument } from '@/lib/types'
 
 interface VaultChecklistProps {
@@ -34,8 +35,8 @@ export function VaultChecklist({ documents, categories }: VaultChecklistProps) {
 
       {/* Checklist rows */}
       <div className="divide-y divide-navy/5">
-        {requiredTypes.map(type => {
-          const doc        = docByType.get(type as any)
+        {requiredTypes.filter(isValidDocumentType).map(type => {
+          const doc        = docByType.get(type)
           const isUploaded = !!doc
           const expiring   = doc ? isDocumentExpiringSoon(doc) : false
           const expired    = doc ? isDocumentExpired(doc)      : false
@@ -49,7 +50,7 @@ export function VaultChecklist({ documents, categories }: VaultChecklistProps) {
               ) : (
                 <Circle size={18} className="text-navy/20 shrink-0" />
               )}
-              <DocumentTypeIcon type={type as any} showLabel size={16} />
+              <DocumentTypeIcon type={type} showLabel size={16} />
               {expired   && <span className="ml-auto text-xs font-medium text-danger">{t('expired')}</span>}
               {!expired && expiring && <span className="ml-auto text-xs font-medium text-orange">{t('expiringSoon')}</span>}
             </div>

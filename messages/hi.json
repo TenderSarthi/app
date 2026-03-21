@@ -60,7 +60,9 @@
     "tenderLimitReached": "Free plan में {limit} tenders save कर सकते हैं।",
     "bidGeneratorPro": "Bid Document Generator Pro feature है।",
     "upgradeMonthly": "₹499/month",
-    "upgradeAnnual": "₹3,999/year"
+    "upgradeAnnual": "₹3,999/year",
+    "upgradeTitle": "Pro में Upgrade करें",
+    "notNow": "अभी नहीं"
   },
   "dashboard": {
     "greeting": "नमस्ते, {name}!",
