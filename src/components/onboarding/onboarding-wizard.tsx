@@ -7,7 +7,7 @@ import { Step1Profile } from './step1-profile'
 import { Step2State } from './step2-state'
 import { Step3Categories } from './step3-categories'
 import { Step4Notifications } from './step4-notifications'
-import { saveOnboardingData } from '@/lib/firebase/firestore'
+import { saveOnboardingData, userExists, createUser } from '@/lib/firebase/firestore'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { track } from '@/lib/posthog'
 import type { LanguageCode } from '@/lib/types'
@@ -17,7 +17,7 @@ const TITLES = ['आपका Profile', 'आपका State', 'आपकी Cate
 const SUBTITLES = ['TenderSarthi में आपका स्वागत है!', 'हम आपके state के tenders filter करेंगे', 'जो लागू हों वो सब चुनें', 'Tender alerts तुरंत पाएं']
 
 export function OnboardingWizard({ locale }: { locale: string }) {
-  const { uid } = useAuth()
+  const { uid, user } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
@@ -34,6 +34,11 @@ export function OnboardingWizard({ locale }: { locale: string }) {
     setSaving(true)
     setSaveError(null)
     try {
+      // Guard: if user reached onboarding without a Firestore doc (e.g. via AppLayout
+      // redirect after a failed createUser), create the base document first.
+      if (!(await userExists(uid))) {
+        await createUser(uid, user?.email ?? null, user?.phoneNumber ?? null)
+      }
       await saveOnboardingData(uid, { name, businessName, state, categories, language: (isValidLanguageCode(locale) ? locale : 'hi') as LanguageCode, fcmToken, notificationsDeclined: declined })
       track('onboarding_completed', { state, categoriesCount: categories.length, locale })
       router.replace(`/${locale}/dashboard`)

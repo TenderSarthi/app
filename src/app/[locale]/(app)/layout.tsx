@@ -21,8 +21,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [authLoading, user, locale, router])
 
   useEffect(() => {
-    if (!profileLoading && user && profile && !profile.name) router.replace(`/${locale}/onboarding`)
-  }, [profileLoading, profile, locale, router])
+    // Redirect to onboarding if: profile missing entirely (no Firestore doc)
+    // or profile exists but name is empty (onboarding never completed)
+    if (!profileLoading && user && (!profile || !profile.name)) {
+      router.replace(`/${locale}/onboarding`)
+    }
+  }, [profileLoading, profile, user, locale, router])
 
   if (authLoading || profileLoading) {
     return (

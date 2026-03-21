@@ -15,10 +15,18 @@ export function useUserProfile() {
       const timer = setTimeout(() => { setProfile(null); setLoading(false) }, 0)
       return () => clearTimeout(timer)
     }
-    return onSnapshot(doc(db, 'users', uid), (snap) => {
-      setProfile(snap.exists() ? (snap.data() as UserProfile) : null)
-      setLoading(false)
-    })
+    return onSnapshot(
+      doc(db, 'users', uid),
+      (snap) => {
+        setProfile(snap.exists() ? (snap.data() as UserProfile) : null)
+        setLoading(false)
+      },
+      (err) => {
+        console.error('[useUserProfile] onSnapshot error:', err)
+        setProfile(null)
+        setLoading(false)
+      }
+    )
   }, [uid])
   return { profile, loading }
 }
