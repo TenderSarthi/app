@@ -33,6 +33,11 @@ export async function sendAlertEmail(payload: AlertEmailPayload): Promise<boolea
     return false
   }
 
+  if (!payload.to || !payload.to.includes('@')) {
+    console.warn('[Email] Invalid recipient email — skipping:', payload.to)
+    return false
+  }
+
   // Construct inside the function after guard to ensure the key is available
   const resend = new Resend(process.env.RESEND_API_KEY)
   const from = process.env.RESEND_FROM_EMAIL ?? 'TenderSarthi <alerts@tendersarthi.com>'

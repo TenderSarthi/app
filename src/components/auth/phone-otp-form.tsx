@@ -18,7 +18,7 @@ export function PhoneOtpForm({ locale }: { locale: string }) {
 
   async function handleSend(e: FormEvent) {
     e.preventDefault()
-    if (phone.length < 10) { setError('Phone number 10 digits का होना चाहिए।'); return }
+    if (phone.length !== 10) { setError('Phone number 10 digits का होना चाहिए।'); return }
     setLoading(true); setError(null)
     try {
       const e164 = phone.startsWith('+') ? phone : `+91${phone}`

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import type { Order, Tender } from '@/lib/types'
 import { addOrder, updateOrder } from '@/lib/firebase/firestore'
 import {
@@ -21,7 +22,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-// TODO: i18n — replace hardcoded strings once orders namespace is added (Task 6)
 
 interface AddOrderDialogProps {
   open: boolean
@@ -49,6 +49,7 @@ export function AddOrderDialog({
   editOrder,
   uid,
 }: AddOrderDialogProps) {
+  const t = useTranslations('orders')
   const isEditing = editOrder != null
 
   const [tenderId,        setTenderId]        = useState('')
@@ -89,18 +90,18 @@ export function AddOrderDialog({
 
   const handleSubmit = async () => {
     if (!isEditing && !tenderId) {
-      setError('Please select a tender.')
+      setError(t('errorSelectTender'))
       return
     }
 
     const parsedValue = value.trim() === '' ? null : Number(value)
     if (parsedValue !== null && (isNaN(parsedValue) || parsedValue <= 0)) {
-      setError('Value must be a positive number.')
+      setError(t('errorInvalidValue'))
       return
     }
 
     if (notes.length > 500) {
-      setError('Notes must be 500 characters or fewer.')
+      setError(t('errorNotesTooLong'))
       return
     }
 
@@ -131,7 +132,7 @@ export function AddOrderDialog({
       }
       handleOpenChange(false)
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError(t('errorSave'))
     } finally {
       setSaving(false)
     }
@@ -142,7 +143,7 @@ export function AddOrderDialog({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Order' : 'Add Work Order'}
+            {isEditing ? t('editOrder') : t('addWorkOrder')}
           </DialogTitle>
         </DialogHeader>
 
@@ -150,7 +151,7 @@ export function AddOrderDialog({
           {/* Tender select — disabled when editing */}
           <div>
             <Label htmlFor="order-tender">
-              Tender <span className="text-destructive">*</span>
+              {t('tenderLabel')} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={tenderId}
@@ -158,17 +159,17 @@ export function AddOrderDialog({
               disabled={isEditing}
             >
               <SelectTrigger id="order-tender" className="mt-1 w-full">
-                <SelectValue placeholder="Select a tender" />
+                <SelectValue placeholder={t('tenderPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {tenders.length === 0 ? (
                   <p className="px-3 py-2 text-sm text-muted-foreground">
-                    No active tenders. Save a tender first.
+                    {t('noWonTenders')}
                   </p>
                 ) : (
-                  tenders.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      {t.name}
+                  tenders.map((tender) => (
+                    <SelectItem key={tender.id} value={tender.id}>
+                      {tender.name}
                     </SelectItem>
                   ))
                 )}
@@ -179,8 +180,8 @@ export function AddOrderDialog({
           {/* Work order number (optional) */}
           <div>
             <Label htmlFor="order-won">
-              Work Order Number{' '}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('workOrderLabel')}{' '}
+              <span className="text-muted-foreground font-normal">({t('optional')})</span>
             </Label>
             <Input
               id="order-won"
@@ -194,8 +195,8 @@ export function AddOrderDialog({
           {/* Value (optional) */}
           <div>
             <Label htmlFor="order-value">
-              Order Value (INR){' '}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('valueLabel')}{' '}
+              <span className="text-muted-foreground font-normal">({t('optional')})</span>
             </Label>
             <Input
               id="order-value"
@@ -203,7 +204,7 @@ export function AddOrderDialog({
               min={0}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="e.g. 500000"
+              placeholder={t('valuePlaceholder')}
               className="mt-1"
             />
           </div>
@@ -211,14 +212,14 @@ export function AddOrderDialog({
           {/* Notes (optional) */}
           <div>
             <Label htmlFor="order-notes">
-              Notes{' '}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('notesLabel')}{' '}
+              <span className="text-muted-foreground font-normal">({t('optional')})</span>
             </Label>
             <textarea
               id="order-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional notes..."
+              placeholder={t('notesPlaceholder')}
               maxLength={500}
               rows={3}
               className="mt-1 w-full border border-input rounded-lg px-2.5 py-2 text-sm bg-transparent resize-none outline-none focus-visible:border-ring placeholder:text-muted-foreground"
@@ -239,13 +240,13 @@ export function AddOrderDialog({
             onClick={() => handleOpenChange(false)}
             disabled={saving}
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={saving || (!isEditing && !tenderId)}
           >
-            {saving ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Order'}
+            {saving ? t('saving') : isEditing ? t('saveChanges') : t('addWorkOrder')}
           </Button>
         </DialogFooter>
       </DialogContent>

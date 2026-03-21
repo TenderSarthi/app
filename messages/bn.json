@@ -231,6 +231,8 @@
     "deleteConfirmBtn": "Yes, Delete",
     "cancelDelete": "Cancel",
     "errorSelectTender": "Please select a tender.",
+    "errorInvalidValue": "Value must be a positive number.",
+    "errorNotesTooLong": "Notes 500 characters से कम होने चाहिए।",
     "errorSave": "Could not save order. Please try again.",
     "errorRetry": "कनेक्शन जांचें और दोबारा try करें।",
     "status_delivery_pending": "Delivery Pending",
@@ -248,7 +250,11 @@
     "mark_payment": "Mark Paid",
     "advancing": "Updating...",
     "orderComplete": "Order Complete ✓",
-    "invoicedDaysAgo": "{days} days since invoice submitted"
+    "invoicedDaysAgo": "{days} days since invoice submitted",
+    "addWorkOrder": "Add Work Order",
+    "editOrder": "Edit Order",
+    "saveChanges": "Save Changes",
+    "optional": "optional"
   },
   "learn": {
     "title": "Learning Center",
@@ -291,7 +297,8 @@
     "deleteWarning": "आपका सारा data permanently delete हो जाएगा। यह undo नहीं हो सकता।",
     "deleteRequested": "Deletion request भेज दी गई। 7 दिनों में process होगा।",
     "deleteConfirm": "हाँ, account delete करें",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "requestFailed": "Request नहीं हुई। फिर try करें।"
   },
   "landing": {
     "nav": {

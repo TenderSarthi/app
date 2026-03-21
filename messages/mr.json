@@ -231,6 +231,8 @@
     "deleteConfirmBtn": "होय, हटवा",
     "cancelDelete": "रद्द करा",
     "errorSelectTender": "Please select a tender.",
+    "errorInvalidValue": "Value must be a positive number.",
+    "errorNotesTooLong": "Notes 500 characters से कम होने चाहिए।",
     "errorSave": "Could not save order. Please try again.",
     "errorRetry": "कनेक्शन जांचें और दोबारा try करें।",
     "status_delivery_pending": "डिलिव्हरी प्रलंबित",
@@ -291,7 +293,8 @@
     "deleteWarning": "सर्व डेटा कायमचा हटवला जाईल.",
     "deleteRequested": "हटवण्याची विनंती केली.",
     "deleteConfirm": "होय, खाते हटवा",
-    "cancel": "रद्द करा"
+    "cancel": "रद्द करा",
+    "requestFailed": "Request नहीं हुई। फिर try करें।"
   }
 ,
   "landing": {

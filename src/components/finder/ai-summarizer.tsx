@@ -71,7 +71,7 @@ export function AISummarizer({ uid, profile, usage, onUsageUpdate, tenderCount, 
 
       track('ai_summary_generated', { language, textLength: text.length })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'AI error'
+      const msg = err instanceof Error ? err.message.slice(0, 200) : 'AI error'
       setError(msg)
     } finally {
       setLoading(false)

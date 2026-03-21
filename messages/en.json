@@ -231,7 +231,13 @@
     "deleteConfirmBtn": "Yes, Delete",
     "cancelDelete": "Cancel",
     "errorSelectTender": "Please select a tender.",
+    "errorInvalidValue": "Value must be a positive number.",
+    "errorNotesTooLong": "Notes must be 500 characters or fewer.",
     "errorSave": "Could not save order. Please try again.",
+    "addWorkOrder": "Add Work Order",
+    "editOrder": "Edit Order",
+    "saveChanges": "Save Changes",
+    "optional": "optional",
     "errorRetry": "Please check your connection and try again.",
     "status_delivery_pending": "Delivery Pending",
     "status_inspection_pending": "Inspection Pending",
@@ -248,7 +254,11 @@
     "mark_payment": "Mark Paid",
     "advancing": "Updating...",
     "orderComplete": "Order Complete ✓",
-    "invoicedDaysAgo": "{days} days since invoice submitted"
+    "invoicedDaysAgo": "{days} days since invoice submitted",
+    "addWorkOrder": "Add Work Order",
+    "editOrder": "Edit Order",
+    "saveChanges": "Save Changes",
+    "optional": "optional"
   },
   "learn": {
     "title": "Learning Center",
@@ -291,7 +301,8 @@
     "deleteWarning": "All your data will be permanently deleted. This cannot be undone.",
     "deleteRequested": "Deletion requested. We'll process it within 7 days.",
     "deleteConfirm": "Yes, delete my account",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "requestFailed": "Request failed. Please try again."
   }
 ,
   "landing": {

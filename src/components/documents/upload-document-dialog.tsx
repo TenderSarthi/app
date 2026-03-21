@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Upload, File as FileIcon, AlertCircle } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
-import { uploadVaultFile } from '@/lib/firebase/storage'
+import { uploadVaultFile, deleteVaultFile } from '@/lib/firebase/storage'
 import { addVaultDocument } from '@/lib/firebase/firestore'
 import { DOCUMENT_TYPE_LABELS } from '@/lib/constants'
 import type { DocumentType } from '@/lib/types'
@@ -52,16 +52,25 @@ export function UploadDocumentDialog({ open, onClose, uid }: UploadDocumentDialo
     setUploading(true); setError(null)
     try {
       const { storagePath, storageUrl } = await uploadVaultFile(uid, file, setProgress)
-      await addVaultDocument(uid, {
-        type: docType,
-        fileName: file.name,
-        fileSize: file.size,
-        storagePath,
-        storageUrl,
-        expiresAt: expiryDate ? Timestamp.fromDate(new Date(expiryDate)) : null,
-        expiryAlertSent: false,
-      })
-      handleClose()
+      try {
+        await addVaultDocument(uid, {
+          type: docType,
+          fileName: file.name,
+          fileSize: file.size,
+          storagePath,
+          storageUrl,
+          expiresAt: expiryDate ? Timestamp.fromDate(new Date(expiryDate)) : null,
+          expiryAlertSent: false,
+        })
+        handleClose()
+      } catch (metaErr) {
+        // Firestore metadata save failed — attempt to clean up the orphaned Storage file
+        console.error('[Upload] Metadata save failed, cleaning up Storage file:', metaErr)
+        deleteVaultFile(storagePath).catch((e) =>
+          console.error('[Upload] Cleanup failed for:', storagePath, e)
+        )
+        throw metaErr
+      }
     } catch {
       setError(t('errorUpload'))
       setUploading(false)

@@ -98,7 +98,9 @@ Respond ONLY with valid JSON (no markdown, no extra text):
       const parsed = JSON.parse(scoreText)
       winScore = Math.max(0, Math.min(100, Number(parsed.score) || 50))
       winReasoning = parsed.reasoning ?? ''
-    } catch { /* use defaults */ }
+    } catch (parseErr) {
+      console.error('[AI] Win score JSON parse failed — using defaults:', parseErr)
+    }
 
     const winLabel = winScore >= 70 ? 'High' : winScore >= 40 ? 'Medium' : 'Low'
 

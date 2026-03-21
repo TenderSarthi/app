@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
 import { LayoutDashboard, Users, Bell, BookOpen, FileCheck, LogOut } from 'lucide-react'
@@ -23,10 +23,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const [isAdmin,      setIsAdmin]      = useState<boolean | null>(null)
   const [checkLoading, setCheckLoading] = useState(true)
-  const cancelledRef = useRef(false)
-
   useEffect(() => {
-    cancelledRef.current = false
+    let cancelled = false
     if (authLoading) return
     if (!user) {
       router.replace(`/${locale}/dashboard`)
@@ -35,22 +33,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     user.getIdToken().then((token) =>
       fetch('/api/admin/me', { headers: { Authorization: `Bearer ${token}` } })
-    ).then((r) => r.json() as Promise<{ isAdmin: boolean }>)
+    ).then((r) => {
+      if (!r.ok) throw new Error('Admin check failed')
+      return r.json() as Promise<{ isAdmin: boolean }>
+    })
     .then(({ isAdmin: admin }) => {
-      if (cancelledRef.current) return
+      if (cancelled) return
       setIsAdmin(admin)
       if (!admin) router.replace(`/${locale}/dashboard`)
     })
     .catch(() => {
-      if (cancelledRef.current) return
+      if (cancelled) return
       setIsAdmin(false)
       router.replace(`/${locale}/dashboard`)
     })
     .finally(() => {
-      if (!cancelledRef.current) setCheckLoading(false)
+      if (!cancelled) setCheckLoading(false)
     })
 
-    return () => { cancelledRef.current = true }
+    return () => { cancelled = true }
   }, [authLoading, user, locale, router])
 
   if (authLoading || checkLoading || !isAdmin) return null

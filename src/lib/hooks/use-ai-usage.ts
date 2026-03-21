@@ -31,7 +31,8 @@ export function useAIUsage(uid: string | null): UseAIUsageResult {
       .then(data => { if (!cancelledRef.current) setUsage(data) })
       .catch((err: unknown) => {
         console.warn('[useAIUsage] Failed to load AI usage:', err)
-        if (!cancelledRef.current) setUsage({ queries: 0, bidDocs: 0 })
+        // Do not reset to zero on error — preserve previous/default state so
+        // the plan guard doesn't incorrectly show capacity as fully available
       })
       .finally(() => { if (!cancelledRef.current) setLoading(false) })
   }, [uid])

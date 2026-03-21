@@ -134,13 +134,19 @@ function SettingsContent() {
   const handleDeleteRequest = useCallback(async () => {
     if (!user) return
     setConfirmDelete(false)
-    const token = await user.getIdToken()
-    await fetch('/api/payments/delete-request', {
-      method: 'POST', headers: { Authorization: `Bearer ${token}` },
-    })
-    setDeletionSent(true)
-    track('account_deletion_requested', {})
-  }, [user])
+    setError(null)
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/payments/delete-request', {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) { setError(t('requestFailed')); return }
+      setDeletionSent(true)
+      track('account_deletion_requested', {})
+    } catch {
+      setError(t('requestFailed'))
+    }
+  }, [user, t])
 
   // ── Language ──────────────────────────────────────────────────────────
   const handleLanguageChange = useCallback(async (lang: LanguageCode) => {
