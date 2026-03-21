@@ -38,18 +38,9 @@ export default function BidPage() {
   const [upgradeOpen, setUpgradeOpen]     = useState(false)
   const [genError, setGenError]           = useState<string | null>(null)
 
-  if (!profile || !user || !usage) {
-    return (
-      <div className="space-y-4">
-        <div className="h-7 w-36 bg-navy/5 rounded-lg animate-pulse" />
-        <div className="h-64 bg-navy/5 rounded-xl animate-pulse" />
-      </div>
-    )
-  }
-
-  const userIsPro = isPro(profile)
-
+  // Must be declared before any early return (Rules of Hooks)
   const handleGenerate = useCallback(async (data: GenerateData) => {
+    if (!profile || !usage || !user) return
     if (!canUseBidGenerator(profile, usage)) { setUpgradeOpen(true); return }
     setGenerating(true); setGenError(null); setResult(null)
     try {
@@ -97,6 +88,18 @@ export default function BidPage() {
       setGenerating(false)
     }
   }, [profile, usage, user, refreshUsage])
+
+  // Early return AFTER all hooks are declared
+  if (!profile || !user || !usage) {
+    return (
+      <div className="space-y-4">
+        <div className="h-7 w-36 bg-navy/5 rounded-lg animate-pulse" />
+        <div className="h-64 bg-navy/5 rounded-xl animate-pulse" />
+      </div>
+    )
+  }
+
+  const userIsPro = isPro(profile)
 
   return (
     <div className="space-y-4 pb-32 desktop:pb-6">
