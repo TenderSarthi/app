@@ -1,4 +1,4 @@
-import type { VaultDocument } from './types'
+import type { VaultDocument, DocumentType } from './types'
 
 export function getRequiredDocTypes(categories: string[]): string[] {
   const required = new Set<string>(['gst', 'pan'])
@@ -30,7 +30,7 @@ export function getVaultProgress(docs: VaultDocument[], categories: string[]): V
   if (categories.length === 0) return { uploaded: 0, required: 0, percent: 100 }
   const requiredTypes = getRequiredDocTypes(categories)
   const uploadedTypes = new Set(docs.map(d => d.type))
-  const uploaded = requiredTypes.filter(t => uploadedTypes.has(t as any)).length
+  const uploaded = requiredTypes.filter((t): t is DocumentType => uploadedTypes.has(t as DocumentType)).length
   const required = requiredTypes.length
   return { uploaded, required, percent: required === 0 ? 100 : Math.round((uploaded / required) * 100) }
 }

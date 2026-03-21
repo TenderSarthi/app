@@ -94,7 +94,7 @@ export interface VaultDocument {
 }
 
 export function isValidDocumentType(s: unknown): s is DocumentType {
-  return ['rc','gst','insurance','itr','msme','pan','udyam','other'].includes(s as string)
+  return typeof s === 'string' && ['rc','gst','insurance','itr','msme','pan','udyam','other'].includes(s)
 }
 
 export interface ChatMessage {
@@ -162,10 +162,10 @@ export interface Order {
 }
 
 export function isValidOrderStatus(s: unknown): s is OrderStatus {
-  return [
+  return typeof s === 'string' && [
     'delivery_pending', 'inspection_pending', 'invoice_pending',
     'payment_pending', 'completed',
-  ].includes(s as string)
+  ].includes(s)
 }
 
 // --- Learning Center types ---

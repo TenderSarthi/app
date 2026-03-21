@@ -4,6 +4,19 @@ import '@/lib/firebase/admin'
 import { verifyWebhookSignature } from '@/lib/razorpay-admin'
 import { upgradeToPro, renewProSubscription, downgradeToFree } from '@/lib/firebase/admin-firestore'
 
+async function crossVerifyUid(uid: string, subscriptionId: string, event: string): Promise<boolean> {
+  const snap = await getFirestore().doc(`users/${uid}`).get()
+  if (!snap.exists) return false
+  const data = snap.data()!
+
+  if (event === 'subscription.activated') {
+    // On activation, subscription should not yet be stored (or could be stored from verify)
+    return true // Allow through — verify route also handles this
+  }
+  // For all other events, verify subscription matches
+  return data.razorpaySubscriptionId === subscriptionId
+}
+
 // Minimal shape of subscription entity in Razorpay webhook payload
 interface RzpSubscriptionEntity {
   id:           string
@@ -43,6 +56,12 @@ export async function POST(req: NextRequest) {
   if (!uid) {
     console.warn('[Webhook] subscription.notes.uid missing — skipping', event.event)
     return NextResponse.json({ ok: true })
+  }
+
+  const isValidUid = await crossVerifyUid(uid, subEntity.id, event.event)
+  if (!isValidUid) {
+    console.error(`[webhook] UID mismatch for subscription ${subEntity.id}, claimed uid: ${uid}`)
+    return Response.json({ ok: true }) // Return 200 to prevent Razorpay retries
   }
 
   switch (event.event) {
