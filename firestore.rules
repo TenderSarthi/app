@@ -3,9 +3,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && !('plan' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('razorpaySubscriptionId' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('trialUsed' in request.resource.data.diff(resource.data).affectedKeys());
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.plan == 'free'
+        && request.resource.data.trialUsed == false
+        && request.resource.data.razorpaySubscriptionId == null;
     }
-    match /aiUsage/{uid}/{month} {
+    match /aiUsage/{uid}/{monthKey}/{doc} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
     match /platformStats/{doc} {
@@ -34,6 +42,10 @@ service cloud.firestore {
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
+    }
+    match /articles/{articleId} {
+      allow read: if request.auth != null;
+      allow write: if false;   // admin SDK only (bypasses rules)
     }
     match /{document=**} { allow read, write: if false; }
   }
