@@ -27,4 +27,7 @@ describe('formatCurrency', () => {
   it('formats with rupee sign and Indian grouping', () => {
     expect(formatCurrency(4990)).toBe('₹4,990')
   })
+  it('handles zero', () => {
+    expect(formatCurrency(0)).toBe('₹0')
+  })
 })
