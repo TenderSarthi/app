@@ -53,7 +53,8 @@
     "alerts": "Alerts",
     "learn": "सीखें",
     "orders": "Orders",
-    "settings": "Settings"
+    "settings": "Settings",
+    "menu": "Menu"
   },
   "planGate": {
     "aiLimitReached": "आपने इस महीने {used}/{limit} AI queries use कर लिए।",
@@ -72,7 +73,23 @@
     "trialBannerSubtitle": "Trial खत्म होने से पहले upgrade करें।",
     "trialBannerCta": "Upgrade करें",
     "discoverMore": "और features देखें →",
-    "aiUsageTitle": "AI Queries"
+    "aiUsageTitle": "AI Queries",
+    "gettingStartedTitle": "शुरू करें",
+    "step1Done": "Account बना लिया",
+    "step2": "पहला Tender खोजें",
+    "step2Sub": "Live tenders में अपनी category search करें",
+    "step3": "AI से Bid बनाएं",
+    "step3Sub": "Tender save करने के बाद unlock होगा",
+    "tipLabel": "💡 Tip",
+    "tipBody": "{category} category में सबसे ज़्यादा tenders आते हैं — {state} में। Find tab से शुरू करें।",
+    "quickActions": "Quick Actions",
+    "statsActive": "Active",
+    "statsWon": "जीते",
+    "statsBids": "Bids भेजे",
+    "noActiveTenders": "कोई active tender नहीं",
+    "findNewTender": "नया Tender खोजें →",
+    "nextDeadlineLabel": "Next Deadline",
+    "latestActiveLabel": "Latest Active"
   },
   "finder": {
     "title": "Tenders खोजें",
