@@ -1,3 +1,4 @@
+// src/app/[locale]/(app)/dashboard/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -12,7 +13,8 @@ import { touchLastActive } from '@/lib/firebase/firestore'
 import { TrustSignalBar } from '@/components/dashboard/trust-signal-bar'
 import { TrialBanner } from '@/components/dashboard/trial-banner'
 import { AIUsageCounter } from '@/components/dashboard/ai-usage-counter'
-import { FeatureCards } from '@/components/dashboard/feature-cards'
+import { GettingStarted } from '@/components/dashboard/getting-started'
+import { ActiveDashboard } from '@/components/dashboard/active-dashboard'
 import { UpgradeDialog } from '@/components/dashboard/upgrade-dialog'
 import { isPro } from '@/lib/plan-guard'
 
@@ -23,37 +25,33 @@ export default function DashboardPage() {
 
   const { user } = useFirebase()
   const { profile } = useUserProfile()
-
-  // Track last active time for engagement metrics
-  useEffect(() => {
-    if (user?.uid) touchLastActive(user.uid).catch(() => {})
-  }, [user?.uid])
   const { stats } = usePlatformStats()
-  const { tenders, error: tendersError } = useUserTenders(user?.uid ?? null)
+  const { tenders, loading: tendersLoading, error: tendersError } = useUserTenders(user?.uid ?? null)
   const { usage } = useAIUsage(user?.uid ?? null)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
 
+  useEffect(() => {
+    if (user?.uid) touchLastActive(user.uid).catch(() => {})
+  }, [user?.uid])
+
+  // Guard 1: profile must be loaded before we render anything that reads it
   if (!profile) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
       <p className="text-sm text-muted">Could not load your profile. Please refresh the page.</p>
     </div>
   )
 
-  const userIsPro = isPro(profile)
+  // Guard 2: wait for tenders snapshot to avoid flashing Getting Started
+  if (tendersLoading) return (
+    <div className="space-y-3 mt-4">
+      <div className="h-20 bg-navy/5 rounded-xl animate-pulse" />
+      <div className="h-20 bg-navy/5 rounded-xl animate-pulse" />
+    </div>
+  )
 
-  const accountAgeDays = profile.createdAt
-    ? Math.floor((Date.now() - profile.createdAt.toMillis()) / 86_400_000)
-    : 0
-  const isNewUser = accountAgeDays < 14 || tenders.length < 3
-
+  const userIsPro     = isPro(profile)
   const activeTenders = tenders.filter(tender => tender.status === 'active')
-  const nextDeadline = activeTenders
-    .filter((t): t is typeof t & { deadline: NonNullable<typeof t['deadline']> } => !!t.deadline)
-    .sort((a, b) => a.deadline.toMillis() - b.deadline.toMillis())[0]
-
-  const daysUntilDeadline = nextDeadline
-    ? Math.ceil((nextDeadline.deadline.toMillis() - Date.now()) / 86_400_000)
-    : null
+  const isNewUser     = tenders.length === 0   // single source of truth
 
   return (
     <div className="space-y-5 pb-20 desktop:pb-6">
@@ -75,11 +73,6 @@ export default function DashboardPage() {
           {activeTenders.length > 0 && (
             <p className="text-sm text-muted mt-0.5">
               {t('activeTenders', { count: activeTenders.length })}
-              {daysUntilDeadline !== null && (
-                <span className={daysUntilDeadline <= 3 ? ' text-danger font-semibold' : ' text-muted'}>
-                  {' '}• {t('nextDeadline', { days: daysUntilDeadline })}
-                </span>
-              )}
             </p>
           )}
         </div>
@@ -90,7 +83,22 @@ export default function DashboardPage() {
         <p className="text-sm text-danger">{tendersError}</p>
       )}
 
-      <FeatureCards isNewUser={isNewUser} locale={locale} />
+      {/* Adaptive section — replaces <FeatureCards> */}
+      {isNewUser ? (
+        <GettingStarted
+          locale={locale}
+          profile={profile}
+          tenders={tenders}
+          usage={usage}
+        />
+      ) : (
+        <ActiveDashboard
+          locale={locale}
+          tenders={tenders}
+          activeTenders={activeTenders}
+          usage={usage}
+        />
+      )}
 
       <UpgradeDialog
         open={upgradeOpen}

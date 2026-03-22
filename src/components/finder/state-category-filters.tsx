@@ -27,9 +27,10 @@ export function StateFilter({ value, onChange }: StateFilterProps) {
 interface CategoryFilterProps {
   selected: string[]
   onChange: (cats: string[]) => void
+  maxVisible?: number   // limits total GEM_CATEGORIES pills rendered; undefined = show all
 }
 
-export function CategoryFilter({ selected, onChange }: CategoryFilterProps) {
+export function CategoryFilter({ selected, onChange, maxVisible }: CategoryFilterProps) {
   const toggle = (cat: string) => {
     onChange(
       selected.includes(cat)
@@ -38,9 +39,17 @@ export function CategoryFilter({ selected, onChange }: CategoryFilterProps) {
     )
   }
 
+  const visibleCategories = maxVisible !== undefined
+    ? GEM_CATEGORIES.slice(0, maxVisible)
+    : GEM_CATEGORIES
+
+  const hiddenCount = maxVisible !== undefined
+    ? Math.max(0, GEM_CATEGORIES.length - maxVisible)
+    : 0
+
   return (
     <div className="flex flex-wrap gap-2">
-      {GEM_CATEGORIES.map(cat => {
+      {visibleCategories.map(cat => {
         const active = selected.includes(cat)
         return (
           <button
@@ -57,6 +66,12 @@ export function CategoryFilter({ selected, onChange }: CategoryFilterProps) {
           </button>
         )
       })}
+
+      {hiddenCount > 0 && (
+        <span className="px-2 py-0.5 bg-navy/10 text-navy/60 rounded-full text-[10px] pointer-events-none">
+          +{hiddenCount} more
+        </span>
+      )}
     </div>
   )
 }

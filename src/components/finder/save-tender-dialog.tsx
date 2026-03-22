@@ -22,15 +22,22 @@ interface SaveTenderDialogProps {
   uid: string
   profile: UserProfile
   currentTenderCount: number
+  /** Pre-fill the tender name (e.g. when saving from live feed) */
+  initialName?: string
+  /** Pre-fill the category (e.g. when saving from live feed) */
+  initialCategory?: string
 }
 
 export function SaveTenderDialog({
-  open, onClose, aiSummary, uid, profile, currentTenderCount
+  open, onClose, aiSummary, uid, profile, currentTenderCount,
+  initialName = '', initialCategory,
 }: SaveTenderDialogProps) {
   const t = useTranslations('finder')
-  const [name, setName] = useState('')
+  const [name, setName] = useState(initialName)
   const [gemId, setGemId] = useState('')
-  const [category, setCategory] = useState(profile.categories[0] ?? GEM_CATEGORIES[0] ?? 'Transport & Vehicles')
+  const [category, setCategory] = useState(
+    initialCategory ?? profile.categories[0] ?? GEM_CATEGORIES[0] ?? 'Transport & Vehicles'
+  )
   const [deadlineStr, setDeadlineStr] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
