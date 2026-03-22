@@ -1,0 +1,71 @@
+<h2>Three Approaches to Fix the Flow</h2>
+<p class="subtitle">Pick the one that feels right — or tell me what to combine</p>
+
+<div class="options">
+
+  <button class="option" data-choice="a" onclick="toggleSelect(this)" style="text-align:left;width:100%;background:none;">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Task-Oriented Nav + Adaptive Dashboard <span style="background:#dcfce7;color:#166534;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;">Recommended</span></h3>
+      <p>Keep 5 bottom tabs but replace broken More→Settings with a proper bottom-sheet menu exposing all 9 screens. Dashboard adapts: new users see a Getting Started checklist; returning users see deadlines + stats.</p>
+      <div style="display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;">
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Home</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Find</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Tenders</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Bid</span>
+        <span style="background:#F97316;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Menu (sheet)</span>
+      </div>
+      <p style="font-size:12px;"><strong>Sheet reveals:</strong> Alerts · Learn · Documents · Orders · Settings</p>
+      <div style="background:#f0fdf4;border-radius:8px;padding:10px;margin:8px 0;font-size:12px;">
+        <strong>Adaptive Dashboard:</strong><br>
+        Day 1 → Getting Started: Find a tender → Save it → Generate a bid<br>
+        Day 30 → Deadlines tracker, AI usage, active tender count
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Least rebuilding — screens stay as-is</li><li>All 9 screens reachable on mobile</li><li>More menu finally makes intuitive sense</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Extra tap for Alerts/Learn via sheet</li><li>Find page still needs cleanup</li></ul></div>
+      </div>
+    </div>
+  </button>
+
+  <button class="option" data-choice="b" onclick="toggleSelect(this)" style="text-align:left;width:100%;background:none;">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Merged Workflow Nav</h3>
+      <p>Collapse into 5 logical workflows. Find + Tenders merge into one Tenders screen with Discover / Saved sub-tabs. Learn gets a dedicated nav slot (free value drives Pro conversion). More is last.</p>
+      <div style="display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;">
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Home</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Tenders</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Bid</span>
+        <span style="background:#1A3766;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">Learn</span>
+        <span style="background:#F97316;color:white;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;">More</span>
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Fewer choices for the user</li><li>Learn drives conversion (always visible)</li><li>Logical workflow grouping</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Merging Find+Tenders = bigger rebuild</li><li>Alerts, Documents, Orders still in More</li></ul></div>
+      </div>
+    </div>
+  </button>
+
+  <button class="option" data-choice="c" onclick="toggleSelect(this)" style="text-align:left;width:100%;background:none;">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Progressive Nav (grows with the user)</h3>
+      <p>Start with 3 tabs on day 1. Tabs unlock as the user completes actions — saving first tender unlocks Tenders tab, going Pro unlocks the full menu. Feels simple early, powerful later.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0;">
+        <div style="background:#f0fdf4;border-radius:8px;padding:10px;font-size:11px;"><strong style="color:#166534;">Day 1</strong><br>Home · Find · Bid</div>
+        <div style="background:#fffbeb;border-radius:8px;padding:10px;font-size:11px;"><strong style="color:#92400e;">1 tender saved</strong><br>Home · Find · Tenders · Bid</div>
+        <div style="background:#eff6ff;border-radius:8px;padding:10px;font-size:11px;"><strong style="color:#1e40af;">Pro user</strong><br>Home · Find · Tenders · Bid · Menu</div>
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Cleanest day-1 experience</li><li>Matches user maturity naturally</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Most complex to build and test</li><li>Tabs appearing unexpectedly can confuse</li></ul></div>
+      </div>
+    </div>
+  </button>
+
+</div>
+
+<section style="background:#f8fafc;border-radius:12px;padding:16px;margin-top:24px;font-size:13px;color:#374151;">
+  <strong>My recommendation: A</strong> — fixes every identified problem with the least rebuilding. Adaptive dashboard + proper More drawer solves day-1 confusion and hidden-screens problem together. B and C are valid long-term evolutions but require significantly more work for the same UX improvement right now.
+</section>

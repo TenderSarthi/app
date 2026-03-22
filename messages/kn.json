@@ -134,7 +134,9 @@
     "confirmDelete": "Confirm?",
     "cancelDelete": "Cancel",
     "noFilterResults": "No tenders match your filters",
-    "noFilterResultsSubtitle": "Try changing or clearing your filters."
+    "noFilterResultsSubtitle": "Try changing or clearing your filters.",
+    "segDiscover": "ಹುಡುಕಿ",
+    "segSaved": "ಉಳಿಸಿದವು"
   },
   "documents": {
     "title": "Document Vault",

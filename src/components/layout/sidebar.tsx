@@ -2,14 +2,13 @@
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LayoutDashboard, Search, FileText, Folder, Hammer, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, FileText, Folder, Hammer, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { signOut } from '@/lib/firebase/auth'
 
 const NAV = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { key: 'find',      href: '/find',      icon: Search },
   { key: 'tenders',   href: '/tenders',   icon: FileText },
   { key: 'documents', href: '/documents', icon: Folder },
   { key: 'bid',       href: '/bid',        icon: Hammer },

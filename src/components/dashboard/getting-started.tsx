@@ -93,13 +93,13 @@ export function GettingStarted({ locale, profile, tenders, usage }: GettingStart
         {/* Step 1: always done */}
         <StepItem num={1} state="done" label={t('step1Done')} />
 
-        {/* Step 2: active CTA — navigates to /find */}
+        {/* Step 2: active CTA — navigates to /tenders (Discover tab) */}
         <StepItem
           num={2}
           state={step2Complete ? 'done' : 'active'}
           label={t('step2')}
           sub={step2Complete ? undefined : t('step2Sub')}
-          onClick={() => router.push(`/${locale}/find`)}
+          onClick={() => router.push(`/${locale}/tenders`)}
         />
 
         {/* Step 3: locked until step 2 complete */}

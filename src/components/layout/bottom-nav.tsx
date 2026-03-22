@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Search, FileText, Hammer, Menu } from 'lucide-react'
+import { LayoutDashboard, FileText, Hammer, Menu } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { MenuSheet } from '@/components/layout/menu-sheet'
@@ -12,7 +12,6 @@ import type { UserProfile } from '@/lib/types'
 
 const NAV = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { key: 'find',      href: '/find',      icon: Search },
   { key: 'tenders',   href: '/tenders',   icon: FileText },
   { key: 'bid',       href: '/bid',        icon: Hammer },
 ] as const

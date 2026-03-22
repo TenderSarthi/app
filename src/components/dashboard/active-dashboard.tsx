@@ -16,7 +16,7 @@ function formatDeadlineDate(ms: number): string {
 }
 
 const QUICK_ACTIONS = [
-  { labelKey: 'find'   as const, icon: Search,   href: '/find',   accentBg: 'bg-navy/8',    accentText: 'text-navy'   },
+  { labelKey: 'tenders' as const, icon: Search,   href: '/tenders', accentBg: 'bg-navy/8',    accentText: 'text-navy'   },
   { labelKey: 'bid'    as const, icon: FileText,  href: '/bid',    accentBg: 'bg-orange/10', accentText: 'text-orange' },
   { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts', accentBg: 'bg-gold/10',   accentText: 'text-gold'   },
   { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn',  accentBg: 'bg-success/10',accentText: 'text-success'},
@@ -52,7 +52,7 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
           <div className="text-center py-2">
             <p className="text-sm text-white/70">{t('noActiveTenders')}</p>
             <button
-              onClick={() => router.push(`/${locale}/find`)}
+              onClick={() => router.push(`/${locale}/tenders`)}
               className="mt-2 text-sm font-semibold text-orange underline underline-offset-2"
             >
               {t('findNewTender')}

@@ -1,0 +1,86 @@
+<h2>Current App Flow — Where the Confusion Lives</h2>
+<p class="subtitle">A map of the existing navigation structure and its gaps</p>
+
+<div class="section" style="margin-bottom: 32px;">
+  <div class="label">Mobile Bottom Nav (what users see)</div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:80px;background:#1A3766;color:white;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;">
+      🏠<br>Dashboard
+    </div>
+    <div style="flex:1;min-width:80px;background:#1A3766;color:white;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;">
+      🔍<br>Find
+    </div>
+    <div style="flex:1;min-width:80px;background:#1A3766;color:white;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;">
+      📄<br>Tenders
+    </div>
+    <div style="flex:1;min-width:80px;background:#1A3766;color:white;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;">
+      🔨<br>Bid
+    </div>
+    <div style="flex:1;min-width:80px;background:#F97316;color:white;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;">
+      ⋯<br>"More"<br><span style="font-size:10px;font-weight:400;">(→ Settings)</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom:32px;">
+  <div class="label" style="color:#DC2626;">Hidden from mobile — only reachable via Dashboard cards or URL</div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:80px;background:#f3f4f6;border:2px dashed #9ca3af;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;color:#6b7280;">
+      🔔<br>Alerts<br><span style="font-size:10px;">(Pro only)</span>
+    </div>
+    <div style="flex:1;min-width:80px;background:#f3f4f6;border:2px dashed #9ca3af;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;color:#6b7280;">
+      📚<br>Learn
+    </div>
+    <div style="flex:1;min-width:80px;background:#f3f4f6;border:2px dashed #9ca3af;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;color:#6b7280;">
+      📦<br>Orders<br><span style="font-size:10px;">(Pro only)</span>
+    </div>
+    <div style="flex:1;min-width:80px;background:#f3f4f6;border:2px dashed #9ca3af;border-radius:12px;padding:16px 8px;text-align:center;font-size:13px;color:#6b7280;">
+      🗂️<br>Documents<br><span style="font-size:10px;">(Pro only)</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom:32px;">
+  <div class="label">Current User Journey (new signup)</div>
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-top:12px;">
+    <div style="background:#e0e7ff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:#3730a3;">Landing</div>
+    <div style="color:#9ca3af;font-size:18px;">→</div>
+    <div style="background:#e0e7ff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:#3730a3;">Auth</div>
+    <div style="color:#9ca3af;font-size:18px;">→</div>
+    <div style="background:#fef3c7;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:#92400e;">Onboarding<br><span style="font-weight:400;font-size:10px;">4 steps</span></div>
+    <div style="color:#9ca3af;font-size:18px;">→</div>
+    <div style="background:#dcfce7;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:#166534;">Dashboard</div>
+    <div style="color:#9ca3af;font-size:18px;">→</div>
+    <div style="background:#f3f4f6;border-radius:8px;padding:8px 14px;font-size:12px;color:#6b7280;">❓ Now what?</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label" style="color:#DC2626;">Key UX Problems Identified</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 "More" goes to Settings</div>
+      <div style="font-size:12px;color:#7f1d1d;">Users expect a menu. They get account settings + danger zone. Confusing and alarming.</div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 4 screens are invisible on mobile</div>
+      <div style="font-size:12px;color:#7f1d1d;">Alerts, Learn, Orders, Documents unreachable unless user finds dashboard cards or guesses the URL.</div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 No clear "what next" after onboarding</div>
+      <div style="font-size:12px;color:#7f1d1d;">Dashboard shows a greeting + feature cards but no guided action. New user doesn't know where to start.</div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 Find page is overloaded</div>
+      <div style="font-size:12px;color:#7f1d1d;">Algolia search + filters + GeM button + live feed + AI summarizer all on one screen. Too much at once.</div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 Pro gate cliffs</div>
+      <div style="font-size:12px;color:#7f1d1d;">After trial: Bid Generator, Alerts, Documents, Orders all block simultaneously with no soft landing.</div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;">
+      <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🚫 Mobile/desktop nav mismatch</div>
+      <div style="font-size:12px;color:#7f1d1d;">Desktop sees all 9 screens in sidebar. Mobile sees 5. Same app, completely different experience.</div>
+    </div>
+  </div>
+</div>

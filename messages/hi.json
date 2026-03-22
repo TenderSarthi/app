@@ -134,7 +134,9 @@
     "confirmDelete": "Confirm?",
     "cancelDelete": "Cancel",
     "noFilterResults": "आपके filters से कोई tender match नहीं हुआ",
-    "noFilterResultsSubtitle": "Filters बदलें या हटाएं।"
+    "noFilterResultsSubtitle": "Filters बदलें या हटाएं।",
+    "segDiscover": "खोजें",
+    "segSaved": "सहेजे"
   },
   "documents": {
     "title": "Document Vault",
