@@ -25,8 +25,9 @@ interface StepItemProps {
 function StepItem({ state, label, sub, onClick }: StepItemProps) {
   return (
     <button
-      onClick={onClick}
-      disabled={state !== 'active'}
+      onClick={state === 'active' ? onClick : undefined}
+      aria-disabled={state !== 'active'}
+      tabIndex={state !== 'active' ? -1 : undefined}
       className={cn(
         'w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors',
         state === 'active' && 'bg-white border-2 border-navy shadow-sm',

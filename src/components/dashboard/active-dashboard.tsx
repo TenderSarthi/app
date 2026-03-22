@@ -15,6 +15,13 @@ function formatDeadlineDate(ms: number): string {
   })
 }
 
+const QUICK_ACTIONS = [
+  { labelKey: 'find'   as const, icon: Search,   href: '/find'   },
+  { labelKey: 'bid'    as const, icon: FileText,  href: '/bid'    },
+  { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts' },
+  { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn'  },
+] as const
+
 interface ActiveDashboardProps {
   locale: string
   tenders: Tender[]
@@ -31,13 +38,6 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
 
   const wonCount  = tenders.filter(tender => tender.status === 'won').length
   const bidsCount = usage.bidDocs ?? 0
-
-  const QUICK_ACTIONS = [
-    { labelKey: 'find'   as const, icon: Search,   href: '/find'   },
-    { labelKey: 'bid'    as const, icon: FileText,  href: '/bid'    },
-    { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts' },
-    { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn'  },
-  ]
 
   return (
     <div className="space-y-4">
