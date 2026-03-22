@@ -146,7 +146,7 @@ export default function BidPage() {
           ? 'h-[calc(100vh-280px)] min-h-[400px] flex flex-col'
           : 'hidden'
       )}>
-        <BidHelperChat profile={profile} usage={usage} onUsageUpdate={refreshUsage} />
+        <BidHelperChat profile={profile} usage={usage} onUsageUpdate={refreshUsage} tenderCount={tenders.length} />
       </div>
 
       {/* ── Generator panel — kept mounted to preserve form state ── */}

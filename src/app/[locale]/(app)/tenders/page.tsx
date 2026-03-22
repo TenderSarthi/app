@@ -3,14 +3,11 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { useUserTenders } from '@/lib/hooks/use-user-tenders'
-import { useAIUsage } from '@/lib/hooks/use-ai-usage'
 import { StateFilter, CategoryFilter } from '@/components/finder/state-category-filters'
 import { GemDeeplinkButton } from '@/components/finder/gem-deeplink-button'
-import { AISummarizer } from '@/components/finder/ai-summarizer'
 import { GemLiveFeed } from '@/components/finder/gem-live-feed'
 import { AlgoliaSearch } from '@/components/finder/algolia-search'
 import { TenderFilters, applyTenderFilters, DEFAULT_FILTERS } from '@/components/tenders/tender-filters'
@@ -23,12 +20,9 @@ type Segment = 'discover' | 'saved'
 
 export default function TendersPage() {
   const tT = useTranslations('tenders')
-  const tF = useTranslations('finder')
   const { user } = useFirebase()
   const { profile } = useUserProfile()
   const { tenders, loading } = useUserTenders(user?.uid ?? null)
-  const { usage, refresh: refreshUsage } = useAIUsage(user?.uid ?? null)
-
   // ── Segment ──────────────────────────────────────────────────────────────
   const [segment, setSegment] = useState<Segment>('discover')
 
@@ -36,7 +30,6 @@ export default function TendersPage() {
   const [selectedState, setSelectedState]           = useState<string>('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [filtersInitialized, setFiltersInitialized] = useState(false)
-  const [summarizerOpen, setSummarizerOpen]         = useState(false)
 
   // ── Saved tab state ───────────────────────────────────────────────────────
   const [filters, setFilters] = useState<TenderFilterState>(DEFAULT_FILTERS)
@@ -120,35 +113,6 @@ export default function TendersPage() {
           profile={profile}
           tenderCount={tenders.length}
         />
-
-        {/* AI Summarizer — collapsed by default */}
-        <div className="border border-navy/10 rounded-xl overflow-hidden">
-          <button
-            onClick={() => setSummarizerOpen(prev => !prev)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-navy/5 transition-colors"
-            aria-expanded={summarizerOpen}
-            aria-controls="ai-summarizer-panel"
-          >
-            <span className="text-sm font-semibold text-navy">🤖 {tF('aiTitle')}</span>
-            {summarizerOpen
-              ? <ChevronUp  size={16} className="text-muted" aria-hidden="true" />
-              : <ChevronDown size={16} className="text-muted" aria-hidden="true" />
-            }
-          </button>
-          <div
-            id="ai-summarizer-panel"
-            className={summarizerOpen ? 'px-4 pb-4 pt-2' : 'hidden'}
-          >
-            <AISummarizer
-              uid={user.uid}
-              profile={profile}
-              usage={usage}
-              onUsageUpdate={refreshUsage}
-              tenderCount={tenders.length}
-              language={profile.language}
-            />
-          </div>
-        </div>
       </div>
 
       {/* ── Saved tab ────────────────────────────────────────── */}
