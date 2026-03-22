@@ -201,7 +201,9 @@ const tendersWithDeadline = activeTenders
 const nextDeadlineTender = tendersWithDeadline[0]  // primary: earliest deadline
 
 // Fallback: most recently created active tender when none have deadlines set
+// Use .slice() before .sort() to avoid mutating the activeTenders array in place
 const fallbackTender = activeTenders
+  .slice()
   .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0]
 
 const daysUntilDeadline = nextDeadlineTender
