@@ -51,6 +51,15 @@ The `MoreHorizontal` icon is replaced with `Menu` (hamburger) from lucide-react 
 
 **i18n:** Add `nav.menu` key to **all 11 locale files** (en, hi, gu, mr, bn, ta, te, kn, pa, or, ml). The existing `nav.more` key becomes unused — leave it in place to avoid churn; it produces no warning if unreferenced.
 
+**Profile prop:** `AppLayout` (`src/app/[locale]/(app)/layout.tsx`) already calls `useUserProfile()` and has `profile` available. Pass `profile` down to `BottomNav` so `MenuSheet` can use it without mounting its own listener:
+
+```tsx
+// layout.tsx — change BottomNav call:
+<BottomNav locale={locale} profile={profile} />
+```
+
+Update `BottomNav` props to `{ locale: string; profile: UserProfile | null }` and thread the prop through to `<MenuSheet>`. This avoids a second `onSnapshot` listener to the same Firestore document.
+
 **File modified:** `src/components/layout/bottom-nav.tsx`
 
 ---
@@ -73,14 +82,15 @@ Wire up open state via the `open` and `onOpenChange` props on the root `Sheet`:
 interface MenuSheetProps {
   open: boolean
   onClose: () => void
-  locale: string   // passed from BottomNav which already receives locale
+  locale: string          // passed from BottomNav
+  profile: UserProfile | null   // passed from BottomNav (sourced from AppLayout's useUserProfile)
 }
 ```
 
 **Layout (top to bottom inside the sheet):**
 
 1. **Drag handle** — `w-10 h-1 rounded bg-gray-200 mx-auto mb-4`
-2. **User strip** — avatar (initials from `profile.name`), display name, plan badge. Read from `useUserProfile()` called inside `MenuSheet`. Plan badge text:
+2. **User strip** — avatar (initials from `profile.name`), display name, plan badge. Use the `profile` prop — do NOT call `useUserProfile()` inside `MenuSheet`. If `profile` is null, skip the user strip. Plan badge text:
    - `profile.plan === 'free'` and no active trial → "Free"
    - Active trial (`profile.trialEndsAt?.toMillis() > Date.now()`) → "Pro Trial · N days left"
    - `profile.plan === 'pro'` → "Pro"
@@ -129,11 +139,16 @@ const { tenders, loading: tendersLoading } = useUserTenders(user?.uid ?? null)
 // keep existing guard first:
 if (!profile) return <ProfileErrorView />
 
-// new guard second:
-if (tendersLoading) return <DashboardSkeleton />
+// new guard second (inline, no new component file needed):
+if (tendersLoading) return (
+  <div className="space-y-3 mt-4">
+    <div className="h-20 bg-navy/5 rounded-xl animate-pulse" />
+    <div className="h-20 bg-navy/5 rounded-xl animate-pulse" />
+  </div>
+)
 ```
 
-`profile` and `tenders` are independent fetches — `!profile` catching a null profile still protects downstream JSX that reads `profile.name`, `profile.trialEndsAt`, etc.
+`profile` and `tenders` are independent fetches — the `!profile` guard protects downstream JSX that reads `profile.name`, `profile.trialEndsAt`, etc. The `tendersLoading` skeleton is inlined directly in `dashboard/page.tsx` — no separate `DashboardSkeleton` component file needed.
 
 ---
 
@@ -160,7 +175,7 @@ Uses i18n key `dashboard.tipBody` with interpolated values:
 t('tipBody', { category: profile.categories[0], state: profile.state })
 ```
 
-English value: `"{category} category में सबसे ज़्यादा tenders आते हैं — {state} में। Find tab से शुरू करें।"`
+English value: `"{category} category में सबसे ज़्यादा tenders आते हैं — {state} में। Find tab से शुरू करें।"` — intentionally Hinglish per the app's language convention. All non-Hindi locales fall back to this Hinglish string, which is the accepted product behaviour for this app's Indian-market audience.
 
 Source fields: `profile.categories[0]` (first onboarding category) and `profile.state`. If either is empty, omit the tip card entirely — do not call `t('tipBody')` in that case.
 
@@ -203,7 +218,7 @@ const daysUntilDeadline = nextDeadlineTender
 - Won: `tenders.filter(t => t.status === 'won').length`
 - Bids sent: `usage?.bidDocs ?? 0` — from `useAIUsage` hook, already called in `dashboard/page.tsx`. Note: `useAIUsage` is a one-time fetch (not a real-time listener) — this stat reflects the value at page load only. No real-time requirement here.
 
-**Quick action grid** (2×2)
+**Quick action grid** (2×2) — rendered under a `t('quickActions')` section heading
 - Find Tenders → `router.push(`/${locale}/find`)`
 - Generate Bid → `router.push(`/${locale}/bid`)` (lands on Chat tab by default; URL-based tab deep-linking is a separate future enhancement)
 - Set Alerts → `router.push(`/${locale}/alerts`)`
@@ -222,10 +237,10 @@ const daysUntilDeadline = nextDeadlineTender
 1. **Compact filter rows** — two JSX changes only in `find/page.tsx`; no new wrapper components needed:
 
    **Row 1** — `<div className="flex items-center gap-2">`:
-   - `<StateFilter>` takes `flex-1` (expands to fill remaining space)
-   - `<GemDeeplinkButton>` sits flush right, unchanged
+   - `<StateFilter value={selectedState || 'all'} onChange={setSelectedState} />` takes `flex-1` (expands to fill remaining space)
+   - `<GemDeeplinkButton state={selectedState || 'all'} categories={selectedCategories} />` sits flush right — pass both props as currently in find/page.tsx line 54
 
-   **Row 2** — handled by adding a `maxVisible={3}` prop to `<CategoryFilter>`. Inside `CategoryFilter` (`src/components/finder/state-category-filters.tsx`), add `maxVisible?: number` to its props. When defined and `selected.length > maxVisible`, render the first `maxVisible` pills as normal then a trailing read-only `+ {selected.length - maxVisible} more` badge (`px-2 py-0.5 bg-navy/10 text-navy/60 rounded-full text-[10px]`). Tapping the badge does nothing. Tapping an existing pill still deselects it.
+   **Row 2** — handled by adding a `maxVisible={8}` prop to `<CategoryFilter>`. `CategoryFilter` currently iterates over ALL `GEM_CATEGORIES` (~20 items). Inside `CategoryFilter` (`src/components/finder/state-category-filters.tsx`), add `maxVisible?: number` to its props. When defined, render only the first `maxVisible` pills from `GEM_CATEGORIES` (not from `selected` — this truncates the full available list, not the selected subset). If `GEM_CATEGORIES.length > maxVisible`, append a trailing read-only `+ {GEM_CATEGORIES.length - maxVisible} more` informational badge (`px-2 py-0.5 bg-navy/10 text-navy/60 rounded-full text-[10px] pointer-events-none`). Tapping the badge does nothing. All rendered pills remain toggleable (selecting/deselecting works normally).
 
    Remove the section heading `{t('filtersTitle')}` — the layout is self-evident without it.
 
@@ -307,14 +322,17 @@ All other 9 locales use the English strings as fallback.
 ## Component Architecture
 
 ```
+AppLayout (modified)
+  └── <BottomNav locale={locale} profile={profile} />   ← new profile prop
+
 BottomNav (modified)
   ├── tabs 1–4: Link map (unchanged)
   ├── tab 5: <button onClick={openSheet}> Menu </button>
-  └── <MenuSheet open={sheetOpen} onClose={...} locale={locale} />
+  └── <MenuSheet open={sheetOpen} onClose={...} locale={locale} profile={profile} />
 
 MenuSheet (new) — uses Base UI Sheet side="bottom"
   ├── DragHandle
-  ├── UserStrip (useUserProfile inside component)
+  ├── UserStrip (reads profile prop — no internal useUserProfile call)
   └── NavGrid (6 buttons: Alerts, Learn, Documents, Orders, Settings, LogOut)
 
 DashboardPage (modified)
