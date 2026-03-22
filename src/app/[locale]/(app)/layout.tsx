@@ -55,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
         <div className="p-4 desktop:p-6">{children}</div>
       </main>
-      <BottomNav locale={locale} />
+      <BottomNav locale={locale} profile={profile} />
       <InstallPrompt />
     </div>
   )
