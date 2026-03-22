@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Search, FileText, Bell, BookOpen } from 'lucide-react'
+import { Search, FileText, Bell, BookOpen, TrendingUp, Trophy, Zap } from 'lucide-react'
 import { deriveDeadlineInfo } from '@/lib/dashboard-utils'
 import type { Tender } from '@/lib/types'
 import type { AIUsageData } from '@/lib/firebase/firestore'
@@ -16,10 +16,10 @@ function formatDeadlineDate(ms: number): string {
 }
 
 const QUICK_ACTIONS = [
-  { labelKey: 'find'   as const, icon: Search,   href: '/find'   },
-  { labelKey: 'bid'    as const, icon: FileText,  href: '/bid'    },
-  { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts' },
-  { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn'  },
+  { labelKey: 'find'   as const, icon: Search,   href: '/find',   accentBg: 'bg-navy/8',    accentText: 'text-navy'   },
+  { labelKey: 'bid'    as const, icon: FileText,  href: '/bid',    accentBg: 'bg-orange/10', accentText: 'text-orange' },
+  { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts', accentBg: 'bg-gold/10',   accentText: 'text-gold'   },
+  { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn',  accentBg: 'bg-success/10',accentText: 'text-success'},
 ] as const
 
 interface ActiveDashboardProps {
@@ -43,7 +43,11 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
     <div className="space-y-4">
 
       {/* ── Deadline card ──────────────────────────────── */}
-      <div className="bg-navy rounded-2xl p-4 text-white">
+      <div className={`rounded-2xl p-4 text-white ${
+        daysUntilDeadline !== null && daysUntilDeadline <= 3
+          ? 'bg-gradient-to-br from-danger via-danger to-danger/80'
+          : 'bg-gradient-to-br from-navy via-navy to-navy/90'
+      }`}>
         {activeTenders.length === 0 ? (
           <div className="text-center py-2">
             <p className="text-sm text-white/70">{t('noActiveTenders')}</p>
@@ -86,30 +90,35 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
       {/* ── Stats row ──────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2">
         {([
-          { label: t('statsActive'), value: activeTenders.length },
-          { label: t('statsWon'),    value: wonCount },
-          { label: t('statsBids'),   value: bidsCount },
-        ] as const).map(({ label, value }) => (
-          <div key={label} className="bg-white border border-navy/10 rounded-xl p-3 text-center">
-            <p className="text-xl font-bold text-navy">{value}</p>
-            <p className="text-[10px] text-muted mt-0.5">{label}</p>
+          { label: t('statsActive'), value: activeTenders.length, icon: TrendingUp, color: 'text-navy',   bg: 'bg-navy/8'    },
+          { label: t('statsWon'),    value: wonCount,             icon: Trophy,     color: 'text-gold',   bg: 'bg-gold/10'   },
+          { label: t('statsBids'),   value: bidsCount,            icon: Zap,        color: 'text-orange', bg: 'bg-orange/10' },
+        ] as const).map(({ label, value, icon: Icon, color, bg }) => (
+          <div key={label} className="bg-white border border-navy/10 rounded-xl p-3 text-center shadow-sm">
+            <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center mx-auto mb-1`}>
+              <Icon size={14} className={color} aria-hidden="true" />
+            </div>
+            <p className="text-xl font-bold text-navy leading-tight">{value}</p>
+            <p className="text-[10px] text-muted mt-0.5 leading-tight">{label}</p>
           </div>
         ))}
       </div>
 
       {/* ── Quick actions ──────────────────────────────── */}
       <div>
-        <h3 className="text-xs font-semibold text-navy uppercase tracking-wide mb-2">
+        <h3 className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">
           {t('quickActions')}
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          {QUICK_ACTIONS.map(({ labelKey, icon: Icon, href }) => (
+          {QUICK_ACTIONS.map(({ labelKey, icon: Icon, href, accentBg, accentText }) => (
             <button
               key={href}
               onClick={() => router.push(`/${locale}${href}`)}
-              className="flex items-center gap-2 p-3 bg-white border border-navy/10 rounded-xl hover:bg-navy/5 transition-colors"
+              className="flex items-center gap-3 p-3 bg-white border border-navy/10 rounded-xl hover:border-navy/30 hover:shadow-sm active:scale-[0.98] transition-all"
             >
-              <Icon size={18} className="text-navy flex-shrink-0" aria-hidden="true" />
+              <div className={`w-8 h-8 rounded-lg ${accentBg} flex items-center justify-center flex-shrink-0`}>
+                <Icon size={16} className={accentText} aria-hidden="true" />
+              </div>
               <span className="text-sm font-medium text-navy">{tNav(labelKey)}</span>
             </button>
           ))}

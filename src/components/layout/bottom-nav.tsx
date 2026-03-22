@@ -29,7 +29,7 @@ export function BottomNav({ locale, profile }: BottomNavProps) {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 desktop:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 desktop:hidden shadow-[0_-1px_12px_rgba(26,55,102,0.06)]">
         <div className="flex items-center justify-around h-16">
           {NAV.map(({ key, href, icon: Icon }) => {
             const full = `/${locale}${href}`
@@ -40,12 +40,16 @@ export function BottomNav({ locale, profile }: BottomNavProps) {
                 href={full}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center',
-                  active ? 'text-orange' : 'text-muted'
+                  'relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center transition-colors',
+                  active ? 'text-orange' : 'text-muted hover:text-navy/60'
                 )}
               >
+                {/* Active indicator bar */}
+                {active && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-orange" />
+                )}
                 <Icon size={22} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
-                <span className="text-[10px] font-medium">{t(key)}</span>
+                <span className={cn('text-[10px] font-medium', active && 'font-semibold')}>{t(key)}</span>
               </Link>
             )
           })}
@@ -56,7 +60,7 @@ export function BottomNav({ locale, profile }: BottomNavProps) {
             aria-label={t('menu')}
             aria-haspopup="dialog"
             aria-expanded={sheetOpen}
-            className="flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center text-muted"
+            className="relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center text-muted hover:text-navy/60 transition-colors"
           >
             <Menu size={22} strokeWidth={1.8} aria-hidden="true" />
             <span className="text-[10px] font-medium">{t('menu')}</span>

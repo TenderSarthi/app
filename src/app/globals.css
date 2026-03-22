@@ -139,8 +139,21 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;
+  }
+
+  /* Micro-transitions for interactive elements */
+  button, a, [role="button"] {
+    @apply transition-colors duration-150;
+  }
+
+  /* Tap highlight removal on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }

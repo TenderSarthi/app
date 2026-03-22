@@ -115,7 +115,7 @@ export function TenderCard({ tender, onStatusPress }: TenderCardProps) {
 
       {/* Main card */}
       <div
-        className="relative bg-white border border-navy/10 rounded-xl p-4 transition-transform duration-150"
+        className="relative bg-white border border-navy/10 rounded-xl p-4 transition-all duration-150 hover:border-navy/20 hover:shadow-sm"
         style={{ transform: `translateX(-${swipeX}px)` }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}

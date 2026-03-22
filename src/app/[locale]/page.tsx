@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CheckCircle, Bell, FileText, Zap } from 'lucide-react'
+import { CheckCircle, Bell, FileText, Zap, Quote } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/hooks/use-auth'
@@ -92,14 +92,16 @@ export default function LandingPage() {
         <h2 className="font-heading font-bold text-2xl text-navy text-center">{t('features.title')}</h2>
         <div className="grid desktop:grid-cols-3 gap-6">
           {[
-            { icon: <Bell size={24} className="text-orange" />, title: t('features.alerts.title'), desc: t('features.alerts.desc') },
-            { icon: <Zap  size={24} className="text-orange" />, title: t('features.ai.title'),    desc: t('features.ai.desc') },
-            { icon: <FileText size={24} className="text-orange" />, title: t('features.bid.title'), desc: t('features.bid.desc') },
-          ].map((f) => (
-            <div key={f.title} className="border rounded-xl p-5 space-y-3">
-              {f.icon}
-              <h3 className="font-semibold text-navy">{f.title}</h3>
-              <p className="text-sm text-muted">{f.desc}</p>
+            { icon: Bell,     accentBg: 'bg-orange/10', accentText: 'text-orange', title: t('features.alerts.title'), desc: t('features.alerts.desc') },
+            { icon: Zap,      accentBg: 'bg-gold/10',   accentText: 'text-gold',   title: t('features.ai.title'),    desc: t('features.ai.desc') },
+            { icon: FileText, accentBg: 'bg-navy/8',    accentText: 'text-navy',   title: t('features.bid.title'),   desc: t('features.bid.desc') },
+          ].map(({ icon: Icon, accentBg, accentText, title, desc }) => (
+            <div key={title} className="bg-white border border-navy/10 rounded-xl p-5 space-y-3 shadow-sm hover:shadow-md hover:border-navy/20 transition-all">
+              <div className={`w-10 h-10 rounded-xl ${accentBg} flex items-center justify-center`}>
+                <Icon size={20} className={accentText} aria-hidden="true" />
+              </div>
+              <h3 className="font-semibold text-navy">{title}</h3>
+              <p className="text-sm text-muted leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -157,10 +159,13 @@ export default function LandingPage() {
         <h2 className="font-heading font-bold text-2xl text-navy text-center">{t('testimonials.title')}</h2>
         <div className="grid desktop:grid-cols-3 gap-6">
           {(['t1','t2','t3'] as const).map((k) => (
-            <div key={k} className="border rounded-xl p-5 space-y-3">
-              <p className="text-sm text-muted italic">"{t(`testimonials.${k}.text`)}"</p>
-              <p className="text-sm font-semibold text-navy">{t(`testimonials.${k}.name`)}</p>
-              <p className="text-xs text-muted">{t(`testimonials.${k}.role`)}</p>
+            <div key={k} className="bg-white border border-navy/10 rounded-xl p-5 space-y-3 shadow-sm">
+              <Quote size={16} className="text-orange/40" aria-hidden="true" />
+              <p className="text-sm text-navy/80 italic leading-relaxed">{t(`testimonials.${k}.text`)}</p>
+              <div className="pt-1 border-t border-navy/5">
+                <p className="text-sm font-semibold text-navy">{t(`testimonials.${k}.name`)}</p>
+                <p className="text-xs text-muted mt-0.5">{t(`testimonials.${k}.role`)}</p>
+              </div>
             </div>
           ))}
         </div>
