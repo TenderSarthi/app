@@ -5,7 +5,6 @@ import { useAuth } from '@/lib/hooks/use-auth'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Sidebar } from '@/components/layout/sidebar'
-import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { OfflineBanner } from '@/components/layout/offline-banner'
 import { InstallPrompt } from '@/components/layout/install-prompt'
 
@@ -50,9 +49,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <OfflineBanner />
       <Sidebar locale={locale} />
       <main className="desktop:ml-60 pb-20 desktop:pb-0">
-        <div className="bg-white border-b border-gray-100 px-4 py-2 flex justify-end desktop:px-6">
-          <LanguageSwitcher currentLocale={locale} />
-        </div>
         <div className="p-4 desktop:p-6">{children}</div>
       </main>
       <BottomNav locale={locale} profile={profile} />
