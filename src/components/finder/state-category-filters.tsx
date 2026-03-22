@@ -1,6 +1,7 @@
 'use client'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { INDIAN_STATES, GEM_CATEGORIES } from '@/lib/constants'
 
 interface StateFilterProps {
@@ -10,27 +11,31 @@ interface StateFilterProps {
 
 export function StateFilter({ value, onChange }: StateFilterProps) {
   return (
-    <Select value={value} onValueChange={(v: string | null) => { if (v) onChange(v) }}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="State चुनें" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All States</SelectItem>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full appearance-none bg-white border border-navy/20 rounded-full pl-3.5 pr-8 py-2 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-navy/20 transition-colors"
+      >
+        <option value="all">All States</option>
         {INDIAN_STATES.map(s => (
-          <SelectItem key={s} value={s}>{s}</SelectItem>
+          <option key={s} value={s}>{s}</option>
         ))}
-      </SelectContent>
-    </Select>
+      </select>
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+    </div>
   )
 }
 
 interface CategoryFilterProps {
   selected: string[]
   onChange: (cats: string[]) => void
-  maxVisible?: number   // limits total GEM_CATEGORIES pills rendered; undefined = show all
+  maxVisible?: number
 }
 
 export function CategoryFilter({ selected, onChange, maxVisible }: CategoryFilterProps) {
+  const [expanded, setExpanded] = useState(false)
+
   const toggle = (cat: string) => {
     onChange(
       selected.includes(cat)
@@ -39,27 +44,23 @@ export function CategoryFilter({ selected, onChange, maxVisible }: CategoryFilte
     )
   }
 
-  const visibleCategories = maxVisible !== undefined
-    ? GEM_CATEGORIES.slice(0, maxVisible)
-    : GEM_CATEGORIES
-
-  const hiddenCount = maxVisible !== undefined
-    ? Math.max(0, GEM_CATEGORIES.length - maxVisible)
-    : 0
+  const limit = expanded ? GEM_CATEGORIES.length : (maxVisible ?? GEM_CATEGORIES.length)
+  const visible = GEM_CATEGORIES.slice(0, limit)
+  const hiddenCount = GEM_CATEGORIES.length - visible.length
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {visibleCategories.map(cat => {
+    <div className="flex flex-wrap gap-1.5">
+      {visible.map(cat => {
         const active = selected.includes(cat)
         return (
           <button
             key={cat}
             onClick={() => toggle(cat)}
             className={[
-              'px-3 py-1.5 rounded-full text-sm font-medium border transition-colors min-h-[36px]',
+              'px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
               active
                 ? 'bg-navy text-white border-navy'
-                : 'bg-white text-navy border-navy/30 hover:border-navy',
+                : 'bg-white text-navy border-navy/25 hover:border-navy',
             ].join(' ')}
           >
             {cat}
@@ -68,9 +69,20 @@ export function CategoryFilter({ selected, onChange, maxVisible }: CategoryFilte
       })}
 
       {hiddenCount > 0 && (
-        <span className="px-2 py-0.5 bg-navy/10 text-navy/60 rounded-full text-[10px] pointer-events-none">
+        <button
+          onClick={() => setExpanded(true)}
+          className="px-2.5 py-1 bg-navy/8 text-navy/60 rounded-full text-xs font-medium border border-navy/15 hover:bg-navy/10 transition-colors"
+        >
           +{hiddenCount} more
-        </span>
+        </button>
+      )}
+      {expanded && maxVisible !== undefined && (
+        <button
+          onClick={() => setExpanded(false)}
+          className="px-2.5 py-1 bg-navy/8 text-navy/60 rounded-full text-xs font-medium border border-navy/15 hover:bg-navy/10 transition-colors"
+        >
+          Show less
+        </button>
       )}
     </div>
   )

@@ -51,37 +51,73 @@ export function TenderFilters({ filters, onChange, availableCategories, availabl
         ))}
       </div>
 
-      {(availableCategories.length > 1 || availableStates.length > 1 || isFiltered) && (
-        <div className="flex gap-2 flex-wrap items-center">
-          {availableCategories.length > 1 && (
-            <select
-              value={filters.category}
-              onChange={e => onChange({ ...filters, category: e.target.value })}
-              className="text-sm border border-navy/20 rounded-lg px-2 py-1.5 text-navy bg-white"
-            >
-              <option value="">{t('allCategories')}</option>
-              {availableCategories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          )}
-          {availableStates.length > 1 && (
-            <select
-              value={filters.state}
-              onChange={e => onChange({ ...filters, state: e.target.value })}
-              className="text-sm border border-navy/20 rounded-lg px-2 py-1.5 text-navy bg-white"
-            >
-              <option value="">{t('allStates')}</option>
-              {availableStates.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          )}
-          {isFiltered && (
+      {availableCategories.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+          <button
+            onClick={() => onChange({ ...filters, category: '' })}
+            className={[
+              'shrink-0 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+              filters.category === ''
+                ? 'bg-navy text-white border-navy'
+                : 'bg-white text-navy border-navy/20 hover:border-navy',
+            ].join(' ')}
+          >
+            {t('allCategories')}
+          </button>
+          {availableCategories.map(c => (
             <button
-              onClick={() => onChange(DEFAULT_FILTERS)}
-              className="flex items-center gap-1 text-sm text-muted hover:text-navy"
+              key={c}
+              onClick={() => onChange({ ...filters, category: c })}
+              className={[
+                'shrink-0 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+                filters.category === c
+                  ? 'bg-navy text-white border-navy'
+                  : 'bg-white text-navy border-navy/20 hover:border-navy',
+              ].join(' ')}
             >
-              <X size={14} />{t('clearFilters')}
+              {c}
             </button>
-          )}
+          ))}
         </div>
+      )}
+
+      {availableStates.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+          <button
+            onClick={() => onChange({ ...filters, state: '' })}
+            className={[
+              'shrink-0 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+              filters.state === ''
+                ? 'bg-navy text-white border-navy'
+                : 'bg-white text-navy border-navy/20 hover:border-navy',
+            ].join(' ')}
+          >
+            {t('allStates')}
+          </button>
+          {availableStates.map(s => (
+            <button
+              key={s}
+              onClick={() => onChange({ ...filters, state: s })}
+              className={[
+                'shrink-0 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
+                filters.state === s
+                  ? 'bg-navy text-white border-navy'
+                  : 'bg-white text-navy border-navy/20 hover:border-navy',
+              ].join(' ')}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isFiltered && (
+        <button
+          onClick={() => onChange(DEFAULT_FILTERS)}
+          className="flex items-center gap-1 text-xs text-muted hover:text-navy self-start"
+        >
+          <X size={13} />{t('clearFilters')}
+        </button>
       )}
     </div>
   )

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useFirebase } from '@/components/providers/firebase-provider'
-import { ExternalLink, RefreshCw, Rss } from 'lucide-react'
+import { ExternalLink, RefreshCw, Rss, Clock, AlertTriangle } from 'lucide-react'
 import { SaveTenderDialog } from './save-tender-dialog'
 import type { UserProfile } from '@/lib/types'
 
@@ -29,6 +29,14 @@ function timeAgo(dateStr: string): string {
   if (diffH < 1)  return 'Just now'
   if (diffH < 24) return `${diffH}h ago`
   return `${Math.floor(diffH / 24)}d ago`
+}
+
+function daysUntil(dateStr: string): number | null {
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return null
+    return Math.ceil((d.getTime() - Date.now()) / 864e5)
+  } catch { return null }
 }
 
 export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLiveFeedProps) {
@@ -71,9 +79,7 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Rss size={13} className="text-orange" />
-          <h2 className="text-sm font-semibold text-navy uppercase tracking-wide">
-            {t('liveFeedTitle')}
-          </h2>
+          <h2 className="text-sm font-semibold text-navy">{t('liveFeedTitle')}</h2>
         </div>
         <button
           onClick={fetchFeed}
@@ -116,73 +122,75 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
       {/* Tender cards */}
       {!loading && !error && tenders.length > 0 && (
         <div className="space-y-2">
-          {tenders.map((tender, i) => (
-            <div
-              key={i}
-              className="bg-white border border-navy/10 rounded-xl p-3 space-y-2"
-            >
-              {/* Title + time */}
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-medium text-navy leading-snug line-clamp-2 flex-1">
-                  {tender.title}
-                </p>
-                <span className="text-[10px] text-muted whitespace-nowrap flex-shrink-0 mt-0.5">
-                  {timeAgo(tender.pubDate)}
-                </span>
-              </div>
-
-              {/* Org + closing date */}
-              <div className="flex items-center justify-between gap-2">
-                {tender.org && (
-                  <p className="text-[11px] text-muted truncate flex-1">{tender.org}</p>
-                )}
-                {tender.closingDate && (
-                  <p className="text-[10px] text-orange font-medium whitespace-nowrap flex-shrink-0">
-                    Closes: {tender.closingDate.replace(/\d{2}:\d{2} [AP]M$/, '').trim()}
+          {tenders.map((tender, i) => {
+            const days = tender.closingDate ? daysUntil(tender.closingDate) : null
+            const urgent = days !== null && days <= 3 && days >= 0
+            return (
+              <div
+                key={i}
+                className="bg-white border border-navy/10 rounded-xl p-3 space-y-2 hover:border-navy/20 hover:shadow-sm transition-all"
+              >
+                {/* Title + time */}
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-medium text-navy leading-snug line-clamp-2 flex-1">
+                    {tender.title}
                   </p>
+                  <span className="text-[10px] text-muted whitespace-nowrap flex-shrink-0 mt-0.5">
+                    {timeAgo(tender.pubDate)}
+                  </span>
+                </div>
+
+                {/* Org */}
+                {tender.org && (
+                  <p className="text-[11px] text-muted truncate">{tender.org}</p>
                 )}
-              </div>
 
-              {/* Badges */}
-              <div className="flex flex-wrap gap-1">
-                {tender.categories.slice(0, 2).map(c => (
-                  <span
-                    key={c}
-                    className="px-2 py-0.5 bg-navy/5 text-navy rounded-full text-[10px] font-medium"
-                  >
-                    {c}
-                  </span>
-                ))}
-                {tender.states.slice(0, 1).map(s => (
-                  <span
-                    key={s}
-                    className="px-2 py-0.5 bg-orange/10 text-orange rounded-full text-[10px] font-medium"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
+                {/* Badges + closing date */}
+                <div className="flex flex-wrap items-center gap-1">
+                  {tender.categories.slice(0, 2).map(c => (
+                    <span key={c} className="px-2 py-0.5 bg-navy/5 text-navy rounded-full text-[10px] font-medium">
+                      {c}
+                    </span>
+                  ))}
+                  {tender.states.slice(0, 1).map(s => (
+                    <span key={s} className="px-2 py-0.5 bg-orange/10 text-orange rounded-full text-[10px] font-medium">
+                      {s}
+                    </span>
+                  ))}
+                  {tender.closingDate && (
+                    <span className={[
+                      'ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
+                      urgent
+                        ? 'bg-danger/10 text-danger'
+                        : 'bg-navy/5 text-muted',
+                    ].join(' ')}>
+                      {urgent ? <AlertTriangle size={9} /> : <Clock size={9} />}
+                      {urgent ? `${days}d left` : tender.closingDate.replace(/\d{2}:\d{2} [AP]M$/, '').trim()}
+                    </span>
+                  )}
+                </div>
 
-              {/* Actions */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedTender(tender)}
-                  className="flex-1 py-1.5 rounded-lg bg-navy text-white text-xs font-medium hover:bg-navy/90 transition-colors"
-                >
-                  {t('saveTender')}
-                </button>
-                <a
-                  href={tender.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg border border-navy/20 text-navy text-xs font-medium hover:bg-navy/5 transition-colors flex items-center gap-1"
-                >
-                  <ExternalLink size={11} />
-                  {t('viewOn')}
-                </a>
+                {/* Actions */}
+                <div className="flex gap-2 pt-0.5">
+                  <button
+                    onClick={() => setSelectedTender(tender)}
+                    className="flex-1 py-2 rounded-xl bg-navy text-white text-xs font-semibold hover:bg-navy/90 transition-colors"
+                  >
+                    {t('saveTender')}
+                  </button>
+                  <a
+                    href={tender.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 rounded-xl border border-navy/20 text-navy text-xs font-medium hover:bg-navy/5 transition-colors flex items-center gap-1"
+                  >
+                    <ExternalLink size={11} />
+                    {t('viewOn')}
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           <p className="text-center text-[10px] text-muted pt-1">
             {t('liveFeedSource')}

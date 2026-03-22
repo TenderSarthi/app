@@ -157,3 +157,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+@layer utilities {
+  /* Hide scrollbar while keeping scroll functionality */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
