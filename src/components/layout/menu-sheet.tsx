@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Bell, BookOpen, Folder, Package, Settings, LogOut } from 'lucide-react'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { signOut } from '@/lib/firebase/auth'
 import { getPlanBadge } from '@/lib/dashboard-utils'
@@ -31,6 +31,7 @@ export function MenuSheet({ open, onClose, locale, profile }: MenuSheetProps) {
   const tSettings = useTranslations('settings')
 
   async function handleLogOut() {
+    onClose()
     await signOut()
     router.replace(`/${locale}/auth`)
   }
@@ -43,6 +44,7 @@ export function MenuSheet({ open, onClose, locale, profile }: MenuSheetProps) {
   return (
     <Sheet open={open} onOpenChange={(val) => { if (!val) onClose() }}>
       <SheetContent side="bottom" showCloseButton={false} className="px-4 pb-8 pt-3 rounded-t-2xl max-h-[85vh]">
+        <SheetTitle className="sr-only">{tNav('menu')}</SheetTitle>
 
         {/* Drag handle — visual affordance only; close via tap-outside or X */}
         <div className="w-10 h-1 rounded bg-gray-200 mx-auto mb-4" />

@@ -54,6 +54,8 @@ export function BottomNav({ locale, profile }: BottomNavProps) {
           <button
             onClick={() => setSheetOpen(true)}
             aria-label={t('menu')}
+            aria-haspopup="dialog"
+            aria-expanded={sheetOpen}
             className="flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center text-muted"
           >
             <Menu size={22} strokeWidth={1.8} aria-hidden="true" />
