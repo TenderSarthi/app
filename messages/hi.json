@@ -48,6 +48,7 @@
     "find": "खोजें",
     "tenders": "Tenders",
     "bid": "Bid",
+    "ai": "AI",
     "documents": "Documents",
     "alerts": "Alerts",
     "learn": "सीखें",
@@ -136,7 +137,13 @@
     "noFilterResults": "आपके filters से कोई tender match नहीं हुआ",
     "noFilterResultsSubtitle": "Filters बदलें या हटाएं।",
     "segDiscover": "खोजें",
-    "segSaved": "सहेजे"
+    "segSaved": "सहेजे",
+    "filters": "Filters",
+    "filterStatus": "Status",
+    "filterCategory": "Category",
+    "filterState": "State",
+    "resetFilters": "Reset",
+    "applyFilters": "Apply"
   },
   "documents": {
     "title": "Document Vault",

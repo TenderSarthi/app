@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LayoutDashboard, FileText, Folder, Hammer, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, FileText, Folder, Sparkles, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { signOut } from '@/lib/firebase/auth'
@@ -10,12 +10,12 @@ import { signOut } from '@/lib/firebase/auth'
 const NAV = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
   { key: 'tenders',   href: '/tenders',   icon: FileText },
-  { key: 'documents', href: '/documents', icon: Folder },
-  { key: 'bid',       href: '/bid',        icon: Hammer },
-  { key: 'alerts',   href: '/alerts',    icon: Bell },
-  { key: 'learn',    href: '/learn',     icon: BookOpen },
-  { key: 'orders',   href: '/orders',    icon: Package },
-  { key: 'settings', href: '/settings',  icon: Settings },
+  { key: 'ai',        href: '/bid',        icon: Sparkles },
+  { key: 'orders',    href: '/orders',     icon: Package },
+  { key: 'alerts',    href: '/alerts',     icon: Bell },
+  { key: 'learn',     href: '/learn',      icon: BookOpen },
+  { key: 'documents', href: '/documents',  icon: Folder },
+  { key: 'settings',  href: '/settings',   icon: Settings },
 ]
 
 export function Sidebar({ locale }: { locale: string }) {

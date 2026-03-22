@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, Hammer, Menu } from 'lucide-react'
+import { LayoutDashboard, FileText, Sparkles, Package, Menu } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { MenuSheet } from '@/components/layout/menu-sheet'
@@ -13,7 +13,8 @@ import type { UserProfile } from '@/lib/types'
 const NAV = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
   { key: 'tenders',   href: '/tenders',   icon: FileText },
-  { key: 'bid',       href: '/bid',        icon: Hammer },
+  { key: 'ai',        href: '/bid',        icon: Sparkles },
+  { key: 'orders',    href: '/orders',     icon: Package },
 ] as const
 
 interface BottomNavProps {

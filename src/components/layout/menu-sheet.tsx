@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Bell, BookOpen, Folder, Package, Settings, LogOut } from 'lucide-react'
+import { Bell, BookOpen, Folder, Settings, LogOut } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { signOut } from '@/lib/firebase/auth'
@@ -21,7 +21,6 @@ const NAV_ITEMS = [
   { key: 'alerts',    icon: Bell,     href: '/alerts'    },
   { key: 'learn',     icon: BookOpen, href: '/learn'     },
   { key: 'documents', icon: Folder,   href: '/documents' },
-  { key: 'orders',    icon: Package,  href: '/orders'    },
   { key: 'settings',  icon: Settings, href: '/settings'  },
 ] as const
 

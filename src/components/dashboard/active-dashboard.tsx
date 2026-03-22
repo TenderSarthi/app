@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Search, FileText, Bell, BookOpen, TrendingUp, Trophy, Zap } from 'lucide-react'
+import { Search, Sparkles, Bell, BookOpen, TrendingUp, Trophy, Zap } from 'lucide-react'
 import { deriveDeadlineInfo } from '@/lib/dashboard-utils'
 import type { Tender } from '@/lib/types'
 import type { AIUsageData } from '@/lib/firebase/firestore'
@@ -17,7 +17,7 @@ function formatDeadlineDate(ms: number): string {
 
 const QUICK_ACTIONS = [
   { labelKey: 'tenders' as const, icon: Search,   href: '/tenders', accentBg: 'bg-navy/8',    accentText: 'text-navy'   },
-  { labelKey: 'bid'    as const, icon: FileText,  href: '/bid',    accentBg: 'bg-orange/10', accentText: 'text-orange' },
+  { labelKey: 'ai'     as const, icon: Sparkles,  href: '/bid',    accentBg: 'bg-orange/10', accentText: 'text-orange' },
   { labelKey: 'alerts' as const, icon: Bell,      href: '/alerts', accentBg: 'bg-gold/10',   accentText: 'text-gold'   },
   { labelKey: 'learn'  as const, icon: BookOpen,  href: '/learn',  accentBg: 'bg-success/10',accentText: 'text-success'},
 ] as const
