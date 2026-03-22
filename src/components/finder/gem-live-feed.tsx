@@ -10,8 +10,9 @@ import type { UserProfile } from '@/lib/types'
 interface LiveTender {
   title: string
   link: string
-  description: string
+  org: string
   pubDate: string
+  closingDate: string
   categories: string[]
   states: string[]
 }
@@ -130,6 +131,18 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
                 </span>
               </div>
 
+              {/* Org + closing date */}
+              <div className="flex items-center justify-between gap-2">
+                {tender.org && (
+                  <p className="text-[11px] text-muted truncate flex-1">{tender.org}</p>
+                )}
+                {tender.closingDate && (
+                  <p className="text-[10px] text-orange font-medium whitespace-nowrap flex-shrink-0">
+                    Closes: {tender.closingDate.replace(/\d{2}:\d{2} [AP]M$/, '').trim()}
+                  </p>
+                )}
+              </div>
+
               {/* Badges */}
               <div className="flex flex-wrap gap-1">
                 {tender.categories.slice(0, 2).map(c => (
@@ -183,7 +196,7 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
           key={selectedTender.link}
           open={true}
           onClose={() => setSelectedTender(null)}
-          aiSummary={selectedTender.description}
+          aiSummary={selectedTender.org ? `Organisation: ${selectedTender.org}\nClosing: ${selectedTender.closingDate}` : undefined}
           uid={user.uid}
           profile={profile}
           currentTenderCount={tenderCount}
