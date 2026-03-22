@@ -89,7 +89,13 @@
     "category": "Category",
     "deadline": "Deadline",
     "queriesLeft": "{left} AI queries left this month",
-    "searchSavedTenders": "Search your saved tenders"
+    "searchSavedTenders": "Search your saved tenders",
+    "liveFeedTitle": "Live Government Tenders",
+    "liveFeedEmpty": "No tenders match your filters. Try selecting All States.",
+    "liveFeedError": "Could not load tenders.",
+    "liveFeedRetry": "Try again",
+    "liveFeedSource": "Source: Government e-Procurement Portal (eprocure.gov.in)",
+    "viewOn": "View"
   },
   "tenders": {
     "title": "My Tenders",
@@ -321,8 +327,7 @@
     "deleteConfirm": "हाँ, account delete करें",
     "cancel": "Cancel",
     "requestFailed": "Request नहीं हुई। फिर try करें।"
-  }
-,
+  },
   "landing": {
     "nav": {
       "login": "लॉग इन",

@@ -10,6 +10,7 @@ import { StateFilter, CategoryFilter } from '@/components/finder/state-category-
 import { GemDeeplinkButton } from '@/components/finder/gem-deeplink-button'
 import { AISummarizer } from '@/components/finder/ai-summarizer'
 import { AlgoliaSearch } from '@/components/finder/algolia-search'
+import { GemLiveFeed } from '@/components/finder/gem-live-feed'
 
 export default function FindPage() {
   const t = useTranslations('finder')
@@ -52,6 +53,14 @@ export default function FindPage() {
         <CategoryFilter selected={selectedCategories} onChange={setSelectedCategories} />
         <GemDeeplinkButton state={selectedState || 'all'} categories={selectedCategories} />
       </div>
+
+      {/* Live government tenders feed */}
+      <GemLiveFeed
+        state={selectedState}
+        categories={selectedCategories}
+        profile={profile}
+        tenderCount={tenders.length}
+      />
 
       {/* AI Summarizer */}
       <div className="space-y-3">
