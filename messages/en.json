@@ -306,7 +306,6 @@
   },
   "settings": {
     "title": "Settings",
-    "title": "Settings",
     "profile": "Profile",
     "saveProfile": "Save Changes",
     "profileSaved": "Profile updated ✓",
@@ -345,8 +344,7 @@
     "deleteConfirm": "Yes, delete my account",
     "cancel": "Cancel",
     "requestFailed": "Request failed. Please try again."
-  }
-,
+  },
   "landing": {
     "nav": {
       "login": "Log In",

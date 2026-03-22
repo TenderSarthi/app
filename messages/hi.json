@@ -344,8 +344,7 @@
     "deleteConfirm": "हाँ, account delete करें",
     "cancel": "Cancel",
     "requestFailed": "Request नहीं हुई। फिर try करें।"
-  }
-,
+  },
   "landing": {
     "nav": {
       "login": "लॉग इन",
