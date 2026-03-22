@@ -75,6 +75,7 @@ export default function FindPage() {
           onClick={() => setSummarizerOpen(prev => !prev)}
           className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-navy/5 transition-colors"
           aria-expanded={summarizerOpen}
+          aria-controls="ai-summarizer-panel"
         >
           <span className="text-sm font-semibold text-navy">
             🤖 {t('aiTitle')}
@@ -85,18 +86,19 @@ export default function FindPage() {
           }
         </button>
 
-        {summarizerOpen && (
-          <div className="px-4 pb-4 pt-2">
-            <AISummarizer
-              uid={user.uid}
-              profile={profile}
-              usage={usage}
-              onUsageUpdate={refreshUsage}
-              tenderCount={tenders.length}
-              language={profile.language}
-            />
-          </div>
-        )}
+        <div
+          id="ai-summarizer-panel"
+          className={summarizerOpen ? 'px-4 pb-4 pt-2' : 'hidden'}
+        >
+          <AISummarizer
+            uid={user.uid}
+            profile={profile}
+            usage={usage}
+            onUsageUpdate={refreshUsage}
+            tenderCount={tenders.length}
+            language={profile.language}
+          />
+        </div>
       </div>
     </div>
   )
