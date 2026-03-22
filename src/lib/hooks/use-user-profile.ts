@@ -7,20 +7,24 @@ import type { UserProfile } from '@/lib/types'
 
 /** Real-time Firestore listener — updates all open sessions within ~1s on any change */
 export function useUserProfile() {
-  const { uid } = useAuth()
+  const { uid, loading: authLoading } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     if (!uid) {
-      // Auth resolved with no user — clear immediately
-      setProfile(null)
-      setLoading(false)
+      // Only declare "done loading" once Firebase Auth has fully resolved.
+      // If authLoading is still true, another effect run will follow when
+      // auth settles — don't prematurely set loading=false here, because
+      // that creates a window where profileLoading=false + user=null →
+      // user=set causes the onboarding guard to fire on locale switches.
+      if (!authLoading) {
+        setProfile(null)
+        setLoading(false)
+      }
       return
     }
     // uid just became available: reset to loading so the app waits for the
-    // first snapshot before making any routing decisions. Without this, the
-    // loading=false state from the previous uid=null path can linger and
-    // cause AppLayout to redirect to onboarding on every page reload.
+    // first snapshot before making any routing decisions.
     setLoading(true)
     return onSnapshot(
       doc(db, 'users', uid),
@@ -34,6 +38,6 @@ export function useUserProfile() {
         setLoading(false)
       }
     )
-  }, [uid])
+  }, [uid, authLoading])
   return { profile, loading }
 }

@@ -1,19 +1,20 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams, useParams } from 'next/navigation'
 import Script from 'next/script'
 import { useTranslations } from 'next-intl'
-import { Zap, Shield, Loader2, CheckCircle } from 'lucide-react'
+import { Zap, Shield, Loader2, CheckCircle, LogOut, ChevronDown, ChevronUp, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge }  from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFirebase }      from '@/components/providers/firebase-provider'
 import { useUserProfile }   from '@/lib/hooks/use-user-profile'
 import { isPro, isOnTrial, isPaidPro, isTrialExpired } from '@/lib/plan-guard'
-import { updateLanguage }   from '@/lib/firebase/firestore'
+import { updateLanguage, updateProfile }   from '@/lib/firebase/firestore'
+import { signOut } from '@/lib/firebase/auth'
 import { track }            from '@/lib/posthog'
-import { LOCALE_CODES }     from '@/lib/constants'
+import { SUPPORTED_LANGUAGES, INDIAN_STATES, GEM_CATEGORIES } from '@/lib/constants'
 import type { LanguageCode } from '@/lib/types'
 
 // useSearchParams requires a Suspense boundary in Next.js App Router
@@ -43,6 +44,72 @@ function SettingsContent() {
   const [deletionSent,    setDeletionSent]    = useState(false)
   const [error,           setError]           = useState<string | null>(null)
   const [successMsg,      setSuccessMsg]      = useState<string | null>(null)
+  const [loggingOut,      setLoggingOut]      = useState(false)
+
+  // ── Profile form state ─────────────────────────────────────────────────
+  const [profileName,     setProfileName]     = useState('')
+  const [profileBusiness, setProfileBusiness] = useState('')
+  const [profileState,    setProfileState]    = useState('')
+  const [profileCats,     setProfileCats]     = useState<string[]>([])
+  const [profileGstin,    setProfileGstin]    = useState('')
+  const [profileUdyam,    setProfileUdyam]    = useState('')
+  const [profileExp,      setProfileExp]      = useState('')
+  const [profileSaving,   setProfileSaving]   = useState(false)
+  const [profileSaved,    setProfileSaved]    = useState(false)
+  const [profileError,    setProfileError]    = useState<string | null>(null)
+  const [showCats,        setShowCats]        = useState(false)
+
+  // Seed form once when profile first loads — keyed on uid so it doesn't
+  // re-seed on every Firestore snapshot (would erase in-progress edits)
+  const seeded = useRef(false)
+  useEffect(() => {
+    if (!profile || seeded.current) return
+    seeded.current = true
+    setProfileName(profile.name ?? '')
+    setProfileBusiness(profile.businessName ?? '')
+    setProfileState(profile.state ?? '')
+    setProfileCats(profile.categories ?? [])
+    setProfileGstin(profile.gstin ?? '')
+    setProfileUdyam(profile.udyamNumber ?? '')
+    setProfileExp(profile.experienceYears != null ? String(profile.experienceYears) : '')
+  }, [profile])
+
+  // ── Save profile ───────────────────────────────────────────────────────
+  const handleSaveProfile = useCallback(async () => {
+    if (!user) return
+    setProfileSaving(true)
+    setProfileError(null)
+    setProfileSaved(false)
+    try {
+      await updateProfile(user.uid, {
+        name:            profileName.trim(),
+        businessName:    profileBusiness.trim(),
+        state:           profileState,
+        categories:      profileCats,
+        gstin:           profileGstin.trim() || null,
+        udyamNumber:     profileUdyam.trim() || null,
+        experienceYears: profileExp ? Number(profileExp) : null,
+      })
+      setProfileSaved(true)
+      track('profile_updated', {})
+      setTimeout(() => setProfileSaved(false), 3000)
+    } catch {
+      setProfileError(t('profileError'))
+    } finally {
+      setProfileSaving(false)
+    }
+  }, [user, profileName, profileBusiness, profileState, profileCats, profileGstin, profileUdyam, profileExp, t])
+
+  // ── Logout ─────────────────────────────────────────────────────────────
+  const handleLogout = useCallback(async () => {
+    setLoggingOut(true)
+    try {
+      await signOut()
+      router.replace(`/${locale}/auth`)
+    } catch {
+      setLoggingOut(false)
+    }
+  }, [router, locale])
 
   // ── Checkout ──────────────────────────────────────────────────────────
   const handleUpgrade = useCallback(async (plan: 'monthly' | 'annual') => {
@@ -63,7 +130,7 @@ function SettingsContent() {
         keyId: string
       }
 
-      const rzpInstance = new (window as { Razorpay: new (o: unknown) => { open(): void } }).Razorpay({
+      const rzpInstance = new (window as unknown as { Razorpay: new (o: unknown) => { open(): void } }).Razorpay({
         key:             keyId,
         subscription_id: subscriptionId,
         name:            'TenderSarthi',
@@ -157,8 +224,14 @@ function SettingsContent() {
 
   if (!profile) return null
 
+  const toggleCategory = (cat: string) => {
+    setProfileCats(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    )
+  }
+
   return (
-    <div className="space-y-6 max-w-lg">
+    <div className="space-y-5 max-w-lg pb-8">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="lazyOnload"
@@ -169,6 +242,149 @@ function SettingsContent() {
 
       {error      && <p role="alert" className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
       {successMsg && <p role="status" className="text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">{successMsg}</p>}
+
+      {/* ── Profile Section ──────────────────────────────────────────── */}
+      <div className="border rounded-xl p-4 space-y-4">
+        <h2 className="font-semibold text-navy flex items-center gap-2">
+          <User size={18} className="text-orange" />
+          {t('profile')}
+        </h2>
+
+        {profileError && (
+          <p role="alert" className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{profileError}</p>
+        )}
+
+        <div className="grid grid-cols-1 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-navy mb-1">{t('fullName')}</label>
+            <input
+              value={profileName}
+              onChange={e => setProfileName(e.target.value)}
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              placeholder="Ramesh Kumar"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-navy mb-1">{t('businessName')}</label>
+            <input
+              value={profileBusiness}
+              onChange={e => setProfileBusiness(e.target.value)}
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              placeholder="Kumar Enterprises"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-navy mb-1">{t('state')}</label>
+            <select
+              value={profileState}
+              onChange={e => setProfileState(e.target.value)}
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+            >
+              <option value="">{t('selectState')}</option>
+              {INDIAN_STATES.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Category multi-select (collapsible) */}
+          <div>
+            <label className="block text-xs font-medium text-navy mb-1">{t('categories')}</label>
+            <button
+              type="button"
+              onClick={() => setShowCats(v => !v)}
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-orange/30"
+            >
+              <span className="truncate">
+                {profileCats.length > 0 ? profileCats.join(', ') : '— select —'}
+              </span>
+              {showCats ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+            {showCats && (
+              <div className="mt-1 border border-navy/10 rounded-lg bg-white p-2 grid grid-cols-1 gap-1 max-h-48 overflow-y-auto">
+                {GEM_CATEGORIES.map(cat => (
+                  <label key={cat} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-navy/5 cursor-pointer text-xs text-navy">
+                    <input
+                      type="checkbox"
+                      checked={profileCats.includes(cat)}
+                      onChange={() => toggleCategory(cat)}
+                      className="accent-orange"
+                    />
+                    {cat}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-navy mb-1">{t('gstin')} <span className="font-normal text-muted">(optional)</span></label>
+              <input
+                value={profileGstin}
+                onChange={e => setProfileGstin(e.target.value)}
+                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+                placeholder={t('gstinPlaceholder')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-navy mb-1">{t('experience')} <span className="font-normal text-muted">(optional)</span></label>
+              <input
+                type="number" min="0" max="50"
+                value={profileExp}
+                onChange={e => setProfileExp(e.target.value)}
+                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+                placeholder="5"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-navy mb-1">{t('udyam')} <span className="font-normal text-muted">(optional)</span></label>
+            <input
+              value={profileUdyam}
+              onChange={e => setProfileUdyam(e.target.value)}
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              placeholder={t('udyamPlaceholder')}
+            />
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          size="sm"
+          className="bg-navy text-white hover:bg-navy/90 w-full"
+          disabled={profileSaving}
+          onClick={handleSaveProfile}
+        >
+          {profileSaving ? (
+            <><Loader2 size={14} className="animate-spin mr-1" />{t('loggingOut')}</>
+          ) : profileSaved ? (
+            <><CheckCircle size={14} className="mr-1 text-green-300" />{t('profileSaved')}</>
+          ) : (
+            t('saveProfile')
+          )}
+        </Button>
+      </div>
+
+      {/* ── Log Out ─────────────────────────────────────────────────── */}
+      <div className="border rounded-xl p-4">
+        <Button
+          type="button"
+          variant="outline"
+          className="border-navy/30 text-navy hover:bg-navy/5 w-full"
+          disabled={loggingOut}
+          onClick={handleLogout}
+        >
+          {loggingOut ? (
+            <><Loader2 size={14} className="animate-spin mr-2" />{t('loggingOut')}</>
+          ) : (
+            <><LogOut size={14} className="mr-2" />{t('logout')}</>
+          )}
+        </Button>
+      </div>
 
       {/* ── Plan Card ───────────────────────────────────────────────── */}
       <div className="border rounded-xl p-4 space-y-4">
@@ -206,8 +422,8 @@ function SettingsContent() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {LOCALE_CODES.map((code) => (
-              <SelectItem key={code} value={code}>{code.toUpperCase()}</SelectItem>
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <SelectItem key={lang.code} value={lang.code}>{lang.nativeLabel}</SelectItem>
             ))}
           </SelectContent>
         </Select>

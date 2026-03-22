@@ -44,10 +44,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { tenderName, tenderCategory, tenderState, experienceYears,
-            pastContracts, capacity, quotedRate, language = 'hi' } = await req.json() as {
+            pastContracts, capacity, quotedRate, tenderDescription = '', language = 'hi' } = await req.json() as {
       tenderName: string; tenderCategory: string; tenderState: string
       experienceYears: number; pastContracts: string; capacity: string
-      quotedRate: string; language?: string
+      quotedRate: string; tenderDescription?: string; language?: string
     }
 
     if (!tenderName || !tenderCategory || !quotedRate) {
@@ -64,12 +64,19 @@ export async function POST(req: NextRequest) {
     if (capacity && capacity.length > 2000) {
       return NextResponse.json({ error: 'capacity too long. Maximum 2000 characters.' }, { status: 400 })
     }
+    if (tenderDescription && tenderDescription.length > 5000) {
+      return NextResponse.json({ error: 'tenderDescription too long. Maximum 5000 characters.' }, { status: 400 })
+    }
+
+    const descriptionBlock = tenderDescription.trim()
+      ? `\nTender document details:\n${tenderDescription.trim()}`
+      : ''
 
     // Step 1: Win Probability Score via Gemini Flash 2.0 (fast)
     const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
     const scorePrompt = `You are TenderSarthi's bid advisor. Compute a win probability score (0-100) for this GeM bid.
 
-Tender: ${tenderName} | Category: ${tenderCategory} | State: ${tenderState}
+Tender: ${tenderName} | Category: ${tenderCategory} | State: ${tenderState}${descriptionBlock}
 Vendor experience: ${experienceYears} years | Past contracts: ${pastContracts}
 Capacity: ${capacity} | Quoted rate: ${quotedRate}
 
@@ -111,7 +118,7 @@ Respond ONLY with valid JSON (no markdown, no extra text):
 TENDER DETAILS:
 Name: ${tenderName}
 Category: ${tenderCategory}
-State: ${tenderState}
+State: ${tenderState}${tenderDescription.trim() ? `\n\nTENDER DOCUMENT DETAILS:\n${tenderDescription.trim()}` : ''}
 
 VENDOR DETAILS:
 Experience: ${experienceYears} years in ${tenderCategory}

@@ -58,6 +58,7 @@ export default function BidPage() {
           pastContracts: data.pastContracts,
           capacity: data.capacity,
           quotedRate: data.quotedRate,
+          tenderDescription: data.tenderDescription,
           language: profile.language,
         }),
       })

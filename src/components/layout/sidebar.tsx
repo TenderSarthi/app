@@ -1,9 +1,11 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LayoutDashboard, Search, FileText, Folder, Hammer, Bell, BookOpen, Package, Settings } from 'lucide-react'
+import { LayoutDashboard, Search, FileText, Folder, Hammer, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useUserProfile } from '@/lib/hooks/use-user-profile'
+import { signOut } from '@/lib/firebase/auth'
 
 const NAV = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -20,14 +22,29 @@ const NAV = [
 export function Sidebar({ locale }: { locale: string }) {
   const pathname = usePathname()
   const t = useTranslations('nav')
+  const { profile } = useUserProfile()
+  const router = useRouter()
+
+  async function handleLogout() {
+    await signOut()
+    router.replace(`/${locale}/auth`)
+  }
+
+  const initials = profile?.name
+    ? profile.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+
   return (
     <aside className="hidden desktop:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-white border-r border-gray-200 z-40">
+      {/* Logo */}
       <div className="flex items-center gap-2 px-5 py-5 border-b border-gray-100">
         <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center">
           <span className="text-orange font-heading font-bold text-xs">TS</span>
         </div>
         <span className="font-heading font-semibold text-navy text-sm">TenderSarthi</span>
       </div>
+
+      {/* Nav links */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         {NAV.map(({ key, href, icon: Icon }) => {
           const full = `/${locale}${href}`
@@ -40,6 +57,25 @@ export function Sidebar({ locale }: { locale: string }) {
           )
         })}
       </nav>
+
+      {/* User footer with logout */}
+      <div className="border-t border-gray-100 px-4 py-3 flex items-center gap-2">
+        <div className="w-8 h-8 rounded-full bg-navy/10 flex items-center justify-center flex-shrink-0">
+          <span className="text-navy font-bold text-xs">{initials}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-navy truncate">{profile?.name || '—'}</p>
+          <p className="text-[10px] text-muted truncate">{profile?.businessName || profile?.email || ''}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          title="Log out"
+          className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-red-50 transition-colors"
+        >
+          <LogOut size={15} aria-label="Log out" />
+        </button>
+      </div>
     </aside>
   )
 }

@@ -22,11 +22,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Redirect to onboarding if: profile missing entirely (no Firestore doc)
-    // or profile exists but name is empty (onboarding never completed)
-    if (!profileLoading && user && (!profile || !profile.name)) {
+    // or profile exists but name is empty (onboarding never completed).
+    // Also guard on !authLoading: on locale switch FirebaseProvider remounts,
+    // briefly resetting auth state. Without this guard, the window between
+    // "auth resolved (user set)" and "profile snapshot arrived" causes a
+    // false redirect because profileLoading is still false from the prior run.
+    if (!authLoading && !profileLoading && user && (!profile || !profile.name)) {
       router.replace(`/${locale}/onboarding`)
     }
-  }, [profileLoading, profile, user, locale, router])
+  }, [authLoading, profileLoading, profile, user, locale, router])
 
   if (authLoading || profileLoading) {
     return (

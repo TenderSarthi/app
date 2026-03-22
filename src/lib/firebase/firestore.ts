@@ -45,6 +45,15 @@ export async function saveOnboardingData(uid: string, data: OnboardingData): Pro
   })
 }
 
+/** Updates editable profile fields set by the user in Settings. */
+export type ProfileUpdate = Partial<Pick<UserProfile,
+  'name' | 'businessName' | 'gstin' | 'udyamNumber' | 'state' | 'categories' | 'experienceYears'
+>>
+
+export async function updateProfile(uid: string, data: ProfileUpdate): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), { ...data })
+}
+
 /** Switches user language. Propagates to all active sessions via Firestore listener. */
 export async function updateLanguage(uid: string, language: LanguageCode): Promise<void> {
   await updateDoc(doc(db, 'users', uid), { language })

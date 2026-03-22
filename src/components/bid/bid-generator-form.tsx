@@ -1,8 +1,10 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
+import { useFirebase } from '@/components/providers/firebase-provider'
 import { WinProbabilityCard } from './win-probability-card'
 import { computeHeuristicScore } from '@/lib/bid-utils'
+import { FileUp, Loader2 } from 'lucide-react'
 import type { Tender } from '@/lib/types'
 import type { UserProfile } from '@/lib/types'
 
@@ -19,16 +21,24 @@ export interface GenerateData {
   pastContracts: string
   capacity: string
   quotedRate: string
+  tenderDescription: string
 }
 
 export function BidGeneratorForm({ profile, tenders, onGenerate, generating }: BidGeneratorFormProps) {
   const t = useTranslations('bid')
-  const [selectedTenderId, setSelectedTenderId] = useState('')
-  const [experienceYears, setExperience]        = useState(String(profile.experienceYears ?? ''))
-  const [pastContracts, setPastContracts]        = useState('')
-  const [capacity, setCapacity]                  = useState('')
-  const [quotedRate, setQuotedRate]              = useState('')
-  const [showScore, setShowScore]                = useState(false)
+  const { user } = useFirebase()
+
+  const [selectedTenderId,   setSelectedTenderId]  = useState('')
+  const [experienceYears,    setExperience]         = useState(String(profile.experienceYears ?? ''))
+  const [pastContracts,      setPastContracts]      = useState('')
+  const [capacity,           setCapacity]           = useState('')
+  const [quotedRate,         setQuotedRate]         = useState('')
+  const [tenderDescription,  setTenderDescription]  = useState('')
+  const [showScore,          setShowScore]          = useState(false)
+  const [extracting,         setExtracting]         = useState(false)
+  const [extractError,       setExtractError]       = useState<string | null>(null)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const selectedTender = tenders.find(t => t.id === selectedTenderId) ?? null
 
@@ -48,9 +58,62 @@ export function BidGeneratorForm({ profile, tenders, onGenerate, generating }: B
   const handleEstimate = () => setShowScore(true)
   const handleGenerate = () => {
     if (!selectedTender || !isValid) return
-    onGenerate({ tender: selectedTender, experienceYears: Number(experienceYears) || 0,
-      pastContracts, capacity, quotedRate })
+    onGenerate({
+      tender: selectedTender,
+      experienceYears: Number(experienceYears) || 0,
+      pastContracts,
+      capacity,
+      quotedRate,
+      tenderDescription,
+    })
   }
+
+  // ── PDF / Image → Gemini text extraction ─────────────────────────────
+  async function handleFileExtract(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!inputRef.current) inputRef.current = e.target
+    e.target.value = ''          // reset so same file can be re-uploaded
+    if (!file || !user) return
+
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png']
+    if (!allowed.includes(file.type)) { setExtractError(t('extractError')); return }
+    if (file.size > 10 * 1024 * 1024) { setExtractError(t('extractError')); return }
+
+    setExtracting(true)
+    setExtractError(null)
+
+    try {
+      // Convert to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const result = reader.result as string
+          // Strip "data:<mimeType>;base64," prefix
+          resolve(result.split(',')[1])
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+
+      const token = await user.getIdToken()
+      const res = await fetch('/api/ai/extract-tender-doc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ base64, mimeType: file.type }),
+      })
+
+      if (!res.ok) throw new Error('extract failed')
+      const { text } = await res.json() as { text: string }
+      setTenderDescription(text)
+    } catch {
+      setExtractError(t('extractError'))
+    } finally {
+      setExtracting(false)
+    }
+  }
+
+  // fileInputRef passed to the hidden <input> for the upload button
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const activeTenders = tenders.filter(t => t.status === 'active')
 
@@ -70,6 +133,48 @@ export function BidGeneratorForm({ profile, tenders, onGenerate, generating }: B
             ))}
           </select>
         )}
+      </div>
+
+      {/* Tender description + PDF extract */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-navy">
+            {t('tenderDetails')}
+            <span className="ml-1 text-xs font-normal text-muted">{t('tenderDetailsHint')}</span>
+          </label>
+          <button
+            type="button"
+            disabled={extracting}
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1 text-xs font-medium text-orange hover:text-orange/80 disabled:opacity-50 transition-colors"
+          >
+            {extracting ? (
+              <><Loader2 size={12} className="animate-spin" />{t('extracting')}</>
+            ) : (
+              <><FileUp size={12} />{t('extractFromPdf')}</>
+            )}
+          </button>
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="hidden"
+            onChange={handleFileExtract}
+          />
+        </div>
+
+        {extractError && (
+          <p className="text-xs text-red-600 mb-1">{extractError}</p>
+        )}
+
+        <textarea
+          value={tenderDescription}
+          onChange={e => setTenderDescription(e.target.value)}
+          rows={4}
+          placeholder={t('tenderDetailsPlaceholder')}
+          className="w-full border border-navy/20 rounded-xl px-3 py-2.5 text-sm text-navy bg-white resize-none focus:outline-none focus:ring-2 focus:ring-orange/30"
+        />
       </div>
 
       {selectedTender && (
