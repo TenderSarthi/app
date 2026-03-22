@@ -744,38 +744,6 @@ import { deriveDeadlineInfo } from '@/lib/dashboard-utils'
 import type { Tender } from '@/lib/types'
 import type { AIUsageData } from '@/lib/firebase/firestore'
 
-// Formats a Firebase Timestamp as "DD Mon YYYY, H:MM AM/PM"
-function formatDeadlineDate(ms: number): string {
-  return new Date(ms).toLocaleString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  })
-}
-
-interface ActiveDashboardProps {
-  locale: string
-  tenders: Tender[]
-  activeTenders: Tender[]
-  usage: AIUsageData
-}
-
-export function ActiveDashboard({ locale, tenders, activeTenders, usage }: ActiveDashboardProps) {
-
-```typescript
-// src/components/dashboard/active-dashboard.tsx
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { Search, FileText, Bell, BookOpen } from 'lucide-react'
-import { deriveDeadlineInfo } from '@/lib/dashboard-utils'
-import type { Tender } from '@/lib/types'
-import type { AIUsageData } from '@/lib/firebase/firestore'
-
 function formatDeadlineDate(ms: number): string {
   return new Date(ms).toLocaleString('en-IN', {
     day: '2-digit', month: 'short', year: 'numeric',
