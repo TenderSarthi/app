@@ -64,9 +64,10 @@ describe('getPlanBadge', () => {
   })
 
   it('returns "Pro Trial · N days left" when trial is active', () => {
-    const futureMs = Date.now() + 3 * 86_400_000 // 3 days from now
+    // Use 3.5 days so Math.ceil produces 4 regardless of sub-ms timing differences
+    const futureMs = Date.now() + 3.5 * 86_400_000
     const result = getPlanBadge({ ...baseProfile, plan: 'free', trialEndsAt: ts(futureMs) })
-    expect(result).toBe('Pro Trial · 3 days left')
+    expect(result).toBe('Pro Trial · 4 days left')
   })
 
   it('returns "Free" when trial timestamp is in the past', () => {

@@ -8,11 +8,12 @@ import type { UserProfile, Tender } from '@/lib/types'
  */
 export function getPlanBadge(profile: UserProfile): string {
   if (profile.plan === 'pro') return 'Pro'
-  if (profile.trialEndsAt && profile.trialEndsAt.toMillis() > Date.now()) {
-    const daysLeft = Math.ceil(
-      (profile.trialEndsAt.toMillis() - Date.now()) / 86_400_000
-    )
-    return `Pro Trial · ${daysLeft} days left`
+  if (profile.trialEndsAt) {
+    const now = Date.now()
+    const msLeft = profile.trialEndsAt.toMillis() - now
+    if (msLeft > 0) {
+      return `Pro Trial · ${Math.ceil(msLeft / 86_400_000)} days left`
+    }
   }
   return 'Free'
 }
@@ -37,7 +38,8 @@ export function deriveDeadlineInfo(activeTenders: Tender[]): DeadlineInfo {
 
   const nextDeadlineTender = withDeadline[0]
 
-  // .slice() prevents mutation of the original activeTenders array
+  // .filter() already returns a new array, so no .slice() is needed here.
+  // But fallbackTender sorts activeTenders directly, so .slice() is required.
   const fallbackTender = activeTenders
     .slice()
     .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0]
