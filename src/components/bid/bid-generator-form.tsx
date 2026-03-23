@@ -165,7 +165,7 @@ export function BidGeneratorForm({ profile, tenders, onGenerate, generating }: B
         </div>
 
         {extractError && (
-          <p className="text-xs text-red-600 mb-1">{extractError}</p>
+          <p className="text-xs text-danger mb-1">{extractError}</p>
         )}
 
         <textarea

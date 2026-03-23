@@ -14,10 +14,10 @@ interface ArticleCardProps {
 }
 
 const CATEGORY_BADGE: Record<string, { label: string; className: string }> = {
-  getting_started:    { label: 'Getting Started',     className: 'bg-blue-100 text-blue-700' },
-  bidding_strategy:   { label: 'Bidding Strategy',    className: 'bg-orange-100 text-orange-700' },
-  finance_compliance: { label: 'Finance & Compliance', className: 'bg-green-100 text-green-700' },
-  post_win:           { label: 'Post Win',             className: 'bg-purple-100 text-purple-700' },
+  getting_started:    { label: 'Getting Started',      className: 'bg-navy/10 text-navy'       },
+  bidding_strategy:   { label: 'Bidding Strategy',     className: 'bg-orange/10 text-orange'   },
+  finance_compliance: { label: 'Finance & Compliance', className: 'bg-success/10 text-success' },
+  post_win:           { label: 'Post Win',             className: 'bg-gold/10 text-gold'       },
 }
 
 export function ArticleCard({ article, locale, onClick }: ArticleCardProps) {
@@ -40,7 +40,7 @@ export function ArticleCard({ article, locale, onClick }: ArticleCardProps) {
               {badge.label}{/* TODO: i18n */}
             </span>
             {article.youtubeId && (
-              <span className="flex items-center gap-0.5 text-xs text-red-600 font-medium">
+              <span className="flex items-center gap-0.5 text-xs text-danger font-medium">
                 <PlayCircle size={12} />
                 Video{/* TODO: i18n */}
               </span>
@@ -53,12 +53,12 @@ export function ArticleCard({ article, locale, onClick }: ArticleCardProps) {
           </p>
 
           {/* Summary */}
-          <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+          <p className="mt-1 text-xs text-muted line-clamp-2">
             {summary}
           </p>
 
           {/* Read time */}
-          <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="mt-3 flex items-center gap-1 text-xs text-muted">
             <Clock size={11} />
             <span>{article.readMinutes} min read{/* TODO: i18n */}</span>
             <BookOpen size={11} className="ml-auto" />

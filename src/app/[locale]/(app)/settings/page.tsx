@@ -240,18 +240,18 @@ function SettingsContent() {
 
       <h1 className="font-heading font-bold text-2xl text-navy">{t('title')}</h1>
 
-      {error      && <p role="alert" className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-      {successMsg && <p role="status" className="text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">{successMsg}</p>}
+      {error      && <p role="alert" className="text-sm text-danger bg-danger/5 px-3 py-2 rounded-xl">{error}</p>}
+      {successMsg && <p role="status" className="text-sm text-success bg-success/5 px-3 py-2 rounded-xl">{successMsg}</p>}
 
       {/* ── Profile Section ──────────────────────────────────────────── */}
-      <div className="border rounded-xl p-4 space-y-4">
+      <div className="bg-white border border-navy/10 rounded-xl p-4 space-y-4">
         <h2 className="font-semibold text-navy flex items-center gap-2">
           <User size={18} className="text-orange" />
           {t('profile')}
         </h2>
 
         {profileError && (
-          <p role="alert" className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{profileError}</p>
+          <p role="alert" className="text-xs text-danger bg-danger/5 px-3 py-2 rounded-xl">{profileError}</p>
         )}
 
         <div className="grid grid-cols-1 gap-3">
@@ -260,7 +260,7 @@ function SettingsContent() {
             <input
               value={profileName}
               onChange={e => setProfileName(e.target.value)}
-              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
               placeholder="Ramesh Kumar"
             />
           </div>
@@ -270,7 +270,7 @@ function SettingsContent() {
             <input
               value={profileBusiness}
               onChange={e => setProfileBusiness(e.target.value)}
-              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
               placeholder="Kumar Enterprises"
             />
           </div>
@@ -280,7 +280,7 @@ function SettingsContent() {
             <select
               value={profileState}
               onChange={e => setProfileState(e.target.value)}
-              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
             >
               <option value="">{t('selectState')}</option>
               {INDIAN_STATES.map(s => (
@@ -295,7 +295,7 @@ function SettingsContent() {
             <button
               type="button"
               onClick={() => setShowCats(v => !v)}
-              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-orange/30"
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-navy/20"
             >
               <span className="truncate">
                 {profileCats.length > 0 ? profileCats.join(', ') : '— select —'}
@@ -325,7 +325,7 @@ function SettingsContent() {
               <input
                 value={profileGstin}
                 onChange={e => setProfileGstin(e.target.value)}
-                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
                 placeholder={t('gstinPlaceholder')}
               />
             </div>
@@ -335,7 +335,7 @@ function SettingsContent() {
                 type="number" min="0" max="50"
                 value={profileExp}
                 onChange={e => setProfileExp(e.target.value)}
-                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+                className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
                 placeholder="5"
               />
             </div>
@@ -346,7 +346,7 @@ function SettingsContent() {
             <input
               value={profileUdyam}
               onChange={e => setProfileUdyam(e.target.value)}
-              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-orange/30"
+              className="w-full border border-navy/20 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
               placeholder={t('udyamPlaceholder')}
             />
           </div>
@@ -362,7 +362,7 @@ function SettingsContent() {
           {profileSaving ? (
             <><Loader2 size={14} className="animate-spin mr-1" />{t('loggingOut')}</>
           ) : profileSaved ? (
-            <><CheckCircle size={14} className="mr-1 text-green-300" />{t('profileSaved')}</>
+            <><CheckCircle size={14} className="mr-1 text-success" />{t('profileSaved')}</>
           ) : (
             t('saveProfile')
           )}
@@ -370,7 +370,7 @@ function SettingsContent() {
       </div>
 
       {/* ── Log Out ─────────────────────────────────────────────────── */}
-      <div className="border rounded-xl p-4">
+      <div className="bg-white border border-navy/10 rounded-xl p-4">
         <Button
           type="button"
           variant="outline"
@@ -387,7 +387,7 @@ function SettingsContent() {
       </div>
 
       {/* ── Plan Card ───────────────────────────────────────────────── */}
-      <div className="border rounded-xl p-4 space-y-4">
+      <div className="bg-white border border-navy/10 rounded-xl p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-navy flex items-center gap-2">
             <Zap size={18} className="text-orange" />
@@ -412,7 +412,7 @@ function SettingsContent() {
       </div>
 
       {/* ── Language ────────────────────────────────────────────────── */}
-      <div className="border rounded-xl p-4 space-y-3">
+      <div className="bg-white border border-navy/10 rounded-xl p-4 space-y-3">
         <h2 className="font-semibold text-navy">{t('language')}</h2>
         <Select
           value={profile.language}
@@ -430,11 +430,11 @@ function SettingsContent() {
       </div>
 
       {/* ── Danger Zone ─────────────────────────────────────────────── */}
-      <div className="border border-red-200 rounded-xl p-4 space-y-3">
-        <h2 className="font-semibold text-red-600">{t('dangerZone')}</h2>
+      <div className="border border-danger/20 rounded-xl p-4 space-y-3">
+        <h2 className="font-semibold text-danger">{t('dangerZone')}</h2>
         {deletionSent ? (
           <p className="text-sm text-muted flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-600" />
+            <CheckCircle size={16} className="text-success" />
             {t('deleteRequested')}
           </p>
         ) : confirmDelete ? (
@@ -452,7 +452,7 @@ function SettingsContent() {
         ) : (
           <Button
             size="sm" variant="outline"
-            className="border-red-300 text-red-600 hover:bg-red-50"
+            className="border-danger/30 text-danger hover:bg-danger/5"
             type="button"
             onClick={() => setConfirmDelete(true)}
           >

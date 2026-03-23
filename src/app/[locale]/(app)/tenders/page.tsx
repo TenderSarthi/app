@@ -1,9 +1,10 @@
 // src/app/[locale]/(app)/tenders/page.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X } from 'lucide-react'
+
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { useUserTenders } from '@/lib/hooks/use-user-tenders'
@@ -13,24 +14,16 @@ import { GemLiveFeed } from '@/components/finder/gem-live-feed'
 import { StateFilter, CategoryFilter } from '@/components/finder/state-category-filters'
 
 export default function TendersPage() {
-  const tT = useTranslations('tenders')
+  const tT      = useTranslations('tenders')
+  const tFinder = useTranslations('finder')
   const { user } = useFirebase()
   const { profile } = useUserProfile()
   const { tenders } = useUserTenders(user?.uid ?? null)
 
-  const [filterOpen, setFilterOpen]                   = useState(false)
-  const [selectedState, setSelectedState]             = useState<string>('')
-  const [selectedCategories, setSelectedCategories]   = useState<string[]>([])
-  const [filtersInitialized, setFiltersInitialized]   = useState(false)
-
-  // Seed from profile once — do not remove
-  useEffect(() => {
-    if (profile && !filtersInitialized) {
-      setSelectedState(profile.state || 'all')
-      setSelectedCategories(profile.categories)
-      setFiltersInitialized(true)
-    }
-  }, [profile, filtersInitialized])
+  const [filterOpen, setFilterOpen]                 = useState(false)
+  const [selectedState, setSelectedState]           = useState<string>('all')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [searchQuery, setSearchQuery]               = useState('')
 
   const activeFilterCount =
     (selectedState && selectedState !== 'all' ? 1 : 0) + selectedCategories.length
@@ -48,6 +41,29 @@ export default function TendersPage() {
 
   return (
     <div className="space-y-3 pb-32 desktop:pb-6">
+
+      {/* Page header */}
+      <h1 className="font-heading font-bold text-xl text-navy">{tFinder('title')}</h1>
+
+      {/* Search bar */}
+      <div className="relative">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Search tenders…"
+          className="w-full h-11 pl-9 pr-9 rounded-xl border border-navy/20 bg-white text-sm text-navy placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-navy/20 transition-colors"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted hover:text-navy transition-colors"
+          >
+            <X size={13} />
+          </button>
+        )}
+      </div>
 
       {/* Filter + GeM row */}
       <div className="flex items-center gap-2">
@@ -74,13 +90,14 @@ export default function TendersPage() {
         categories={selectedCategories}
         profile={profile}
         tenderCount={tenders.length}
+        searchQuery={searchQuery}
       />
 
       {/* Filter sheet */}
       <Sheet open={filterOpen} onOpenChange={(v) => { if (!v) setFilterOpen(false) }}>
         <SheetContent side="bottom" showCloseButton={false} className="px-4 pb-8 pt-3 rounded-t-2xl max-h-[85vh] overflow-y-auto">
           <SheetTitle className="sr-only">{tT('filters')}</SheetTitle>
-          <div className="w-10 h-1 rounded bg-gray-200 mx-auto mb-5" />
+          <div className="w-10 h-1 rounded bg-navy/10 mx-auto mb-5" />
 
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-heading font-semibold text-navy text-base">{tT('filters')}</h2>
@@ -102,7 +119,7 @@ export default function TendersPage() {
 
           <div className="flex gap-3 mt-8">
             <button
-              onClick={() => { setSelectedState(profile.state || 'all'); setSelectedCategories(profile.categories) }}
+              onClick={() => { setSelectedState('all'); setSelectedCategories([]) }}
               className="flex-1 py-2.5 rounded-xl border border-navy/20 text-navy text-sm font-medium hover:bg-navy/5 transition-colors"
             >
               {tT('resetFilters')}

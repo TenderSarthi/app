@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { BookOpen } from 'lucide-react'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { ARTICLES } from '@/lib/learn-content'
 import { filterByCategory } from '@/lib/learn-utils'
@@ -83,7 +84,11 @@ export default function LearnPage() {
       {/* Article list */}
       {filteredArticles.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-muted-foreground text-sm">No articles in this category yet.</p>
+          <div className="w-14 h-14 rounded-2xl bg-navy/8 flex items-center justify-center mb-4">
+            <BookOpen size={28} className="text-navy/30" />
+          </div>
+          <p className="font-semibold text-navy text-sm">No articles yet</p>
+          <p className="text-sm text-muted mt-1">Check back soon for new content.</p>
         </div>
       ) : (
         <div className="space-y-3">

@@ -17,11 +17,11 @@ interface OrderCardProps {
 }
 
 const STATUS_CLASS: Record<OrderStatus, string> = {
-  delivery_pending:   'bg-orange-100 text-orange-700',
-  inspection_pending: 'bg-orange-100 text-orange-700',
-  invoice_pending:    'bg-blue-100 text-blue-700',
-  payment_pending:    'bg-yellow-100 text-yellow-700',
-  completed:          'bg-green-100 text-green-700',
+  delivery_pending:   'bg-orange/10 text-orange',
+  inspection_pending: 'bg-orange/10 text-orange',
+  invoice_pending:    'bg-navy/10 text-navy',
+  payment_pending:    'bg-gold/10 text-gold',
+  completed:          'bg-success/10 text-success',
 }
 
 const STATUS_I18N_KEY: Record<OrderStatus, string> = {
@@ -39,7 +39,7 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
   const [deleting,       setDeleting]       = useState(false)
   const [deleteError,    setDeleteError]    = useState(false)
 
-  const badgeClass  = STATUS_CLASS[order.status] ?? 'bg-gray-100 text-gray-700'
+  const badgeClass  = STATUS_CLASS[order.status] ?? 'bg-navy/10 text-navy'
   const badgeLabel  = STATUS_I18N_KEY[order.status] ? t(STATUS_I18N_KEY[order.status] as never) : order.status
   const nextStatus  = getNextStatus(order.status)
   const isCompleted = order.status === 'completed'
@@ -82,7 +82,7 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
                 {order.workOrderNumber}
               </p>
             ) : (
-              <p className="text-sm text-muted-foreground italic">
+              <p className="text-sm text-muted italic">
                 No work order number
               </p>
             )}
@@ -108,14 +108,14 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
 
         {/* Notes */}
         {order.notes && (
-          <p className="mt-3 text-xs text-muted-foreground line-clamp-2">
+          <p className="mt-3 text-xs text-muted line-clamp-2">
             {order.notes}
           </p>
         )}
       </CardContent>
 
       {deleteError && (
-        <p role="alert" className="px-4 pb-0 text-xs text-destructive">
+        <p role="alert" className="px-4 pb-0 text-xs text-danger">
           Delete failed. Please try again.
         </p>
       )}
@@ -152,14 +152,14 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="text-xs font-semibold text-destructive px-2 py-1 rounded-lg hover:bg-destructive/5 disabled:opacity-50"
+                className="text-xs font-semibold text-danger px-2 py-1 rounded-lg hover:bg-danger/5 disabled:opacity-50"
               >
                 {deleting ? '...' : 'Confirm?'}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}
                 disabled={deleting}
-                className="text-xs text-muted-foreground px-2 py-1 rounded-lg hover:bg-muted/50"
+                className="text-xs text-muted px-2 py-1 rounded-lg hover:bg-navy/5"
               >
                 Cancel
               </button>
@@ -167,7 +167,7 @@ export function OrderCard({ order, onEdit }: OrderCardProps) {
           ) : (
             <button
               onClick={() => setConfirmDelete(true)}
-              className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/5"
+              className="p-1.5 text-muted hover:text-danger rounded-lg hover:bg-danger/5"
               aria-label="Delete order"
             >
               <Trash2 size={15} />

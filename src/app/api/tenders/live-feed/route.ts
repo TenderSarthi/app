@@ -3,8 +3,9 @@ import { getAuth } from 'firebase-admin/auth'
 import '@/lib/firebase/admin'
 import { CATEGORY_KEYWORDS, INDIAN_STATES } from '@/lib/constants'
 
-const CPPP_BASE = 'https://eprocure.gov.in/cppp/latestactivetendersnew'
-const FETCH_PAGES = 3   // ~30 tenders per fetch
+const CPPP_BASE   = 'https://eprocure.gov.in/cppp/latestactivetendersnew'
+const CPPP_ORIGIN = 'https://eprocure.gov.in'
+const FETCH_PAGES = 6   // ~60 tenders per fetch
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
@@ -13,6 +14,7 @@ const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 interface RawTender {
   title:       string
   link:        string
+  refId:       string   // e.g. "2026_AAI_272420_1" — stable, session-free identifier
   org:         string
   pubDate:     Date
   closingDate: string
@@ -30,9 +32,13 @@ function parseCPPPPage(html: string): RawTender[] {
 
     const titleCell  = cells[4]
     const rawText    = text(titleCell)
-    // Title is everything before the first "/" (ref number follows)
-    const title      = rawText.split('/')[0].trim()
-    const link       = href(titleCell)
+    // rawText format: "Tender Title/2026_ORG_ID_1/more..." — ref number is the 2nd segment
+    const parts      = rawText.split('/')
+    const title      = parts[0].trim()
+    const refId      = parts[1]?.trim() ?? ''   // stable reference number (no session dependency)
+    const rawLink    = href(titleCell)
+    // Normalise relative paths to absolute URLs
+    const link       = rawLink.startsWith('http') ? rawLink : `${CPPP_ORIGIN}${rawLink}`
     const org        = text(cells[5])
     const pubDateStr = text(cells[1])   // e.g. "22-Mar-2026 12:10 PM"
 
@@ -40,7 +46,7 @@ function parseCPPPPage(html: string): RawTender[] {
 
     const pubDate = new Date(pubDateStr.replace(/(\d{2})-([A-Za-z]{3})-(\d{4})/, '$2 $1 $3'))
 
-    return [{ title, link, org, pubDate: isNaN(pubDate.getTime()) ? new Date() : pubDate, closingDate: text(cells[2]) }]
+    return [{ title, link, refId, org, pubDate: isNaN(pubDate.getTime()) ? new Date() : pubDate, closingDate: text(cells[2]) }]
   })
 }
 
@@ -113,16 +119,22 @@ export async function GET(req: NextRequest) {
   // Filter — category uses keyword matching; state matching is best-effort
   const filtered = enriched.filter(t => {
     const categoryMatch = categories.length === 0 || categories.some(c => t.categories.includes(c))
+    // State match: pass central/national tenders (no state detected) when a state is selected,
+    // but also pass explicit state matches. This avoids hiding valid national tenders.
     const stateMatch    = !state || state === 'all' || t.states.includes(state) || t.states.length === 0
     return categoryMatch && stateMatch
   })
 
   const tenders = filtered
     .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
-    .slice(0, 25)
+    .slice(0, 60)
     .map(t => ({
       title:       t.title,
-      link:        t.link,
+      // tendersfullview URLs embed an IP-bound session hash → always rejected
+      // in the user's browser. Use the stable CPPP list page instead; the refId
+      // lets the user search for the exact tender on that page.
+      link:        'https://eprocure.gov.in/cppp/latestactivetendersnew',
+      refId:       t.refId,   // e.g. "2026_AAI_272420_1" — searchable on CPPP
       org:         t.org,
       pubDate:     t.pubDate.toISOString(),
       closingDate: t.closingDate,

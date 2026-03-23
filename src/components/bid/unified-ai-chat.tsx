@@ -1,22 +1,17 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Send, Sparkles, Info, Paperclip, X, Save, FileText } from 'lucide-react'
+import { Send, Sparkles, Info, Paperclip, Save } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { incrementAIQueryCount } from '@/lib/firebase/firestore'
 import { canUseAI } from '@/lib/plan-guard'
 import { UpgradeDialog } from '@/components/dashboard/upgrade-dialog'
 import { SaveTenderDialog } from '@/components/finder/save-tender-dialog'
-import { BidGeneratorForm } from '@/components/bid/bid-generator-form'
-import { BidDocumentViewer } from '@/components/bid/bid-document-viewer'
 import type { ChatMessage, UserProfile } from '@/lib/types'
 import type { AIUsageData } from '@/lib/firebase/firestore'
 import type { Tender } from '@/lib/types'
-import type { GenerateData } from '@/components/bid/bid-generator-form'
 import { getAuth } from 'firebase/auth'
 import { track } from '@/lib/posthog'
-import { addBidDocument, incrementBidDocCount } from '@/lib/firebase/firestore'
-import { isPro, canUseBidGenerator } from '@/lib/plan-guard'
 
 // Threshold: text longer than this is treated as tender content → summarize
 const SUMMARIZE_THRESHOLD = 150
@@ -28,24 +23,15 @@ const QUICK_CHIPS = [
   'Documents checklist क्या है?',
 ]
 
-interface BidResult {
-  msgId: string
-  tenderName: string
-  document: string
-  winScore: number
-  winLabel: string
-  winReasoning: string
-}
-
 interface UnifiedAIChatProps {
   profile: UserProfile
   usage: AIUsageData
   onUsageUpdate: () => void
   tenderCount: number
-  tenders: Tender[]
+  tenders: Tender[] // kept for future use
 }
 
-export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tenders }: UnifiedAIChatProps) {
+export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount }: UnifiedAIChatProps) {
   const t = useTranslations('bid')
   const { user } = useFirebase()
 
@@ -54,13 +40,6 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
   const [loading, setLoading]         = useState(false)
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [confirmId, setConfirmId]     = useState<string | null>(null)
-
-  // Bid generator — shown inline in the thread
-  const [showBidForm, setShowBidForm] = useState(false)
-  const [generating, setGenerating]   = useState(false)
-  const [genError, setGenError]       = useState<string | null>(null)
-  const [bidResult, setBidResult]     = useState<BidResult | null>(null)
-  const [viewerOpen, setViewerOpen]   = useState(false)
 
   // Summaries get a "Save Tender" button
   const [summaryMsgIds, setSummaryMsgIds] = useState<Set<string>>(new Set())
@@ -73,7 +52,7 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, showBidForm])
+  }, [messages])
 
   // Auto-resize textarea as content grows
   useEffect(() => {
@@ -211,83 +190,23 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
     }
   }, [profile, usage, user, onUsageUpdate, t])
 
-  // ── Bid generation ────────────────────────────────────────────────────
-  const handleGenerate = useCallback(async (data: GenerateData) => {
-    if (!profile || !usage || !user) return
-    if (!canUseBidGenerator(profile, usage)) { setUpgradeOpen(true); return }
-    setGenerating(true); setGenError(null)
-
-    try {
-      const idToken = await getAuth().currentUser?.getIdToken()
-      if (!idToken) throw new Error('Not authenticated')
-
-      const res = await fetch('/api/ai/generate-bid', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({
-          tenderName: data.tender.name,
-          tenderCategory: data.tender.category,
-          tenderState: data.tender.state,
-          experienceYears: data.experienceYears,
-          pastContracts: data.pastContracts,
-          capacity: data.capacity,
-          quotedRate: data.quotedRate,
-          tenderDescription: data.tenderDescription,
-          language: profile.language,
-        }),
-      })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Generation failed')
-      const { winScore, winLabel, winReasoning, generatedDocument } = await res.json()
-
-      await addBidDocument(user.uid, {
-        tenderId: data.tender.id,
-        tenderName: data.tender.name,
-        tenderCategory: data.tender.category,
-        experienceYears: data.experienceYears,
-        pastContracts: data.pastContracts,
-        capacity: data.capacity,
-        quotedRate: data.quotedRate,
-        winScore, winLabel, generatedDocument,
-      })
-      await incrementBidDocCount(user.uid)
-      refreshUsage()
-
-      // Result appears as a message in the thread
-      const msgId = (Date.now() + 1).toString()
-      setMessages(prev => [...prev, {
-        id: msgId,
-        role: 'model',
-        content: `✅ Bid document generated for **${data.tender.name}**\n\nWin chance: ${winScore}% — ${winLabel}\n\n${winReasoning}`,
-      }])
-      setBidResult({ msgId, tenderName: data.tender.name, document: generatedDocument, winScore, winLabel, winReasoning })
-      setShowBidForm(false)
-      track('bid_document_generated', { category: data.tender.category, winScore })
-    } catch (err) {
-      setGenError(err instanceof Error ? err.message : 'Generation failed')
-    } finally {
-      setGenerating(false)
-    }
-
-    function refreshUsage() { onUsageUpdate() }
-  }, [profile, usage, user, onUsageUpdate])
-
   const isLongInput = input.trim().length >= SUMMARIZE_THRESHOLD
-  const userIsPro = isPro(profile)
 
   return (
-    <div className="flex flex-col h-full">
-
-      {/* ── Messages ──────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto space-y-3 pb-3">
+    <>
+      {/* ── Messages (normal document flow) ───────────────────── */}
+      <div className="space-y-3">
 
         {/* Empty state */}
-        {messages.length === 0 && !showBidForm && (
-          <div className="py-8 text-center">
-            <Sparkles size={32} className="mx-auto text-navy/20 mb-3" />
-            <p className="text-sm font-medium text-navy">{t('chatWelcome')}</p>
-            <p className="text-xs text-muted mt-1">{t('chatWelcomeSub')}</p>
-            <p className="text-xs text-muted/60 mt-2">
-              Paste tender text to summarize &nbsp;·&nbsp; Upload a PDF &nbsp;·&nbsp; Generate a bid doc
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center min-h-[52vh] text-center px-4">
+            <div className="w-14 h-14 rounded-2xl bg-orange/10 flex items-center justify-center mb-4">
+              <Sparkles size={28} className="text-orange" />
+            </div>
+            <p className="text-base font-semibold text-navy mb-1">{t('chatWelcome')}</p>
+            <p className="text-sm text-muted mb-3">{t('chatWelcomeSub')}</p>
+            <p className="text-xs text-muted/50">
+              Paste tender text to summarize &nbsp;·&nbsp; Upload a PDF
             </p>
           </div>
         )}
@@ -300,7 +219,7 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
                 'max-w-[85%] rounded-2xl px-4 py-3 text-sm',
                 msg.role === 'user'
                   ? 'bg-navy text-white rounded-br-sm'
-                  : 'bg-navy/5 text-navy rounded-bl-sm',
+                  : 'bg-white border border-navy/10 text-navy rounded-bl-sm shadow-sm',
               ].join(' ')}>
                 <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 {msg.role === 'model' && (
@@ -324,19 +243,6 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
                 </button>
               </div>
             )}
-
-            {/* View Bid Document — on generated bid messages */}
-            {bidResult?.msgId === msg.id && (
-              <div className="flex justify-start mt-1.5 pl-2">
-                <button
-                  onClick={() => setViewerOpen(true)}
-                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-orange/10 text-orange font-medium border border-orange/20 hover:bg-orange/20 transition-colors"
-                >
-                  <FileText size={12} aria-hidden="true" />
-                  View Document
-                </button>
-              </div>
-            )}
           </div>
         ))}
 
@@ -357,10 +263,10 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
         {/* Typing indicator */}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-navy/5 rounded-2xl rounded-bl-sm px-4 py-3">
-              <div className="flex gap-1">
+            <div className="bg-white border border-navy/10 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+              <div className="flex gap-1 items-center">
                 {[0, 1, 2].map(i => (
-                  <span key={i} className="w-1.5 h-1.5 rounded-full bg-navy/30 animate-bounce"
+                  <span key={i} className="w-1.5 h-1.5 rounded-full bg-orange/40 animate-bounce"
                     style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
@@ -368,142 +274,84 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
           </div>
         )}
 
-        {/* ── Inline Bid Generator card ────────────────────────── */}
-        {showBidForm && (
-          <div className="bg-white border border-orange/20 rounded-2xl overflow-hidden">
-            {/* Card header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-orange/5 border-b border-orange/10">
-              <div className="flex items-center gap-2">
-                <Sparkles size={14} className="text-orange" aria-hidden="true" />
-                <span className="text-sm font-semibold text-navy">{t('generatorTab')}</span>
-              </div>
-              <button
-                onClick={() => { setShowBidForm(false); setGenError(null) }}
-                className="p-1 rounded-lg text-muted hover:text-navy hover:bg-navy/5 transition-colors"
-              >
-                <X size={14} aria-label="Close" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-4">
-              {!userIsPro ? (
-                <div className="text-center space-y-2 py-4">
-                  <p className="text-sm font-semibold text-navy">{t('proOnly')}</p>
-                  <p className="text-xs text-muted">{t('proOnlySub')}</p>
-                  <button
-                    onClick={() => { setShowBidForm(false); setUpgradeOpen(true) }}
-                    className="px-5 py-2 rounded-xl bg-orange text-white font-semibold text-sm"
-                  >
-                    {t('upgradeCta')}
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {genError && (
-                    <p className="text-sm text-danger bg-danger/5 rounded-xl p-3">{genError}</p>
-                  )}
-                  <BidGeneratorForm
-                    profile={profile}
-                    tenders={tenders}
-                    onGenerate={handleGenerate}
-                    generating={generating}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Quick chips ─────────────────────────────────────────── */}
-      {messages.length === 0 && !showBidForm && (
-        <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
-          {QUICK_CHIPS.map(chip => (
-            <button key={chip} onClick={() => { setInput(chip); textareaRef.current?.focus() }}
-              className="shrink-0 text-xs px-3 py-2 rounded-full border border-navy/20 text-navy bg-white hover:bg-navy/5 transition-colors">
-              {chip}
-            </button>
-          ))}
-          <button
-            onClick={() => setShowBidForm(true)}
-            className="shrink-0 flex items-center gap-1 text-xs px-3 py-2 rounded-full border border-orange/30 text-orange bg-orange/5 hover:bg-orange/10 transition-colors"
-          >
-            <Sparkles size={11} aria-hidden="true" />
-            Generate Bid
-          </button>
-        </div>
-      )}
+      {/* ── Floating bottom panel — fixed above bottom nav ────── */}
+      {/* desktop:left-60 offsets past the fixed sidebar (w-60); desktop:bottom-0 since there's no bottom nav */}
+      <div className="fixed bottom-20 left-0 right-0 desktop:bottom-6 desktop:left-60 px-4 desktop:px-6 pt-8 bg-gradient-to-t from-[#F0F4FB] via-[#F0F4FB]/98 to-transparent pointer-events-none">
+        <div className="pointer-events-auto">
 
-      {/* ── Input bar ───────────────────────────────────────────── */}
-      <div className="flex gap-2 pt-2 border-t border-navy/10 items-end">
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png"
-          className="hidden"
-          onChange={handleFile}
-        />
-
-        {/* Attach — directly opens file picker */}
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={loading}
-          aria-label="Upload PDF or image"
-          title="Upload PDF or image"
-          className="w-10 h-10 rounded-xl border border-navy/20 text-muted hover:text-navy hover:border-navy/40 flex items-center justify-center shrink-0 transition-colors disabled:opacity-40 mb-0.5"
-        >
-          <Paperclip size={16} aria-hidden="true" />
-        </button>
-
-        {/* Auto-growing textarea */}
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
-            }}
-            placeholder={isLongInput ? 'Paste tender text to summarize…' : t('chatPlaceholder')}
-            disabled={loading}
-            rows={1}
-            className="w-full rounded-xl border border-navy/20 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/30 disabled:opacity-50 resize-none overflow-hidden leading-relaxed"
-          />
-          {/* Character hint when long text is pasted */}
-          {isLongInput && (
-            <span className="absolute right-2 bottom-1.5 text-[10px] text-muted/60 pointer-events-none">
-              summarize
-            </span>
+          {/* Quick chips */}
+          {messages.length === 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
+              {QUICK_CHIPS.map(chip => (
+                <button key={chip} onClick={() => { setInput(chip); textareaRef.current?.focus() }}
+                  className="shrink-0 text-xs px-3 py-2 rounded-full border border-orange/20 text-orange bg-orange/5 hover:bg-orange/10 hover:border-orange/30 transition-colors">
+                  {chip}
+                </button>
+              ))}
+            </div>
           )}
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="hidden"
+            onChange={handleFile}
+          />
+
+          {/* Input bar */}
+          <div className="pb-1">
+            <div className="flex gap-2 bg-white border border-navy/10 rounded-2xl px-2 py-1 items-center shadow-sm">
+
+              {/* Attach */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                aria-label="Upload PDF or image"
+                title="Upload PDF or image"
+                className="w-9 h-9 rounded-xl text-muted hover:text-navy hover:bg-navy/5 flex items-center justify-center shrink-0 transition-colors disabled:opacity-40"
+              >
+                <Paperclip size={16} aria-hidden="true" />
+              </button>
+
+              {/* Textarea */}
+              <div className="flex-1 relative flex items-center">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+                  }}
+                  placeholder={isLongInput ? 'Paste tender text to summarize…' : t('chatPlaceholder')}
+                  disabled={loading}
+                  rows={1}
+                  className="w-full bg-transparent px-1 py-0 text-sm focus:outline-none disabled:opacity-50 resize-none overflow-hidden leading-normal text-navy placeholder:text-muted"
+                />
+                {isLongInput && (
+                  <span className="absolute right-1 bottom-2 text-[10px] text-orange/60 pointer-events-none font-medium">
+                    summarize
+                  </span>
+                )}
+              </div>
+
+              {/* Send */}
+              <button
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                aria-label={t('sendMessage')}
+                className="w-9 h-9 rounded-xl bg-orange text-white flex items-center justify-center disabled:opacity-30 shrink-0 transition-colors hover:bg-orange/90"
+              >
+                <Send size={15} />
+              </button>
+            </div>
+          </div>
+
         </div>
-
-        {/* Generate Bid button */}
-        <button
-          onClick={() => setShowBidForm(v => !v)}
-          aria-label="Generate Bid Document"
-          title="Generate Bid Document"
-          className={[
-            'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors mb-0.5',
-            showBidForm
-              ? 'bg-orange text-white'
-              : 'bg-orange/10 text-orange hover:bg-orange/20',
-          ].join(' ')}
-        >
-          <Sparkles size={16} aria-hidden="true" />
-        </button>
-
-        {/* Send */}
-        <button
-          onClick={handleSend}
-          disabled={loading || !input.trim()}
-          aria-label={t('sendMessage')}
-          className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center disabled:opacity-40 shrink-0 mb-0.5"
-        >
-          <Send size={16} />
-        </button>
       </div>
 
       {/* Dialogs */}
@@ -519,19 +367,6 @@ export function UnifiedAIChat({ profile, usage, onUsageUpdate, tenderCount, tend
           currentTenderCount={tenderCount}
         />
       )}
-
-      {viewerOpen && bidResult && (
-        <div className="fixed inset-0 z-50 bg-lightbg overflow-y-auto p-4">
-          <BidDocumentViewer
-            tenderName={bidResult.tenderName}
-            document={bidResult.document}
-            winScore={bidResult.winScore}
-            winLabel={bidResult.winLabel}
-            winReasoning={bidResult.winReasoning}
-            onClose={() => setViewerOpen(false)}
-          />
-        </div>
-      )}
-    </div>
+    </>
   )
 }

@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, Sparkles, Package, Menu } from 'lucide-react'
+import { LayoutDashboard, FileText, Sparkles, Package, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { MenuSheet } from '@/components/layout/menu-sheet'
@@ -54,16 +54,16 @@ export function BottomNav({ locale, profile }: BottomNavProps) {
             )
           })}
 
-          {/* Tab 5: Menu button — never highlighted as "active" */}
+          {/* Tab 5: Profile button — never highlighted as "active" */}
           <button
             onClick={() => setSheetOpen(true)}
-            aria-label={t('menu')}
+            aria-label={t('profile')}
             aria-haspopup="dialog"
             aria-expanded={sheetOpen}
             className="relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[48px] min-h-[48px] justify-center text-muted hover:text-navy/60 transition-colors"
           >
-            <Menu size={22} strokeWidth={1.8} aria-hidden="true" />
-            <span className="text-[10px] font-medium">{t('menu')}</span>
+            <User size={22} strokeWidth={1.8} aria-hidden="true" />
+            <span className="text-[10px] font-medium">{t('profile')}</span>
           </button>
         </div>
       </nav>

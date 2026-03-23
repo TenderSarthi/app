@@ -6,13 +6,11 @@ import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
-import { usePlatformStats } from '@/lib/hooks/use-platform-stats'
 import { useUserTenders } from '@/lib/hooks/use-user-tenders'
 import { useAIUsage } from '@/lib/hooks/use-ai-usage'
 import { touchLastActive } from '@/lib/firebase/firestore'
-import { TrustSignalBar } from '@/components/dashboard/trust-signal-bar'
 import { TrialBanner } from '@/components/dashboard/trial-banner'
-import { AIUsageCounter } from '@/components/dashboard/ai-usage-counter'
+import { NotificationBell } from '@/components/dashboard/notification-bell'
 import { GettingStarted } from '@/components/dashboard/getting-started'
 import { ActiveDashboard } from '@/components/dashboard/active-dashboard'
 import { UpgradeDialog } from '@/components/dashboard/upgrade-dialog'
@@ -25,10 +23,9 @@ export default function DashboardPage() {
 
   const { user } = useFirebase()
   const { profile } = useUserProfile()
-  const { stats } = usePlatformStats()
   const { tenders, loading: tendersLoading, error: tendersError } = useUserTenders(user?.uid ?? null)
   const { usage } = useAIUsage(user?.uid ?? null)
-  const [upgradeOpen, setUpgradeOpen] = useState(false)
+  const [upgradeOpen, setUpgradeOpen]       = useState(false)
 
   useEffect(() => {
     if (user?.uid) touchLastActive(user.uid).catch(() => {})
@@ -54,9 +51,7 @@ export default function DashboardPage() {
   const isNewUser     = tenders.length === 0   // single source of truth
 
   return (
-    <div className="space-y-5 pb-20 desktop:pb-6">
-      <TrustSignalBar stats={stats} />
-
+    <div className="space-y-5 pb-32 desktop:pb-6">
       {!userIsPro && (
         <TrialBanner
           trialEndsAt={profile.trialEndsAt}
@@ -76,7 +71,7 @@ export default function DashboardPage() {
             </p>
           )}
         </div>
-        <AIUsageCounter usage={usage} isPro={userIsPro} />
+        <NotificationBell tenders={tenders} locale={locale} />
       </div>
 
       {tendersError && (

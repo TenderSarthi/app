@@ -99,7 +99,7 @@ export default function SavedPage() {
       <Sheet open={filterOpen} onOpenChange={(v) => { if (!v) setFilterOpen(false) }}>
         <SheetContent side="bottom" showCloseButton={false} className="px-4 pb-8 pt-3 rounded-t-2xl max-h-[85vh] overflow-y-auto">
           <SheetTitle className="sr-only">{tT('filters')}</SheetTitle>
-          <div className="w-10 h-1 rounded bg-gray-200 mx-auto mb-5" />
+          <div className="w-10 h-1 rounded bg-navy/10 mx-auto mb-5" />
 
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-heading font-semibold text-navy text-base">{tT('filters')}</h2>

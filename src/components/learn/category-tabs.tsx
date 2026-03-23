@@ -39,7 +39,7 @@ export function CategoryTabs({ active, onChange, counts }: CategoryTabsProps) {
             'shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap',
             active === tab.value
               ? 'bg-navy text-white'
-              : 'bg-white text-muted-foreground border border-gray-200 hover:border-navy/30'
+              : 'bg-white text-muted border border-navy/10 hover:border-navy/30'
           )}
         >
           {tab.label}{/* TODO: i18n */}

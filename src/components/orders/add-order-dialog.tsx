@@ -151,7 +151,7 @@ export function AddOrderDialog({
           {/* Tender select — disabled when editing */}
           <div>
             <Label htmlFor="order-tender">
-              {t('tenderLabel')} <span className="text-destructive">*</span>
+              {t('tenderLabel')} <span className="text-danger">*</span>
             </Label>
             <Select
               value={tenderId}
@@ -163,7 +163,7 @@ export function AddOrderDialog({
               </SelectTrigger>
               <SelectContent>
                 {tenders.length === 0 ? (
-                  <p className="px-3 py-2 text-sm text-muted-foreground">
+                  <p className="px-3 py-2 text-sm text-muted">
                     {t('noWonTenders')}
                   </p>
                 ) : (
@@ -181,7 +181,7 @@ export function AddOrderDialog({
           <div>
             <Label htmlFor="order-won">
               {t('workOrderLabel')}{' '}
-              <span className="text-muted-foreground font-normal">({t('optional')})</span>
+              <span className="text-muted font-normal">({t('optional')})</span>
             </Label>
             <Input
               id="order-won"
@@ -196,7 +196,7 @@ export function AddOrderDialog({
           <div>
             <Label htmlFor="order-value">
               {t('valueLabel')}{' '}
-              <span className="text-muted-foreground font-normal">({t('optional')})</span>
+              <span className="text-muted font-normal">({t('optional')})</span>
             </Label>
             <Input
               id="order-value"
@@ -213,7 +213,7 @@ export function AddOrderDialog({
           <div>
             <Label htmlFor="order-notes">
               {t('notesLabel')}{' '}
-              <span className="text-muted-foreground font-normal">({t('optional')})</span>
+              <span className="text-muted font-normal">({t('optional')})</span>
             </Label>
             <textarea
               id="order-notes"
@@ -222,15 +222,15 @@ export function AddOrderDialog({
               placeholder={t('notesPlaceholder')}
               maxLength={500}
               rows={3}
-              className="mt-1 w-full border border-input rounded-lg px-2.5 py-2 text-sm bg-transparent resize-none outline-none focus-visible:border-ring placeholder:text-muted-foreground"
+              className="mt-1 w-full border border-input rounded-lg px-2.5 py-2 text-sm bg-transparent resize-none outline-none focus-visible:border-ring placeholder:text-muted"
             />
-            <p className="text-xs text-muted-foreground text-right mt-0.5">
+            <p className="text-xs text-muted text-right mt-0.5">
               {notes.length}/500
             </p>
           </div>
 
           {error && (
-            <p role="alert" className="text-sm text-destructive">{error}</p>
+            <p role="alert" className="text-sm text-danger">{error}</p>
           )}
         </div>
 

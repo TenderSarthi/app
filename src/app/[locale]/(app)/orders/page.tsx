@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Lock, Plus } from 'lucide-react'
+import { Lock, Plus, Package } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { useOrders } from '@/lib/hooks/use-orders'
@@ -93,21 +93,17 @@ export default function OrdersPage() {
   return (
     <div className="space-y-4 pb-32 desktop:pb-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
-          <p className="text-sm text-muted mt-0.5">{t('subtitle')}</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => { setEditOrder(null); setDialogOpen(true) }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-navy text-white text-sm font-semibold"
-          aria-label="Add work order"
-        >
-          <Plus size={15} />
-          {t('addOrder')}
-        </button>
-      </div>
+      <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
+
+      {/* FAB — same pattern as Document Vault */}
+      <button
+        type="button"
+        onClick={() => { setEditOrder(null); setDialogOpen(true) }}
+        aria-label={t('addOrder')}
+        className="fixed bottom-24 right-4 desktop:bottom-6 desktop:right-6 z-50 w-14 h-14 bg-navy text-white rounded-full shadow-lg flex items-center justify-center hover:bg-navy/90 active:scale-95 transition-all"
+      >
+        <Plus size={24} />
+      </button>
 
       {/* Order list */}
       {loading ? (
@@ -125,6 +121,9 @@ export default function OrdersPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-navy/8 flex items-center justify-center mb-4">
+            <Package size={28} className="text-navy/30" />
+          </div>
           <p className="font-semibold text-navy">{t('emptyState')}</p>
           <p className="text-sm text-muted mt-1 max-w-xs">
             {t('emptyStateSub')}

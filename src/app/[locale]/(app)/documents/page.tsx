@@ -32,7 +32,7 @@ export default function DocumentsPage() {
   // Free users: show checklist + upgrade prompt, no documents
   if (!userIsPro) {
     return (
-      <div className="space-y-4 pb-6">
+      <div className="space-y-4 pb-32 desktop:pb-6">
         <div>
           <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
           <p className="text-sm text-muted mt-0.5">{t('subtitle')}</p>

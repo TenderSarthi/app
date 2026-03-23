@@ -1,7 +1,6 @@
 // src/app/[locale]/(app)/bid/page.tsx
 'use client'
 import { useTranslations } from 'next-intl'
-import { Sparkles } from 'lucide-react'
 import { useFirebase } from '@/components/providers/firebase-provider'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { useUserTenders } from '@/lib/hooks/use-user-tenders'
@@ -25,21 +24,17 @@ export default function BidPage() {
   }
 
   return (
-    <div className="flex flex-col pb-20 desktop:pb-0" style={{ height: 'calc(100vh - 80px)' }}>
-      <div className="flex items-center gap-2 pb-3 shrink-0">
-        <Sparkles size={18} className="text-orange" aria-hidden="true" />
-        <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
-      </div>
+    <div className="space-y-3 pb-48 desktop:pb-28">
+      {/* Header — same pattern as Tenders / Orders */}
+      <h1 className="font-heading font-bold text-xl text-navy">{t('title')}</h1>
 
-      <div className="flex-1 min-h-0">
-        <UnifiedAIChat
-          profile={profile}
-          usage={usage}
-          onUsageUpdate={refreshUsage}
-          tenderCount={tenders.length}
-          tenders={tenders}
-        />
-      </div>
+      <UnifiedAIChat
+        profile={profile}
+        usage={usage}
+        onUsageUpdate={refreshUsage}
+        tenderCount={tenders.length}
+        tenders={tenders}
+      />
     </div>
   )
 }

@@ -20,7 +20,7 @@ export function GemDeeplinkButton({ state, categories }: GemDeeplinkButtonProps)
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="shrink-0 flex items-center gap-1.5 bg-navy text-white rounded-full px-3.5 py-2 text-sm font-medium hover:bg-navy/90 transition-colors"
+      className="shrink-0 flex items-center gap-1.5 h-10 px-3.5 rounded-xl border border-orange/25 bg-orange/5 text-orange text-sm font-medium hover:border-orange/40 hover:bg-orange/10 transition-colors"
     >
       <ExternalLink size={13} aria-hidden="true" />
       GeM

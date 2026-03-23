@@ -35,9 +35,9 @@ export function Sidebar({ locale }: { locale: string }) {
     : '?'
 
   return (
-    <aside className="hidden desktop:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-white border-r border-gray-200 z-40">
+    <aside className="hidden desktop:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-white border-r border-navy/20 z-40">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-5 py-5 border-b border-gray-100">
+      <div className="flex items-center gap-2 px-5 py-5 border-b border-navy/10">
         <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center">
           <span className="text-orange font-heading font-bold text-xs">TS</span>
         </div>
@@ -50,7 +50,7 @@ export function Sidebar({ locale }: { locale: string }) {
           const full = `/${locale}${href}`
           const active = pathname.startsWith(full)
           return (
-            <Link key={key} href={full} aria-current={active ? 'page' : undefined} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-colors', active ? 'bg-orange/10 text-orange font-semibold' : 'text-gray-600 hover:bg-gray-100')}>
+            <Link key={key} href={full} aria-current={active ? 'page' : undefined} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-colors', active ? 'bg-orange/10 text-orange font-semibold' : 'text-navy/60 hover:bg-navy/5')}>
               <Icon size={18} aria-hidden="true" />
               <span>{t(key)}</span>
             </Link>
@@ -59,7 +59,7 @@ export function Sidebar({ locale }: { locale: string }) {
       </nav>
 
       {/* User footer with logout */}
-      <div className="border-t border-gray-100 px-4 py-3 flex items-center gap-2">
+      <div className="border-t border-navy/10 px-4 py-3 flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-navy/10 flex items-center justify-center flex-shrink-0">
           <span className="text-navy font-bold text-xs">{initials}</span>
         </div>
@@ -71,7 +71,7 @@ export function Sidebar({ locale }: { locale: string }) {
           type="button"
           onClick={handleLogout}
           title="Log out"
-          className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-red-50 transition-colors"
+          className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-danger/5 transition-colors"
         >
           <LogOut size={15} aria-label="Log out" />
         </button>

@@ -47,22 +47,22 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
                   idx === 0
                     ? 'invisible'
                     : isDone && order.milestones[MILESTONES[idx - 1].key] !== null
-                    ? 'bg-green-500'
-                    : 'bg-gray-200'
+                    ? 'bg-success'
+                    : 'bg-navy/10'
                 )}
               />
 
               {/* Step icon */}
               <div className="relative flex items-center justify-center">
                 {isDone ? (
-                  <CheckCircle2 size={20} className="text-green-500 shrink-0" />
+                  <CheckCircle2 size={20} className="text-success shrink-0" />
                 ) : isCurrent ? (
                   <div className="relative">
-                    <Clock size={20} className="text-orange-500 shrink-0" />
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                    <Clock size={20} className="text-orange shrink-0" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-orange animate-pulse" />
                   </div>
                 ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-200 bg-white shrink-0" />
+                  <div className="w-5 h-5 rounded-full border-2 border-navy/10 bg-white shrink-0" />
                 )}
               </div>
 
@@ -73,8 +73,8 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
                   idx === MILESTONES.length - 1
                     ? 'invisible'
                     : isDone && nextMilestoneDone
-                    ? 'bg-green-500'
-                    : 'bg-gray-200'
+                    ? 'bg-success'
+                    : 'bg-navy/10'
                 )}
               />
             </div>
@@ -85,17 +85,17 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
                 className={cn(
                   'text-[10px] font-medium leading-none',
                   isDone
-                    ? 'text-green-600'
+                    ? 'text-success'
                     : isCurrent
-                    ? 'text-orange-500'
-                    : 'text-gray-400'
+                    ? 'text-orange'
+                    : 'text-muted'
                 )}
               >
                 {milestone.label}
               </span>
 
               {isDone && milestoneDate && (
-                <span className="text-[9px] text-gray-400 leading-none">
+                <span className="text-[9px] text-muted leading-none">
                   {milestoneDate.toDate().toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'short',
@@ -104,7 +104,7 @@ export function MilestoneStepper({ order }: MilestoneStepperProps) {
               )}
 
               {invoiceDays !== null && invoiceDays >= 0 && (
-                <span className="text-[9px] text-blue-500 leading-none font-medium">
+                <span className="text-[9px] text-navy/60 leading-none font-medium">
                   {invoiceDays}d ago
                 </span>
               )}

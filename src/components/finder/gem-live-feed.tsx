@@ -3,18 +3,19 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useFirebase } from '@/components/providers/firebase-provider'
-import { ExternalLink, RefreshCw, Rss, Clock, AlertTriangle } from 'lucide-react'
+import { ExternalLink, RefreshCw, Rss, Clock, AlertTriangle, Copy, Check } from 'lucide-react'
 import { SaveTenderDialog } from './save-tender-dialog'
 import type { UserProfile } from '@/lib/types'
 
 interface LiveTender {
-  title: string
-  link: string
-  org: string
-  pubDate: string
+  title:       string
+  link:        string
+  refId:       string   // CPPP reference number, e.g. "2026_AAI_272420_1"
+  org:         string
+  pubDate:     string
   closingDate: string
-  categories: string[]
-  states: string[]
+  categories:  string[]
+  states:      string[]
 }
 
 interface GemLiveFeedProps {
@@ -22,6 +23,7 @@ interface GemLiveFeedProps {
   categories: string[]
   profile: UserProfile
   tenderCount: number
+  searchQuery?: string
 }
 
 function timeAgo(dateStr: string): string {
@@ -39,7 +41,7 @@ function daysUntil(dateStr: string): number | null {
   } catch { return null }
 }
 
-export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLiveFeedProps) {
+export function GemLiveFeed({ state, categories, profile, tenderCount, searchQuery }: GemLiveFeedProps) {
   const t = useTranslations('finder')
   const { user } = useFirebase()
 
@@ -47,6 +49,14 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
   const [loading,         setLoading]         = useState(true)
   const [error,           setError]           = useState(false)
   const [selectedTender,  setSelectedTender]  = useState<LiveTender | null>(null)
+  const [copiedId,        setCopiedId]        = useState<string | null>(null)
+
+  const copyRefId = (refId: string) => {
+    navigator.clipboard.writeText(refId).then(() => {
+      setCopiedId(refId)
+      setTimeout(() => setCopiedId(null), 2000)
+    })
+  }
 
   const fetchFeed = useCallback(async () => {
     if (!user) return
@@ -92,9 +102,9 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
 
       {/* Loading skeletons */}
       {loading && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {[0, 1, 2].map(i => (
-            <div key={i} className="h-24 bg-navy/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-32 bg-navy/5 rounded-xl animate-pulse" />
           ))}
         </div>
       )}
@@ -114,25 +124,46 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
 
       {/* Empty state */}
       {!loading && !error && tenders.length === 0 && (
-        <div className="text-center py-8 bg-navy/5 rounded-xl">
-          <p className="text-sm text-muted">{t('liveFeedEmpty')}</p>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-navy/5 flex items-center justify-center mb-4">
+            <Rss size={26} className="text-navy/25" />
+          </div>
+          <p className="font-semibold text-navy text-sm">{t('liveFeedEmpty')}</p>
+          <p className="text-sm text-muted mt-1 max-w-xs">Try adjusting your filters or check back shortly.</p>
         </div>
       )}
 
       {/* Tender cards */}
-      {!loading && !error && tenders.length > 0 && (
-        <div className="space-y-2">
-          {tenders.map((tender, i) => {
+      {!loading && !error && tenders.length > 0 && (() => {
+        const q = searchQuery?.trim().toLowerCase() ?? ''
+        const visible = q
+          ? tenders.filter(t =>
+              t.title.toLowerCase().includes(q) ||
+              t.org?.toLowerCase().includes(q)
+            )
+          : tenders
+        return (
+        <div className="space-y-3">
+          {visible.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-navy/5 flex items-center justify-center mb-4">
+                <Rss size={26} className="text-navy/25" />
+              </div>
+              <p className="font-semibold text-navy text-sm">No tenders match your search</p>
+              <p className="text-sm text-muted mt-1">Try a different keyword or clear filters.</p>
+            </div>
+          )}
+          {visible.map((tender, i) => {
             const days = tender.closingDate ? daysUntil(tender.closingDate) : null
             const urgent = days !== null && days <= 3 && days >= 0
             return (
               <div
                 key={i}
-                className="bg-white border border-navy/10 rounded-xl p-3 space-y-2 hover:border-navy/20 hover:shadow-sm transition-all"
+                className="bg-white border border-navy/10 rounded-xl p-4 space-y-2.5 hover:border-navy/20 hover:shadow-sm transition-all"
               >
                 {/* Title + time */}
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium text-navy leading-snug line-clamp-2 flex-1">
+                  <p className="text-sm font-semibold text-navy leading-snug line-clamp-2 flex-1">
                     {tender.title}
                   </p>
                   <span className="text-[10px] text-muted whitespace-nowrap flex-shrink-0 mt-0.5">
@@ -142,7 +173,7 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
 
                 {/* Org */}
                 {tender.org && (
-                  <p className="text-[11px] text-muted truncate">{tender.org}</p>
+                  <p className="text-xs text-muted truncate">{tender.org}</p>
                 )}
 
                 {/* Badges + closing date */}
@@ -170,6 +201,25 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
                   )}
                 </div>
 
+                {/* Ref number row */}
+                {tender.refId && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-mono text-muted/70 bg-navy/5 px-2 py-0.5 rounded-lg truncate flex-1 min-w-0">
+                      {tender.refId}
+                    </span>
+                    <button
+                      onClick={() => copyRefId(tender.refId)}
+                      className="shrink-0 p-1 rounded-lg text-muted hover:text-navy hover:bg-navy/5 transition-colors"
+                      aria-label="Copy reference number"
+                    >
+                      {copiedId === tender.refId
+                        ? <Check size={11} className="text-success" />
+                        : <Copy size={11} />
+                      }
+                    </button>
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex gap-2 pt-0.5">
                   <button
@@ -179,13 +229,13 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
                     {t('saveTender')}
                   </button>
                   <a
-                    href={tender.link}
+                    href="https://eprocure.gov.in/cppp/latestactivetendersnew"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-2 rounded-xl border border-navy/20 text-navy text-xs font-medium hover:bg-navy/5 transition-colors flex items-center gap-1"
                   >
                     <ExternalLink size={11} />
-                    {t('viewOn')}
+                    CPPP
                   </a>
                 </div>
               </div>
@@ -196,7 +246,8 @@ export function GemLiveFeed({ state, categories, profile, tenderCount }: GemLive
             {t('liveFeedSource')}
           </p>
         </div>
-      )}
+        )
+      })()}
 
       {/* Save dialog — key forces remount on tender change so useState reinitialises */}
       {selectedTender && user && (

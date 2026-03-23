@@ -55,7 +55,8 @@
     "learn": "Learn",
     "orders": "Orders",
     "settings": "Settings",
-    "menu": "Menu"
+    "menu": "Menu",
+    "profile": "ಪ್ರೊಫೈಲ್"
   },
   "planGate": {
     "aiLimitReached": "You've used {used}/{limit} AI queries this month.",
@@ -315,7 +316,7 @@
   },
   "settings": {
     "title": "Settings",
-    "profile": "प्रोफाइल",
+    "profile": "ಪ್ರೊಫೈಲ್",
     "saveProfile": "बदलाव सेव करें",
     "profileSaved": "प्रोफाइल अपडेट ✓",
     "profileError": "सेव नहीं हो सका। दोबारा try करें।",

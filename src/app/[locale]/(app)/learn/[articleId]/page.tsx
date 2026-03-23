@@ -17,10 +17,10 @@ const CATEGORY_LABEL: Record<string, string> = {
 }
 
 const CATEGORY_CLASS: Record<string, string> = {
-  getting_started:    'bg-blue-100 text-blue-700',
-  bidding_strategy:   'bg-orange-100 text-orange-700',
-  finance_compliance: 'bg-green-100 text-green-700',
-  post_win:           'bg-purple-100 text-purple-700',
+  getting_started:    'bg-navy/10 text-navy',
+  bidding_strategy:   'bg-orange/10 text-orange',
+  finance_compliance: 'bg-success/10 text-success',
+  post_win:           'bg-gold/10 text-gold',
 }
 
 export default function ArticleDetailPage() {
@@ -43,7 +43,7 @@ export default function ArticleDetailPage() {
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-navy"
+          className="flex items-center gap-1.5 text-sm text-muted hover:text-navy"
         >
           <ArrowLeft size={15} />
           Back to Learning Center
@@ -62,7 +62,7 @@ export default function ArticleDetailPage() {
       <button
         type="button"
         onClick={handleBack}
-        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-navy"
+        className="flex items-center gap-1.5 text-sm text-muted hover:text-navy"
       >
         <ArrowLeft size={15} />
         Back to Learning Center
@@ -76,12 +76,12 @@ export default function ArticleDetailPage() {
         )}>
           {CATEGORY_LABEL[article.category]}
         </span>
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 text-xs text-muted">
           <Clock size={11} />
           {article.readMinutes} min read
         </span>
         {article.youtubeId && (
-          <span className="flex items-center gap-1 text-xs text-red-600 font-medium">
+          <span className="flex items-center gap-1 text-xs text-danger font-medium">
             <PlayCircle size={11} />
             Video
           </span>
@@ -95,7 +95,7 @@ export default function ArticleDetailPage() {
 
       {/* YouTube embed */}
       {article.youtubeId && (
-        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-100">
+        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-navy/5">
           <iframe
             src={`https://www.youtube.com/embed/${article.youtubeId}`}
             className="absolute inset-0 w-full h-full"
@@ -109,7 +109,7 @@ export default function ArticleDetailPage() {
       {/* Body paragraphs */}
       <div className="space-y-4">
         {body.map((paragraph, idx) => (
-          <p key={idx} className="text-sm text-gray-700 leading-relaxed">
+          <p key={idx} className="text-sm text-navy/80 leading-relaxed">
             {paragraph}
           </p>
         ))}

@@ -55,7 +55,8 @@
     "learn": "Learn",
     "orders": "Orders",
     "settings": "Settings",
-    "menu": "Menu"
+    "menu": "Menu",
+    "profile": "Profile"
   },
   "planGate": {
     "aiLimitReached": "You've used {used}/{limit} AI queries this month.",

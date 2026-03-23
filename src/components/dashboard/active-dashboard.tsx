@@ -43,7 +43,7 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
     <div className="space-y-4">
 
       {/* ── Deadline card ──────────────────────────────── */}
-      <div className={`rounded-2xl p-4 text-white ${
+      <div className={`rounded-xl p-4 text-white ${
         daysUntilDeadline !== null && daysUntilDeadline <= 3
           ? 'bg-gradient-to-br from-danger via-danger to-danger/80'
           : 'bg-gradient-to-br from-navy via-navy to-navy/90'
@@ -106,7 +106,7 @@ export function ActiveDashboard({ locale, tenders, activeTenders, usage }: Activ
 
       {/* ── Quick actions ──────────────────────────────── */}
       <div>
-        <h3 className="text-xs font-semibold text-muted uppercase tracking-widest mb-2">
+        <h3 className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
           {t('quickActions')}
         </h3>
         <div className="grid grid-cols-2 gap-2">
