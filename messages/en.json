@@ -109,7 +109,7 @@
     "deadline": "Deadline",
     "queriesLeft": "{left} AI queries left this month",
     "searchSavedTenders": "Search your saved tenders",
-    "liveFeedTitle": "Live Government Tenders",
+    "liveFeedTitle": "Live GeM Bids",
     "liveFeedEmpty": "No tenders match your filters. Try selecting All States.",
     "liveFeedError": "Could not load tenders. Check your connection.",
     "liveFeedRetry": "Try again",

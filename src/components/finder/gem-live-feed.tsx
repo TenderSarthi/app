@@ -10,8 +10,9 @@ import type { UserProfile } from '@/lib/types'
 interface LiveTender {
   title:       string
   link:        string
-  refId:       string   // CPPP reference number, e.g. "2026_AAI_272420_1"
+  refId:       string   // GeM bid number, e.g. "GEM/2026/B/7195650"
   org:         string
+  dept?:       string   // Department name (from GeM CPPP)
   pubDate:     string
   closingDate: string
   categories:  string[]
@@ -171,9 +172,12 @@ export function GemLiveFeed({ state, categories, profile, tenderCount, searchQue
                   </span>
                 </div>
 
-                {/* Org */}
+                {/* Org + Dept */}
                 {tender.org && (
                   <p className="text-xs text-muted truncate">{tender.org}</p>
+                )}
+                {tender.dept && tender.dept !== tender.org && (
+                  <p className="text-[11px] text-muted/60 truncate">{tender.dept}</p>
                 )}
 
                 {/* Badges + closing date */}
@@ -229,13 +233,13 @@ export function GemLiveFeed({ state, categories, profile, tenderCount, searchQue
                     {t('saveTender')}
                   </button>
                   <a
-                    href="https://eprocure.gov.in/cppp/latestactivetendersnew"
+                    href="https://bidplus.gem.gov.in/all-bids"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-2 rounded-xl border border-navy/20 text-navy text-xs font-medium hover:bg-navy/5 transition-colors flex items-center gap-1"
                   >
                     <ExternalLink size={11} />
-                    CPPP
+                    GeM
                   </a>
                 </div>
               </div>
@@ -255,7 +259,12 @@ export function GemLiveFeed({ state, categories, profile, tenderCount, searchQue
           key={selectedTender.link}
           open={true}
           onClose={() => setSelectedTender(null)}
-          aiSummary={selectedTender.org ? `Organisation: ${selectedTender.org}\nClosing: ${selectedTender.closingDate}` : undefined}
+          aiSummary={[
+            selectedTender.refId   && `GeM Bid: ${selectedTender.refId}`,
+            selectedTender.org     && `Organisation: ${selectedTender.org}`,
+            selectedTender.dept    && `Department: ${selectedTender.dept}`,
+            selectedTender.closingDate && `Closing: ${selectedTender.closingDate}`,
+          ].filter(Boolean).join('\n') || undefined}
           uid={user.uid}
           profile={profile}
           currentTenderCount={tenderCount}

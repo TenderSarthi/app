@@ -109,7 +109,7 @@
     "deadline": "Deadline",
     "queriesLeft": "इस महीने {left} AI queries बाकी हैं",
     "searchSavedTenders": "Apne saved tenders search करें",
-    "liveFeedTitle": "Live Sarkari Tenders",
+    "liveFeedTitle": "Live GeM Bids",
     "liveFeedEmpty": "आपके filters से कोई tender नहीं मिला। All States try करें।",
     "liveFeedError": "Tenders load नहीं हो सके। Internet check करें।",
     "liveFeedRetry": "फिर try करें",

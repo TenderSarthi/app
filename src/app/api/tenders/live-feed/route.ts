@@ -1,64 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuth } from 'firebase-admin/auth'
 import '@/lib/firebase/admin'
-import { CATEGORY_KEYWORDS, INDIAN_STATES } from '@/lib/constants'
+import { INDIAN_STATES } from '@/lib/constants'
 
-const CPPP_BASE   = 'https://eprocure.gov.in/cppp/latestactivetendersnew'
-const CPPP_ORIGIN = 'https://eprocure.gov.in'
-const FETCH_PAGES = 6   // ~60 tenders per fetch
+// GeM-only endpoint on CPPP — ~3,000 pages of live GeM bids
+// Column layout differs from regular CPPP latestactivetendersnew
+const GEM_CPPP_BASE = 'https://eprocure.gov.in/cppp/gemtender'
+const FETCH_PAGES   = 5   // 50 GeM bids per fetch (10 rows/page × 5 pages)
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
-// ── CPPP HTML parser ──────────────────────────────────────────────────────────
+// ── GeM HTML parser ───────────────────────────────────────────────────────────
+// GeM CPPP column layout:
+//   [0] Sl.No
+//   [1] Bid Start Date   ← pubDate
+//   [2] Bid End Date     ← closingDate
+//   [3] Bid Number       ← <a>GEM/2026/B/NNNNNNN</a>/Qty
+//   [4] Product Category ← structured category string
+//   [5] Organisation
+//   [6] Department
 
 interface RawTender {
-  title:       string
-  link:        string
-  refId:       string   // e.g. "2026_AAI_272420_1" — stable, session-free identifier
-  org:         string
-  pubDate:     Date
-  closingDate: string
+  bidNumber:    string   // e.g. "GEM/2026/B/7195650" — the stable, human-readable GeM bid ID
+  org:          string   // Organisation Name (e.g. "Indian Army")
+  dept:         string   // Department Name (e.g. "Department of Military Affairs")
+  category:     string   // Product/Service Category (structured, not inferred)
+  bidStartDate: Date
+  bidEndDate:   string   // raw string for display
 }
 
-function parseCPPPPage(html: string): RawTender[] {
+function parseGeMPage(html: string): RawTender[] {
   const rows = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/g) ?? []
 
   return rows.slice(1).flatMap(row => {
     const cells = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(m => m[0])
-    if (cells.length < 6) return []
+    if (cells.length < 7) return []
 
-    const text  = (cell: string) => cell.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-    const href  = (cell: string) => { const m = cell.match(/href="([^"]+)"/); return m?.[1] ?? '' }
+    const text = (cell: string) => cell.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+    const anchorText = (cell: string) => {
+      const m = cell.match(/<a[^>]*>([\s\S]*?)<\/a>/)
+      return m?.[1]?.replace(/<[^>]+>/g, '').trim() ?? ''
+    }
 
-    const titleCell  = cells[4]
-    const rawText    = text(titleCell)
-    // rawText format: "Tender Title/2026_ORG_ID_1/more..." — ref number is the 2nd segment
-    const parts      = rawText.split('/')
-    const title      = parts[0].trim()
-    const refId      = parts[1]?.trim() ?? ''   // stable reference number (no session dependency)
-    const rawLink    = href(titleCell)
-    // Normalise relative paths to absolute URLs
-    const link       = rawLink.startsWith('http') ? rawLink : `${CPPP_ORIGIN}${rawLink}`
-    const org        = text(cells[5])
-    const pubDateStr = text(cells[1])   // e.g. "22-Mar-2026 12:10 PM"
+    const bidNumber   = anchorText(cells[3])
+    const category    = text(cells[4])
+    const org         = text(cells[5])
+    const dept        = text(cells[6])
+    const bidStartStr = text(cells[1])
+    const bidEndDate  = text(cells[2])
 
-    if (!title || !link) return []
+    // Only accept real GeM bid numbers — filter out header/footer rows
+    if (!bidNumber.startsWith('GEM/')) return []
 
-    const pubDate = new Date(pubDateStr.replace(/(\d{2})-([A-Za-z]{3})-(\d{4})/, '$2 $1 $3'))
+    // CPPP date format: "22-Mar-2026 12:10 PM" → parse as "Mar 22 2026"
+    const bidStartDate = new Date(
+      bidStartStr.replace(/(\d{2})-([A-Za-z]{3})-(\d{4})/, '$2 $1 $3')
+    )
 
-    return [{ title, link, refId, org, pubDate: isNaN(pubDate.getTime()) ? new Date() : pubDate, closingDate: text(cells[2]) }]
+    return [{
+      bidNumber,
+      org,
+      dept,
+      category,
+      bidStartDate: isNaN(bidStartDate.getTime()) ? new Date() : bidStartDate,
+      bidEndDate,
+    }]
   })
 }
 
-// ── Category + state extraction (mirrors alert-utils logic) ──────────────────
-
-function extractCategories(text: string): string[] {
-  const lower = text.toLowerCase()
-  const cats = Object.entries(CATEGORY_KEYWORDS)
-    .filter(([, kws]) => kws.some(k => lower.includes(k)))
-    .map(([cat]) => cat)
-  return cats.length > 0 ? cats : ['Other']
-}
+// ── State extraction (best-effort from org + dept text) ───────────────────────
 
 function extractStates(text: string): string[] {
   const lower = text.toLowerCase()
@@ -84,10 +94,11 @@ export async function GET(req: NextRequest) {
   const state      = searchParams.get('state') ?? ''
   const categories = searchParams.get('categories')?.split(',').filter(Boolean) ?? []
 
-  // Fetch CPPP pages concurrently
+  // Fetch GeM CPPP pages concurrently
+  // GeM endpoint uses ?page=N (not ?cpage=N like regular CPPP)
   const pages = await Promise.allSettled(
     Array.from({ length: FETCH_PAGES }, (_, i) =>
-      fetch(`${CPPP_BASE}?cpage=${i + 1}`, {
+      fetch(`${GEM_CPPP_BASE}?page=${i + 1}`, {
         headers: { 'User-Agent': UA, Accept: 'text/html' },
         signal: AbortSignal.timeout(12_000),
       }).then(r => r.text())
@@ -96,49 +107,47 @@ export async function GET(req: NextRequest) {
 
   const raw: RawTender[] = pages
     .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled')
-    .flatMap(r => parseCPPPPage(r.value))
+    .flatMap(r => parseGeMPage(r.value))
 
-  // Deduplicate by link
+  // Deduplicate by bid number
   const seen = new Set<string>()
   const unique = raw.filter(t => {
-    if (seen.has(t.link)) return false
-    seen.add(t.link)
+    if (seen.has(t.bidNumber)) return false
+    seen.add(t.bidNumber)
     return true
   })
 
-  // Enrich with categories + states
-  const enriched = unique.map(t => {
-    const combined = `${t.title} ${t.org}`
-    return {
-      ...t,
-      categories: extractCategories(combined),
-      states:     extractStates(combined),
-    }
-  })
+  // Enrich with states (extracted from org + dept names)
+  const enriched = unique.map(t => ({
+    ...t,
+    states: extractStates(`${t.org} ${t.dept}`),
+  }))
 
-  // Filter — category uses keyword matching; state matching is best-effort
+  // Filter — category: partial case-insensitive match against GeM's structured category string
   const filtered = enriched.filter(t => {
-    const categoryMatch = categories.length === 0 || categories.some(c => t.categories.includes(c))
-    // State match: pass central/national tenders (no state detected) when a state is selected,
-    // but also pass explicit state matches. This avoids hiding valid national tenders.
-    const stateMatch    = !state || state === 'all' || t.states.includes(state) || t.states.length === 0
+    const categoryMatch =
+      categories.length === 0 ||
+      categories.some(c => t.category.toLowerCase().includes(c.toLowerCase()))
+    // Pass central/national tenders (no state detected) so they're never hidden
+    const stateMatch =
+      !state || state === 'all' || t.states.includes(state) || t.states.length === 0
     return categoryMatch && stateMatch
   })
 
   const tenders = filtered
-    .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+    .sort((a, b) => b.bidStartDate.getTime() - a.bidStartDate.getTime())
     .slice(0, 60)
     .map(t => ({
-      title:       t.title,
-      // tendersfullview URLs embed an IP-bound session hash → always rejected
-      // in the user's browser. Use the stable CPPP list page instead; the refId
-      // lets the user search for the exact tender on that page.
-      link:        'https://eprocure.gov.in/cppp/latestactivetendersnew',
-      refId:       t.refId,   // e.g. "2026_AAI_272420_1" — searchable on CPPP
+      title:       t.category || t.bidNumber,   // GeM category IS the tender title
+      // gemtendersfullview URLs are session-bound just like regular CPPP.
+      // Link to the CPPP GeM list page instead; bid number lets user find the exact bid.
+      link:        'https://eprocure.gov.in/cppp/gemtender',
+      refId:       t.bidNumber,                  // "GEM/2026/B/7195650" — searchable on GeM & CPPP
       org:         t.org,
-      pubDate:     t.pubDate.toISOString(),
-      closingDate: t.closingDate,
-      categories:  t.categories,
+      dept:        t.dept,
+      pubDate:     t.bidStartDate.toISOString(),
+      closingDate: t.bidEndDate,
+      categories:  [t.category].filter(Boolean),
       states:      t.states,
     }))
 
