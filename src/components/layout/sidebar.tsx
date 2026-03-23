@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LayoutDashboard, FileText, Folder, Sparkles, Bell, BookOpen, Package, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, FileText, Folder, Sparkles, Bell, BookOpen, Package, Bookmark, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUserProfile } from '@/lib/hooks/use-user-profile'
 import { signOut } from '@/lib/firebase/auth'
@@ -12,6 +12,7 @@ const NAV = [
   { key: 'tenders',   href: '/tenders',   icon: FileText },
   { key: 'ai',        href: '/bid',        icon: Sparkles },
   { key: 'orders',    href: '/orders',     icon: Package },
+  { key: 'saved',     href: '/saved',      icon: Bookmark },
   { key: 'alerts',    href: '/alerts',     icon: Bell },
   { key: 'learn',     href: '/learn',      icon: BookOpen },
   { key: 'documents', href: '/documents',  icon: Folder },

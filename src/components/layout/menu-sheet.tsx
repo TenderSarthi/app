@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Bell, BookOpen, Folder, Settings, LogOut } from 'lucide-react'
+import { Bell, BookOpen, Folder, Bookmark, Settings, LogOut } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { signOut } from '@/lib/firebase/auth'
@@ -18,6 +18,7 @@ interface MenuSheetProps {
 }
 
 const NAV_ITEMS = [
+  { key: 'saved',     icon: Bookmark, href: '/saved'     },
   { key: 'alerts',    icon: Bell,     href: '/alerts'    },
   { key: 'learn',     icon: BookOpen, href: '/learn'     },
   { key: 'documents', icon: Folder,   href: '/documents' },
